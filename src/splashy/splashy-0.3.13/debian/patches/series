@@ -1,0 +1,2 @@
+01_fix_splashy_fails_at_boot_bug505270.diff
+02_untangle_fix_splashy-chvt_hanging_untangle_bug_6228.diff

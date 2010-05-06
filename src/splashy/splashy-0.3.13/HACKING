@@ -1,0 +1,224 @@
+                      TOC
+                      +++
+
+                1. INTRODUCTION
+                2. FIFO COMMANDS
+                3. INITRAMFS
+                4. THEMES
+                5. PROCEDURES 
+                    a. RELEASE
+                    b. POST RELEASE
+                6. TROUBLESHOOTING
+                7. APPENDIX
+
+
+INTRODUCTION
+============
+
+This file is intended to help you get off-the-ground with incorportating
+Splashy into your own distribution or adding new features to Splashy.
+
+A few things to keep in mind while reading Splashy sources:
+  * We follow the GNU Coding Standard. Please become familiar with these
+    standards especially before submitting patches (Google is your friend).
+  * All Splashy sources are inside the "src" directory and they are prefixed
+    according to what they do (library-like,namespace-like). Thus,
+    "splashy_functions.c" holds functions that apply only to splashy itself,
+    not splashy_config or splashy_update or splashy_* anything. 
+  * When in doubt, ask in splashy-devel@lists.alioth.debian.org or in #splashy
+    at irc.freenode.net
+
+SPLASHY_UPDATE COMMANDS
+=======================
+
+When talking to the Splashy server you can use the following commands:
+  ------------+----------+----------------------------------------------------------
+  COMMAND       ARGS      NOTE
+  ------------+----------+----------------------------------------------------------
+  chroot        <string>  <string> is a valid path to which Splashy will be chroot'd
+  chvt          <number>  Switch to vt <number>. See "allowchvt".
+  clear                   Clears the text box area.
+  CLEAR                   Same as "clrprint". For compatibility with usplash.
+  exit                    Exits Splashy server.
+  getstring	<string>  Makes splashy prompt for a string. The first argument will
+			  be the prompt displayed.
+  getpass	<string>  Same as getstring except that the characters typed will no
+			  be shown, like in a password box.
+  progress      <number>  Updates the progress bar to <number>%, where N is a number
+                          between 0 and 100.
+  PROGRESS      <number>  Same as "progress". For compatibility with usplash
+  print         <string>  Print <string> in the text box.
+  scroll        <string>  Print <string> in the text box and scroll down.
+  repaint                 Redraw the background image.
+  TEXT          <string>  Same as "print". For compatibility with usplash.
+  SCROLL        <string>  Same as "scroll".
+  timeout       <number>  Sets the amount of seconds splashy waits for new commands
+                          in the fifo file. If that time is exceeded, it exits.
+  QUIT                    Same as "exit". For compatibility with usplash.
+  ------------+----------+----------------------------------------------------------
+
+Sending commands to the Splashy server is then as simple as:
+
+splashy_update exit
+
+or
+
+splashy_update getpass "Type your resume password"
+
+These commands will not block. Commands that expect answer will output the 
+string to stdout.
+
+
+INITRAMFS
+=========
+
+Splashy should be copied to the initramfs by using the provided hooks and
+scripts. These files go into:
+
+  /usr/share/initramfs/hooks/splashy
+  /usr/share/initramfs/scripts/init-top/splashy
+
+The command to create a new initramfs on Debian image is: 
+
+  update-initramfs -u
+
+To see the content of the initramfs run:
+
+  mkdir /tmp/initrd
+  cd /tmp/initrd
+  cat /boot/initrd.img-`uname -r` | gzip -d | cpio -i
+
+After this you will see everything that the initramfs image has.
+
+A few things to note: 
+  * Be sure that the init-top script (splashy) runs "/sbin/splashy boot"
+  * ldd sbin/splashy should show a static binary and only libc6 as output:
+      $> ldd sbin/splashy
+        linux-gate.so.1 =>  (0xffffe000)
+        libpthread.so.0 => /lib/tls/i686/cmov/libpthread.so.0 (0xb7f0b000)
+        libm.so.6 => /lib/tls/i686/cmov/libm.so.6 (0xb7ee9000)
+        libc.so.6 => /lib/tls/i686/cmov/libc.so.6 (0xb7dba000)
+        /lib/ld-linux.so.2 (0xb7f3a000)
+  * Running "/sbin/splashy boot" or "/sbin/splashy test" should ensure that
+    splashy from initramfs is good. Remember that Splashy is just a user-space
+    application
+
+THEMES
+======
+
+To validate all themes against our themes.xsd schema, do:
+
+./scripts/xml-validator -S schemas/theme.xsd themes/*/theme.xml
+
+or simply:
+
+xmllint --schema schemas/theme.xsd themes/default/theme.xml
+
+Theme Specifications:
+---------------------
+
+  * theme name should contain alphanumeric chacters only (avoid white spaces). 
+    This will be referred to from an XML file (/etc/splashy/config.xml).
+
+  * theme folder name is the "name" of the theme
+    ls default/
+    theme.xml
+    background.png
+
+    cat default/theme.xml
+    ...
+    <name>default</name>
+
+  * inside the theme directory there should be:
+    - theme.xml file describing the theme itself
+    - at least one image (conventionally called "background.png") which will be 
+      used as background during the boot process
+
+  * All images should be in PNG format. Other formats are supported by directfb 
+    but you will need to modify src/Makefile.am to include them. The official 
+    Splashy binary packages only include support for PNG.
+
+  * Size depends on user. Image size 1024x768 is what we ship with Splashy 
+    default theme as most users will use vga=791 or so as boot kernel param
+  
+  * Theme.xml must validate against the latest version of theme schema file 
+    (found under http://splashy.alioth.debian.org/schemas/)
+
+
+PROCEDURES
+==========
+
+RELEASE
+-------
+
+   1. Make sure you have the latest code:
+      
+      git status # and commit your local changes
+      git fetch origin
+      git rebase origin
+
+   2. Tag the repository.
+      
+      export VERSION=0.3.4
+      # make sure you use the right information on your ~/.gitconfig. i.e.:
+      # [user]
+      #  name = Luis Mondesi
+      #  email = lemsx1@gmail.com
+      #  signingkey = <gpg-key-id>
+
+      git tag -s v$VERSION
+      git push --tags
+
+   3. Copy splashy tree to /usr/src/splashy-$VERSION and run 
+      ./autogen.sh on /usr/src/splashy-$VERSION
+   4. Run make dist
+   5. (Optional) Sign the two tarballs
+
+      gpg -ab splashy-$VERSION.tar.gz
+      gpg --verify splashy-$VERSION.tar.gz.asc splashy-$VERSION.tar.gz
+
+   6. (Optional) Build the SRPM
+
+      rpmbuild -ts --sign --with ... splashy-$VERSION.tar.gz
+
+   7. Upload the tarball (if applicable: the signature, and the src.rpm)
+   8. Update the splashy website
+         1. Change http://splashy.alioth.debian.org (only for full releases, not for betas)
+
+POST RELEASE 
+------------
+
+   1. Increment version number in configure.ac and add new entry on NEWS
+   2. Update freshmeat.net
+   3. (Optional) Update #splashy topic
+   4. Update wiki
+
+TROUBLESHOOTING
+===============
+
+  * libgcc_s.so.1 must be installed for pthread_cancel to work 
+    - Error is fixed by adding /lib to /etc/ld.so.conf and running ldconfig. Which is done by
+      default in current distros. Splashy needs to be linked against this file with: -lgcc_s.
+      which is already in src/Makefile.am: splashy_LDFLAGS = -lgcc_s ...
+  * -lsplashycnf link (ld) errors are found when "make -jN" is used (say: make -j8). Make sure
+    that you don't use "parallel" builds or anything that alters the precedence of the build
+    process.
+
+APPENDIX A - Debian Packaging
+==========
+   
+   * Since Splashy is a native Debian package, all you need to do is:
+     - ./autogen.sh
+     - debuild -uc -us
+
+APPENDIX B - Fedora Core Packaging (work in progress)
+===========   
+
+   * use the package spec supplied in trunk/splashy.spec to create an RPM:
+     - cp -r trunk /tmp/splashy-$VERSION
+     - cd /tmp/splashy-$VERSION
+     - ./autogen.sh
+     - make dist-dist
+     - copy splashy-VERSION.tar.gz to /usr/src/{rpm,redhat,others}/SOURCES
+     - rpmbuild -ba splashy.spec
+

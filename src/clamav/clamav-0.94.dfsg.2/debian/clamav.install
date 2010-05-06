@@ -1,0 +1,3 @@
+debian/tmp/usr/bin/clamscan
+debian/tmp/usr/bin/sigtool
+debian/script usr/share/bug/clamav/

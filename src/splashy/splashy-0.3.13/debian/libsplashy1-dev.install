@@ -1,0 +1,3 @@
+lib/libsplashy*.so
+lib/libsplashy*.la
+usr/include/*

@@ -1,0 +1,451 @@
+#!/bin/sh -e
+
+# Source debconf library
+. /usr/share/debconf/confmodule
+
+# This conf script is capable of backing up
+db_version 2.0
+db_capb backup
+
+#COMMON-FUNCTIONS#
+
+CLAMAVCONF='/etc/clamav/clamd.conf'
+
+slurp_config "$CLAMAVCONF"
+
+# Store conf file values as debconf answers - make sure user changes made 
+# outside of debconf are preserved
+if [ -n "$User" ]; then
+  db_set clamav-base/User "$User" || true
+  if ! [ "$User" = 'root' ]; then
+    AddGroups=`groups "$User" | awk -F ':' '{print $2}' | sed -e s/"$User"//`
+  fi
+  if [ -n "$AddGroups" ]; then
+    db_set clamav-base/AddGroups "$AddGroups" || true
+  fi
+fi
+if [ -n "$TCPSocket" ]; then
+  db_set clamav-base/TcpOrLocal TCP || true
+elif [ -n "$LocalSocket" ]; then
+  db_set clamav-base/TcpOrLocal UNIX || true
+fi
+if [ -n "$LocalSocket" ]; then
+  db_set clamav-base/LocalSocket "$LocalSocket" || true
+fi
+if [ "$FixStaleSocket" = "true" ]; then
+  db_set clamav-base/FixStaleSocket true || true
+fi
+if [ -n "$TCPSocket" ]; then
+  db_set clamav-base/TCPSocket "$TCPSocket" || true
+fi
+if [ -n "$TCPaddr" ]; then
+  db_set clamav-base/TCPAddr "$TCPaddr" || true
+fi
+if [ "$ScanMail" = "true" ]; then
+  db_set clamav-base/ScanMail true || true
+fi
+if [ "$ScanArchive" = "true" ]; then
+  db_set clamav-base/ScanArchive true || true
+fi
+if [ -n "$StreamMaxLength" ]; then
+  StreamMaxLength="`echo $StreamMaxLength | sed -e s/M//`"
+  db_set clamav-base/StreamMaxLength "$StreamMaxLength" || true
+fi
+if [ -n "$MaxDirectoryRecursion" ]; then
+  db_set clamav-base/MaxDirectoryRecursion "$MaxDirectoryRecursion" || true
+fi
+if [ "$FollowDirectorySymlinks" = "true" ]; then
+  db_set clamav-base/FollowDirectorySymlinks true || true
+fi
+if [ "$FollowFileSymlinks" = "true" ]; then
+  db_set clamav-base/FollowFileSymlinks true || true
+fi
+if [ -n "$ReadTimeout" ] && [ -z "$ThreadTimeout" ]; then
+  db_set clamav-base/ReadTimeout "$ReadTimeout" || true
+elif
+  [ -z "$ReadTimeout" ] && [ -n "$ThreadTimeout" ]; then
+  ReadTimeout="$ThreadTimeout"
+  db_set clamav-base/ReadTimeout "$ReadTimeout" || true
+elif [ -n "$ReadTimeout" ]; then
+  db_set clamav-base/ReadTimeout "$ReadTimeout" || true
+fi
+if [ -n "$MaxThreads" ]; then
+  db_set clamav-base/MaxThreads "$MaxThreads" || true
+fi
+if [ -n "$MaxConnectionQueueLength" ]; then
+  db_set clamav-base/MaxConnectionQueueLength "$MaxConnectionQueueLength" || true
+fi
+if [ "$LogSyslog" = "true" ]; then
+  db_set clamav-base/LogSyslog true || true
+fi
+if [ -n "$LogFile" ]; then
+  db_set clamav-base/LogFile "$LogFile" || true
+fi
+if [ "$LogTime" = "true" ]; then
+  db_set clamav-base/LogTime true || true
+fi
+if [ "$SelfCheck" = "true" ]; then
+  db_set clamav-base/SelfCheck true || true
+fi
+
+# Functions
+
+isdigit ()
+{
+  case $1 in
+    [[:digit:]]*)
+    ISDIGIT=1
+    ;;
+    *)
+    ISDIGIT=0
+    ;;
+  esac
+}
+
+inputdigit ()
+{
+  ISDIGIT=0
+  while [ "$ISDIGIT" = '0' ]; do
+    db_input "$1" "$2" || true
+    if ! db_go; then
+      return 30
+    fi
+    db_get $2 || true
+    isdigit $RET
+    if [ "$ISDIGIT" = '0' ]; then
+      db_input critical clamav-base/numinfo || true
+      db_go
+    fi
+  done
+  return 0
+}
+
+# States
+
+StateDebconf()
+{
+  db_input medium clamav-base/debconf || true
+  if ! db_go; then
+    STATE="End"
+  else
+    db_get clamav-base/debconf || true
+    if [ "$RET" = "false" ]; then
+      STATE="End"
+    else
+      STATE="Socket"
+    fi
+  fi
+}
+
+StateSocket()
+{
+  db_input medium clamav-base/TcpOrLocal || true
+  if ! db_go; then
+    STATE="Debconf"
+  else
+    db_metaget clamav-base/TcpOrLocal value
+    STATE=$RET
+  fi
+}
+
+StateUNIX()
+{
+  db_input low clamav-base/LocalSocket || true
+  if db_go; then
+    STATE="FixStale"
+  else
+    STATE="Socket"
+  fi
+}
+
+
+StateFixStale()
+{
+  db_input low clamav-base/FixStaleSocket || true
+  if db_go; then
+    STATE="ScanMail"
+  else
+    STATE="UNIX"
+  fi
+}
+
+
+StateTCP()
+{
+  if inputdigit low clamav-base/TCPSocket; then
+    STATE="TCPAddr"
+  else
+    STATE="Socket"
+  fi
+}
+
+StateTCPAddr()
+{
+  db_input low clamav-base/TCPAddr || true
+  if db_go; then
+    STATE="ScanMail"
+  else
+    STATE="TCP"
+  fi
+}
+
+StateScanMail()
+{
+  db_input medium clamav-base/ScanMail || true
+  if db_go; then
+    STATE="ScanArchive"
+  else
+    db_metaget clamav-base/TcpOrLocal value
+    if [ "$RET" = "TCP" ]; then
+      STATE="TCPAddr"
+    else
+      STATE="FixStale"
+    fi
+  fi
+}
+
+StateScanArchive()
+{
+  db_input low clamav-base/ScanArchive || true
+  if db_go; then
+    db_metaget clamav-base/ScanArchive value
+    if [ "$RET" = "true" ]; then
+      STATE="StreamMaxLength"
+    else
+      STATE="MaxDirectoryRecursion"
+    fi
+  else
+    STATE="ScanMail"
+  fi
+}
+
+StateStreamMaxLength()
+{
+  if inputdigit low clamav-base/StreamMaxLength; then
+    STATE="MaxDirectoryRecursion"
+  else
+    STATE="ScanArchive"
+  fi
+}
+
+StateMaxDirectoryRecursion()
+{
+  if inputdigit low clamav-base/MaxDirectoryRecursion; then
+    db_metaget clamav-base/MaxDirectoryRecursion value
+    if [ "$RET" = "0" ]; then
+      STATE="FollowDirectorySymlinks"
+    else
+      STATE="FollowFileSymlinks"
+    fi
+  else
+      STATE="ScanArchive"
+  fi
+}
+
+StateFollowDirectorySymlinks()
+{
+  db_input low clamav-base/FollowDirectorySymlinks || true
+  if db_go; then
+    STATE="FollowFileSymlinks"
+  else
+    STATE="MaxDirectoryRecursion"
+  fi
+}
+
+StateFollowFileSymlinks()
+{
+  db_input low clamav-base/FollowFileSymlinks || true
+  if db_go; then
+    STATE="ReadTimeout"
+  else
+    db_metaget clamav-base/MaxDirectoryRecursion value;
+    if [ "$RET" = "0" ]; then
+      STATE="FollowDirectorySymlinks"
+    else
+      STATE="MaxDirectoryRecursion"
+    fi
+  fi
+}
+
+StateReadTimeout()
+{
+  if inputdigit low clamav-base/ReadTimeout; then
+    STATE="MaxThreads"
+  else
+    STATE="FollowFileSymlinks"
+  fi    
+}
+
+StateMaxThreads()
+{
+  if inputdigit low clamav-base/MaxThreads; then
+    STATE="MaxConnectionQueueLength"
+  else
+    STATE="ReadTimeout"
+  fi
+}
+
+StateMaxConnectionQueueLength()
+{
+  if inputdigit low clamav-base/MaxConnectionQueueLength; then
+    STATE="LogSyslog"
+  else
+    STATE="MaxThreads"
+  fi
+}
+
+StateLogSyslog()
+{
+  db_input medium clamav-base/LogSyslog || true
+  if db_go; then
+    STATE="LogFile"
+  else
+    STATE="MaxConnectionQueueLength"
+  fi
+}
+
+StateLogFile()
+{
+  db_input low clamav-base/LogFile || true
+  if db_go; then
+    db_metaget clamav-base/LogFile value
+    if [ "$RET" = "" ]; then
+      db_set clamav-base/LogFile "/var/log/clamav/clamav.log" || true
+    elif [ "$RET" = 'none' ]; then
+      db_set clamav-base/LogFile "" || true
+    fi
+    STATE="LogTime"
+  else
+    STATE="LogSyslog"
+  fi
+}
+
+StateLogTime()
+{
+  db_input low clamav-base/LogTime || true
+  if db_go; then
+    STATE="SelfCheck"
+  else
+    STATE="LogFile"
+  fi
+}
+
+StateSelfCheck()
+{
+  db_input low clamav-base/SelfCheck || true
+  if db_go; then
+    STATE="User"
+  else
+    STATE="LogTime"
+  fi
+}
+
+StateUser()
+{
+  db_input medium clamav-base/User || true
+  if db_go; then
+    db_metaget clamav-base/User value
+    if [ "$RET" = "" ]; then
+      db_set clamav-base/User "clamav" || true
+    fi
+    STATE="AddGroups"
+  else
+    STATE="SelfCheck"
+  fi
+}
+
+StateAddGroups()
+{
+  db_input medium clamav-base/AddGroups || true
+  if db_go; then
+    STATE="End"
+  else
+    STATE="User"
+  fi
+}
+
+# To many options to configure at configure
+if [ "$1" = "reconfigure" ]; then
+  STATE="Init"
+elif [ -n "$2" ]; then
+  if [ -z "$User" ]; then
+    STATE="User"
+  fi
+else
+  STATE="End"
+fi
+
+[ -z "$STATE" ] && STATE='End'
+
+# This is the statemachine that controls execution. All the 'real' work is 
+# performed by subfunctions above. 
+
+while [ "$STATE" != "End" ]; do
+  case "$STATE" in
+    "Init")
+    StateDebconf
+    ;;
+    "Socket")
+    StateSocket
+    ;;
+    "FixStale")
+    StateFixStale
+    ;;
+    "TCP")
+    StateTCP
+    ;;
+    "TCPAddr")
+    StateTCPAddr
+    ;;
+    "UNIX")
+    StateUNIX
+    ;;
+    "ScanMail")
+    StateScanMail
+    ;;
+    "ScanArchive")
+    StateScanArchive
+    ;;
+    "StreamMaxLength")
+    StateStreamMaxLength
+    ;;
+    "MaxDirectoryRecursion")
+    StateMaxDirectoryRecursion
+    ;;
+    "FollowDirectorySymlinks")
+    StateFollowDirectorySymlinks
+    ;;
+    "FollowFileSymlinks")
+    StateFollowFileSymlinks
+    ;;
+    "ReadTimeout")
+    StateReadTimeout
+    ;;
+    "MaxThreads")
+    StateMaxThreads
+    ;;
+    "MaxConnectionQueueLength")
+    StateMaxConnectionQueueLength
+    ;;
+    "LogSyslog")
+    StateLogSyslog
+    ;;
+    "LogFile")
+    StateLogFile
+    ;;
+    "LogTime")
+    StateLogTime
+    ;;
+    "SelfCheck")
+    StateSelfCheck
+    ;;
+    "User")
+    StateUser
+    ;;
+    "AddGroups")
+    StateAddGroups
+    ;;
+  esac
+done
+db_stop || true
+exit 0

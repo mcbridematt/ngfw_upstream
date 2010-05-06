@@ -1,0 +1,61 @@
+Source: splashy
+Section: graphics
+Priority: optional
+Maintainer: Splashy Devel <splashy-devel@lists.alioth.debian.org>
+Uploaders: Otavio Salvador <otavio@debian.org>, Luis Mondesi <lemsx1@gmail.com>, Tim Dijkstra <tim@famdijkstra.org>, Fathi Boudra <fabo@debian.org>
+Homepage: http://splashy.alioth.debian.org/
+# Reasons of build-dependencies:
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# - libdirectfb-dev (>= 1.0.1-9) - due the need of static library and 92_reopen_console.patch
+#   included on that specific version
+#   The changelog of libdirectfb-1.0-0 says:
+#   "Add 92_reopen_console.patch: when libdirectfb detects zero length reads, it
+#   attempts to reopen the console (possibly from a newly mounted root tree)."
+# - libglib2.0-dev (>> 2.0.1-2) - due the need of static library
+# - perl - pod2man used to generate man pages
+# - libmagic-dev - needed to detect mimetypes
+# - chrpath - for removing the rpath defined in /sbin/splashy
+#
+Build-Depends: cdbs (>= 0.4.23-1.1), quilt, autotools-dev, debhelper (>= 5),
+ libdirectfb-dev (>= 1.0.1-9), libglib2.0-dev (>> 2.0.1-2), libtool, perl,
+ libmagic-dev, chrpath
+Standards-Version: 3.8.0
+XS-Vcs-Git: git://git.debian.org/git/splashy/debian/splashy.git
+XS-Vcs-Browser: http://git.debian.org/?p=splashy/debian/splashy.git;a=summary
+
+# console-common is needed to not run keymap.sh on Debian earlier than Sid
+Package: splashy
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdirectfb-1.0-0 (>= 1.0.1-9),
+ lsb-base, initramfs-tools
+Provides: bootsplash
+Replaces: debsplash-utils, bootsplash, usplash
+Conflicts: debsplash-utils, bootsplash, usplash, console-common (<= 0.7.76), desktop-base (<< 5.0.2)
+Suggests: splashy-themes, upstart, console-common (>= 0.7.77)
+Description: A complete user-space boot splash system
+ A boot splash program that doesn't require patching the Linux kernel.
+ It paints graphic images directly to framebuffers using libdirectfb.
+
+# Package: splashy-themes
+# Architecture: all
+# Depends: ${shlibs:Depends}, splashy
+# Description: A complete user-space boot splash system
+#  This package contains extra themes to be used with splashy.
+
+Package: libsplashy1
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdirectfb-extra
+Description: Library to draw splash screen on boot, shutdown, resume or suspend
+ A boot splash library that doesn't require patching the Linux kernel.
+
+Package: libsplashy1-dev
+Architecture: any
+Section: libdevel
+Provides: libsplashy-dev
+Conflicts: libsplashy-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsplashy1 (= ${binary:Version}),
+ libglib2.0-dev, libdirectfb-dev
+Description: Library to draw splash screen on boot, shutdown, resume or suspend
+ A boot splash library that doesn't require patching the Linux kernel.

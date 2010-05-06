@@ -1,0 +1,13 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc -i
+dpkg-buildpackage: set CFLAGS to default value: -g -O2
+dpkg-buildpackage: set CPPFLAGS to default value: 
+dpkg-buildpackage: set LDFLAGS to default value: 
+dpkg-buildpackage: set FFLAGS to default value: -g -O2
+dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+dpkg-buildpackage: source package splashy
+dpkg-buildpackage: source version 0.3.13-3
+dpkg-buildpackage: source changed by Fathi Boudra <fabo@debian.org>
+dpkg-buildpackage: host architecture amd64
+dpkg-checkbuilddeps: Unmet build dependencies: autotools-dev libdirectfb-dev (>= 1.0.1-9) libglib2.0-dev (>> 2.0.1-2) libtool libmagic-dev chrpath
+dpkg-buildpackage: warning: Build dependencies/conflicts unsatisfied; aborting.
+dpkg-buildpackage: warning: (Use -d flag to override.)

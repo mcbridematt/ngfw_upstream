@@ -1,0 +1,26 @@
+Splashy:
+---------------------------------------------------------------------------------------
+A complete user-space boot splash system
+
+A boot splash program that doesn't require patching the Linux kernel.
+It paints graphic images directly to framebuffers using libdirectfb.
+
+You can enable splashy by adding splash to the kernel's command line.
+See your bootmanagers configuration file (/boot/grub/menu.lst, /etc/lilo.conf).
+
+Ubuntu:
+
+If you are going to install Splashy on Ubuntu Dapper / Breezy you should 
+REMOVE ubuntu-desktop and usplash.
+
+For more info and known issues see:
+---------------------------------------------------------------------------------------
+    /usr/share/doc/splashy/README.gz
+
+and
+
+    http://splashy.alioth.debian.org
+
+and the FAQ
+
+    http://splashy.alioth.debian.org/wiki/faq

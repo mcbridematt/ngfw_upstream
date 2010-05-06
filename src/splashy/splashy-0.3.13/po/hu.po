@@ -1,0 +1,497 @@
+# Hungarian translations for Splashy package.
+# Copyright (C) 2007 Splashy Project
+# This file is distributed under the same license as the Splashy package.
+# Miklos Vajna <vmiklos@frugalware.org>, 2007.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: splashy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-24 11:17-0500\n"
+"PO-Revision-Date: 2007-12-20 16:54+0100\n"
+"Last-Translator: Miklos Vajna <vmiklos@frugalware.org>\n"
+"Language-Team: Hungarian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/splashy_config-functions.c:81
+#, c-format
+msgid ">Set theme as: "
+msgstr ">Téma beállítása mint:"
+
+#: src/splashy_config-functions.c:109
+#, c-format
+msgid "Run %s to update your initrd image\n"
+msgstr ""
+
+#: src/splashy_config-functions.c:124
+#, c-format
+msgid ">Install theme"
+msgstr ">Téma telepítése"
+
+#: src/splashy_config-functions.c:130
+msgid "This format is invalid\n"
+msgstr "Ez a formátum érvénytelen\n"
+
+#: src/splashy_config-functions.c:167
+#, c-format
+msgid "Did you really give me a tarball ?\n"
+msgstr "Biztos hogy tarball lett megadva?\n"
+
+#: src/splashy_config-functions.c:191
+#, c-format
+msgid "An error occurred checking theme \n"
+msgstr "Hiba történt a téma vizsgálata közben \n"
+
+#: src/splashy_config-functions.c:261 src/splashy_config-functions.c:475
+#, c-format
+msgid "This theme already exists\n"
+msgstr "Ez a téma már létezik\n"
+
+#: src/splashy_config-functions.c:284
+#, c-format
+msgid "An error occurred installing theme \n"
+msgstr "Hiba történt a téma telepítése közben \n"
+
+#: src/splashy_config-functions.c:302
+#, c-format
+msgid "The tarball does not exist!\n"
+msgstr "A tarball nem létezik!\n"
+
+#: src/splashy_config-functions.c:317
+#, c-format
+msgid ">Remove theme"
+msgstr ">Téma eltávolítása"
+
+#: src/splashy_config-functions.c:330
+#, c-format
+msgid "The theme does not exist!\n"
+msgstr "A téma nem létezik!\n"
+
+#: src/splashy_config-functions.c:337
+#, c-format
+msgid "This theme is currently used!\n"
+msgstr "Ez a téma jelenleg használt!\n"
+
+#: src/splashy_config-functions.c:393
+#, c-format
+msgid ">Theme currently used:\n"
+msgstr ">Jelenleg használt téma:\n"
+
+#: src/splashy_config-functions.c:396
+#, c-format
+msgid "                      version %s\n"
+msgstr "                      verzió: %s\n"
+
+#: src/splashy_config-functions.c:400
+#, c-format
+msgid "                      URLs %s\n"
+msgstr "                      URLek: %s\n"
+
+#: src/splashy_config-functions.c:402
+#, c-format
+msgid "                      by %s\n"
+msgstr "                      szerzõ: %s\n"
+
+#: src/splashy_config-functions.c:405
+#, c-format
+msgid ">Installed themes:\n"
+msgstr ">Telepített témák:\n"
+
+#: src/splashy_config-functions.c:445
+#, c-format
+msgid ""
+"<!> Insufficient priviledges <!>\n"
+"Root priviledges required for this function\n"
+msgstr ""
+"<!> Elégtelen jogosultságok <!>\n"
+"Rendszergazdai jogosultság szükséges ehhez a mûvelethez\n"
+
+#: src/splashy_config-functions.c:458
+#, c-format
+msgid ">Create theme "
+msgstr ">Téma létrehozása "
+
+#: src/splashy_config-functions.c:463
+#, c-format
+msgid "This file does not exist: %s\n"
+msgstr "A fájl nem létezik: %s\n"
+
+#: src/splashy_config-functions.c:491
+#, c-format
+msgid "The boot image does not seem to be an image\n"
+msgstr "A betöltõ kép nem tûnik képnek\n"
+
+#: src/splashy_config-functions.c:508
+#, c-format
+msgid "The shutdown image does not seem to be an image\n"
+msgstr "A leállítási kép nem tûnik képnek\n"
+
+#: src/splashy_config-functions.c:524
+#, c-format
+msgid "The error image does not seem to be an image\n"
+msgstr "A hiba kép nem tûnik képnek\n"
+
+#: src/splashy_config-functions.c:541
+#, c-format
+msgid "The resume image does not seem to be an image\n"
+msgstr "A folytatási kép nem tûnik képnek\n"
+
+#: src/splashy_config-functions.c:558
+#, c-format
+msgid "The suspend image does not seem to be an image\n"
+msgstr "A hibernálási kép nem tûnik képnek\n"
+
+#: src/splashy_config-functions.c:595
+#, c-format
+msgid "Error! Can't create theme directory %s\n"
+msgstr "Hiba! Nem sikerült létrehozni a(z) %s téma-könyvtárat\n"
+
+#: src/splashy_config-functions.c:598
+#, c-format
+msgid "Writing theme %s to current directory\n"
+msgstr "A(z) %s téma írása a jelenlegi könyvtárba\n"
+
+#: src/splashy_config-functions.c:603
+#, c-format
+msgid "Error! Can't create directory %s\n"
+msgstr "Hiba! Nem sikerült létrehozni a(z) %s könyvtárat\n"
+
+#: src/splashy_config-functions.c:623 src/splashy_config-functions.c:647
+#: src/splashy_config-functions.c:671 src/splashy_config-functions.c:695
+#: src/splashy_config-functions.c:719 src/splashy_config-functions.c:746
+#, c-format
+msgid ""
+"Error! Unable to use the picture %s.\n"
+"Aborting\n"
+msgstr ""
+"Hiba! Nem lehet használni a(z) %s képet.\n"
+"Megszakítás\n"
+
+#: src/splashy_config-functions.c:783
+#, c-format
+msgid "You tried to create a theme without a name\n"
+msgstr "Név nélkül nem hozható létre téma\n"
+
+#: src/splashy_config-functions.c:808
+msgid "* Name"
+msgstr "* Név"
+
+#: src/splashy_config-functions.c:820
+msgid "* Boot image"
+msgstr "* Betöltési kép"
+
+#: src/splashy_config-functions.c:832
+msgid "* Shutdown image"
+msgstr "* Leállítási kép"
+
+#: src/splashy_config-functions.c:844
+msgid "* Error image"
+msgstr "* Hiba kép"
+
+#: src/splashy_config-functions.c:856
+msgid "* Resume image"
+msgstr "* Folytatási kép"
+
+#: src/splashy_config-functions.c:868
+msgid "* Suspend image"
+msgstr "* Hibernálási kép"
+
+#: src/splashy_config-functions.c:875
+msgid ""
+"Do you want to set the resolution (height & width) of these images ? (yes|no)"
+msgstr ""
+"Szeretnénk állítani a felbontását (magasság & szélesség) ezeknek a "
+"képeknek ? (yes|no)"
+
+#: src/splashy_config-functions.c:884
+msgid " Width"
+msgstr " Szélesség"
+
+#: src/splashy_config-functions.c:888
+msgid " Height"
+msgstr " Magasság"
+
+#. Version
+#: src/splashy_config-functions.c:893
+msgid "Version"
+msgstr "Verzió"
+
+#. Description
+#: src/splashy_config-functions.c:896
+msgid "Description"
+msgstr "Leírás"
+
+#. URLs
+#: src/splashy_config-functions.c:899
+msgid "URLs"
+msgstr "URLek"
+
+#. Author
+#: src/splashy_config-functions.c:902
+msgid "Author"
+msgstr "Szerzõ"
+
+#. Progressbaronboot
+#: src/splashy_config-functions.c:905
+msgid "Do you want to see a progress bar on boot ? (yes|no)"
+msgstr "Szeretnénk látni folyamatjelzõt a betöltés során ? (yes|no)"
+
+#: src/splashy_config-functions.c:910 src/splashy_config-functions.c:920
+#: src/splashy_config-functions.c:930 src/splashy_config-functions.c:940
+msgid " Direction ? (forward|backward)"
+msgstr " Irány ? (forward|backward)"
+
+#: src/splashy_config-functions.c:915
+msgid "Do you want to see a progress bar on shutdown ? (yes|no)"
+msgstr "Szeretnénk látni folyamatjelzõt a leállítás során ? (yes|no)"
+
+#: src/splashy_config-functions.c:925
+msgid "Do you want to see a progress bar on resume ? (yes|no)"
+msgstr "Szeretnénk látni folyamatjelzõt a folytatás során ? (yes|no)"
+
+#: src/splashy_config-functions.c:935
+msgid "Do you want to see a progress bar on suspend ? (yes|no)"
+msgstr "Szeretnénk látni folyamatjelzõt a hibernálás során ? (yes|no)"
+
+#: src/splashy_config-functions.c:949
+#, c-format
+msgid "Progress bar\n"
+msgstr "Folyamatjelzõ\n"
+
+#: src/splashy_config-functions.c:954 src/splashy_config-functions.c:1075
+msgid " X position in pixel units"
+msgstr " X pozíció pixelben"
+
+#: src/splashy_config-functions.c:959 src/splashy_config-functions.c:1080
+msgid " X position in percentage"
+msgstr " X pozíció százalékban"
+
+#: src/splashy_config-functions.c:966 src/splashy_config-functions.c:1088
+msgid " Y position in pixel units"
+msgstr " Y pozíció pixelben"
+
+#: src/splashy_config-functions.c:971 src/splashy_config-functions.c:1093
+msgid " Y position in percentage"
+msgstr " Y pozíció százalékban"
+
+#: src/splashy_config-functions.c:980 src/splashy_config-functions.c:1102
+msgid " Width in pixel units"
+msgstr " Szélesség pixelben"
+
+#: src/splashy_config-functions.c:985 src/splashy_config-functions.c:1107
+msgid " Width in percentage"
+msgstr " Szélesség százalékban"
+
+#: src/splashy_config-functions.c:995 src/splashy_config-functions.c:1117
+msgid " Height in pixel units"
+msgstr " Magasság pixelben"
+
+#: src/splashy_config-functions.c:1000 src/splashy_config-functions.c:1122
+msgid " Height in percentage"
+msgstr " Magasság százalékban"
+
+#: src/splashy_config-functions.c:1005 src/splashy_config-functions.c:1127
+#, c-format
+msgid " Color\n"
+msgstr " Szín\n"
+
+#. Red
+#: src/splashy_config-functions.c:1008 src/splashy_config-functions.c:1022
+#: src/splashy_config-functions.c:1044 src/splashy_config-functions.c:1130
+#: src/splashy_config-functions.c:1151 src/splashy_config-functions.c:1189
+msgid "  Red"
+msgstr "  Piros"
+
+#. Green
+#: src/splashy_config-functions.c:1011 src/splashy_config-functions.c:1025
+#: src/splashy_config-functions.c:1047 src/splashy_config-functions.c:1133
+#: src/splashy_config-functions.c:1154 src/splashy_config-functions.c:1192
+msgid "  Green"
+msgstr "  Zöld"
+
+#. Blue
+#: src/splashy_config-functions.c:1014 src/splashy_config-functions.c:1028
+#: src/splashy_config-functions.c:1050 src/splashy_config-functions.c:1136
+#: src/splashy_config-functions.c:1158 src/splashy_config-functions.c:1195
+msgid "  Blue"
+msgstr "  Kék"
+
+#. Alpha
+#: src/splashy_config-functions.c:1017 src/splashy_config-functions.c:1031
+#: src/splashy_config-functions.c:1053 src/splashy_config-functions.c:1139
+#: src/splashy_config-functions.c:1162 src/splashy_config-functions.c:1198
+msgid "  Alpha"
+msgstr " Álfa"
+
+#: src/splashy_config-functions.c:1019
+#, c-format
+msgid " Background color\n"
+msgstr " Háttérszín\n"
+
+#: src/splashy_config-functions.c:1035
+msgid " Do you want a border around the progress bar? (yes|no)"
+msgstr " Szeretnénk keretet a folyamatjelzõ köré? (igen|nem)"
+
+#: src/splashy_config-functions.c:1041
+#, c-format
+msgid " Border color\n"
+msgstr " Keret színe\n"
+
+#. if border
+#. if progressbar
+#. Auto verbose
+#: src/splashy_config-functions.c:1059
+msgid "Pass in verbose mode on error? (yes|no)"
+msgstr "Lépjünk beszédes módba hiba esetén? (igen|nem)"
+
+#. Text box or not
+#: src/splashy_config-functions.c:1063
+msgid "Do you want to see a text box? (yes|no)"
+msgstr "Szeretnénk látni egy szövegdobozt? (igen|nem)"
+
+#: src/splashy_config-functions.c:1070
+#, c-format
+msgid "Text box\n"
+msgstr "Szövegdoboz\n"
+
+#: src/splashy_config-functions.c:1143
+msgid " Do you want a border around the text box ? (yes|no)"
+msgstr " Szeretnénk keretet a szövegdoboz köré ? (yes|no)"
+
+#: src/splashy_config-functions.c:1148
+#, c-format
+msgid "  Border color\n"
+msgstr "  Keret színe\n"
+
+#: src/splashy_config-functions.c:1174
+msgid " Text font file"
+msgstr " Szöveg betûtípus-fájlja"
+
+#: src/splashy_config-functions.c:1183
+msgid " Font size"
+msgstr " Betûtípus mérete"
+
+#: src/splashy_config-functions.c:1186
+#, c-format
+msgid " Text color\n"
+msgstr " Szöveg színe\n"
+
+#. Fade in ?
+#: src/splashy_config-functions.c:1203
+msgid "Do you want a fade-in? (yes|no)"
+msgstr " Szeretnénk elõtûnést? (yes|no)"
+
+#. Fade out ?
+#: src/splashy_config-functions.c:1206
+msgid "Do you want a fade-out? (yes|no)"
+msgstr " Szeretnénk eltûnést? (yes|no)"
+
+#: src/splashy_config-functions.c:1241
+#, c-format
+msgid "Failed to read the file: %s"
+msgstr "Sikertelen a(z) %s fájl olvasása"
+
+#: src/splashy_config-functions.c:1249
+#, c-format
+msgid "Error opening destination file %s\n"
+msgstr "Sikertelen a(z) %s célfájl megnyitása\n"
+
+#: src/splashy_config-functions.c:1257
+#, c-format
+msgid "Failed to write the file: %s"
+msgstr "Sikertelen a(z) %s fájl irása"
+
+#: src/splashy_config-functions.c:1359
+msgid "Author <author@mail.com>"
+msgstr "Szerzõ <szerzo@mail.hu>"
+
+#: src/splashy_config-main.c:52
+#, c-format
+msgid ""
+"A Splashy Configuration Tool\n"
+"\n"
+"usage: %s [option] arg \n"
+"\n"
+"-h, --help                          Display this help\n"
+"-g, --get-key XPATH                 Returns the value of a key from Splashy "
+"config file, or the current theme\n"
+"-s, --set-theme THEME               Set THEME as the Splashy theme\n"
+"-i, --install-theme THEME.tar.gz    Install the THEME from a tarball\n"
+"-r, --remove-theme THEME            Remove the THEME\n"
+"    --info                          Display some information\n"
+"-c, --create-theme  [args...]       Create a theme in an interactive mode if "
+"no arguments were given\n"
+"                                    Inline mode arguments, the following "
+"arguments are obligatory\n"
+"                                    see the man page for a complete list\n"
+"            --name  NAME                 Set the NAME of the new Splashy "
+"theme\n"
+"            --boot-image PATH            Upload the boot image located at "
+"the specified PATH\n"
+"            --shutdown-image PATH        Upload the shutdown image located "
+"at the specified PATH\n"
+"            --error-image PATH           Upload the error image located at "
+"the specified PATH\n"
+msgstr ""
+"Egy Splashy Beállító Eszköz\n"
+"\n"
+"használat: %s [opció] argumentum \n"
+"\n"
+"-h, --help                          Megjeleníti ezt a segítséget\n"
+"-g, --get-key ÚTVONAL               Visszaadja egy kulcs értékét a "
+"Splashy beállítási fájlból vagy az aktuális témából\n"
+"-s, --set-theme TÉMA                TÉMA beállítása Splashy témaként\n"
+"-i, --install-theme TÉMA.tar.gz     TÉMA telepítése egy tarballból\n"
+"-r, --remove-theme TÉMA             TÉMA eltávolítása\n"
+"    --info                          Megjelenít néhány információt\n"
+"-c, --create-theme  [argok...]      Téma létrehozása interaktív módon "
+"ha nincsenek argumentumok\n"
+"                                    \"Inline\" módú argumentumok, a "
+"következõ argumentumok kötelezõek\n"
+"                                     teljes lista a man oldalban "
+"található\n"
+"            --name  NÉV                  Beállítja az új Splashy téma "
+"nevét\n"
+"            --boot-image ÚTVONAL         Feltölti a betöltõ képet ami az "
+"ÚTVONAL helyen található\n"
+"            --shutdown-image ÚTVONAL     Feltölti a leállítási képet "
+"ami az ÚTVONAL helyen található\n"
+"            --error-image ÚTVONAL        Feltölti a hiba-képet ami az "
+"ÚTVONAL helyen található\n"
+
+#: src/splashy_config-main.c:70
+#, c-format
+msgid ""
+"usage: %s [option] arg \n"
+"[-h, --help][-s, --set-theme THEME][-i, --install-theme THEME.tar.gz]\n"
+"[-r, --remove-theme THEME][--info][-c, --create-theme  [args...]]\n"
+"[-g, --get-key XPATH]\n"
+"See --help for more information\n"
+msgstr ""
+"használat: %s [opció] argumentum \n"
+"[-h, --help][-s, --set-theme TÉMA][-i, --install-theme TÉMA.tar.gz]\n"
+"[-r, --remove-theme TÉMA][--info][-c, --create-theme  [argok...]]\n"
+"[-g, --get-key ÚTVONAL]\n"
+"Lásd a --help kapcsolót további információért\n"
+
+#: src/splashy_config-main.c:163
+msgid ""
+"Error occured while starting Splashy\n"
+"Make sure that you can read Splashy's configuration file\n"
+msgstr ""
+"Hiba történt a Splashy indítása közben\n"
+"Gyõzõdjünk meg arról, hogy a beállítási fájl olvasható\n"
+
+#: src/splashy_config-main.c:178
+#, c-format
+msgid "Missing arguments\n"
+msgstr "Hiányzó argumentumok\n"
+
+#: src/xml_functions.c:128
+#, c-format
+msgid "Error: Could not open theme file for writing\n"
+msgstr "Hiba: Nem lehet megnyitni a téma fájlt írásra\n"

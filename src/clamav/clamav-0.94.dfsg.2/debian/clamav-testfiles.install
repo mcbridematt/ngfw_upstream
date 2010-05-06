@@ -1,0 +1,6 @@
+test/clam.cab /usr/share/clamav-testfiles/
+test/clam.exe /usr/share/clamav-testfiles/
+test/clam.exe.bz2 /usr/share/clamav-testfiles/
+test/clam-v2.rar /usr/share/clamav-testfiles/
+test/clam-v3.rar /usr/share/clamav-testfiles/
+test/clam.zip /usr/share/clamav-testfiles/

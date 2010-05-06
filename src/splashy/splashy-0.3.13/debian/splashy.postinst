@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+    if dpkg --compare-versions "$2" lt "0.3.12-1"; then
+        sed -i "s|/etc/splashy/themes|/usr/share/splashy/themes|" /etc/splashy/config.xml
+    fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+if [ -x "/etc/init.d/splashy" ]; then
+    # This is needed to put the splashy links in the new location
+    # if they exist already
+    update-rc.d -f splashy remove > /dev/null
+    update-rc.d splashy start 03 S . stop 01 6 0 . > /dev/null
+fi
+
+[ -r /etc/default/splashy ] && . /etc/default/splashy
+
+if [ "x$ENABLE_INITRAMFS" = "x1" ]; then
+    update-initramfs -u;
+fi
+
+#DEBHELPER#
+
+exit 0

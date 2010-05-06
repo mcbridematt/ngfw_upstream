@@ -1,0 +1,9 @@
+ipset/ipset-2.5.0					lenny,sid
+jslint/jslint-0.1.0					lenny,sid
+monit/monit-5.0.3					lenny,sid
+libjson/libjson-0.7					lenny,sid,hardy,intrepid
+libmicrohttpd/libmicrohttpd-0.3.1			hardy,sid
+libwww-mechanize-ruby/libwww-mechanize-ruby-0.7.7	hardy
+clamav/clamav-0.94.dfsg.2				hardy
+splashy/splashy-0.3.13					lenny
+

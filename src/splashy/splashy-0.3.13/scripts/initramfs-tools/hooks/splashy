@@ -1,0 +1,33 @@
+#!/bin/sh
+
+test -r /etc/default/splashy &&
+    . /etc/default/splashy
+test "$ENABLE_INITRAMFS" = 1 ||
+	exit 0
+
+PREREQ=""
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+test -x /sbin/splashy ||
+	exit 0
+
+. /usr/share/initramfs-tools/hook-functions
+
+# splashy and _chvt are 24k!
+copy_exec /sbin/splashy /sbin
+copy_exec /sbin/splashy_chvt /sbin
+
+# Luis Mondesi
+# we don't need splashy_update in initramfs yet
+# and now we do! #473109. Luks needs it to prompt for passwords
+copy_exec /sbin/splashy_update /sbin

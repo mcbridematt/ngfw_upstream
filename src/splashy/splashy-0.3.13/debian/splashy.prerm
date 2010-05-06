@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# removes theme legacy old directory
+if [ -e /etc/splashy/themes.old ]; then
+   rm -fr /etc/splashy/themes.old
+fi
+
+#DEBHELPER#
+
+exit 0

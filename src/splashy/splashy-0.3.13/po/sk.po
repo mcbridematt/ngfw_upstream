@@ -1,0 +1,505 @@
+# Translation of Splashy to Slovak.
+# Copyright (C) 2007
+# This file is distributed under the same license as the Splashy package.
+# Ivan Masár <helix84@centrum.sk>, 2007.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: splashy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-24 11:17-0500\n"
+"PO-Revision-Date: 2007-11-16 11:46+0100\n"
+"Last-Translator: Ivan Masár <helix84@centrum.sk>\n"
+"Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/splashy_config-functions.c:81
+#, c-format
+msgid ">Set theme as: "
+msgstr ">Nastaviť tému: "
+
+#: src/splashy_config-functions.c:109
+#, c-format
+msgid "Run %s to update your initrd image\n"
+msgstr ""
+
+#: src/splashy_config-functions.c:124
+#, c-format
+msgid ">Install theme"
+msgstr ">Nainštalovať tému"
+
+#: src/splashy_config-functions.c:130
+msgid "This format is invalid\n"
+msgstr "Tento formát je neplatný\n"
+
+#: src/splashy_config-functions.c:167
+#, c-format
+msgid "Did you really give me a tarball ?\n"
+msgstr "Naozaj ste mi dali tarball?\n"
+
+#: src/splashy_config-functions.c:191
+#, c-format
+msgid "An error occurred checking theme \n"
+msgstr "Počas kontroly témy sa vyskytla chyba\n"
+
+#: src/splashy_config-functions.c:261 src/splashy_config-functions.c:475
+#, c-format
+msgid "This theme already exists\n"
+msgstr "Táto téma už existuje\n"
+
+#: src/splashy_config-functions.c:284
+#, c-format
+msgid "An error occurred installing theme \n"
+msgstr "Počas inštalácie témy sa vyskytla chyba\n"
+
+#: src/splashy_config-functions.c:302
+#, c-format
+msgid "The tarball does not exist!\n"
+msgstr "Tarball neexistuje!\n"
+
+#: src/splashy_config-functions.c:317
+#, c-format
+msgid ">Remove theme"
+msgstr ">Odstrániť tému"
+
+#: src/splashy_config-functions.c:330
+#, c-format
+msgid "The theme does not exist!\n"
+msgstr "Téma neexistuje!\n"
+
+#: src/splashy_config-functions.c:337
+#, c-format
+msgid "This theme is currently used!\n"
+msgstr "Téma sa momentálne používa!\n"
+
+#: src/splashy_config-functions.c:393
+#, c-format
+msgid ">Theme currently used:\n"
+msgstr ">Momentálne používaná téma:\n"
+
+#: src/splashy_config-functions.c:396
+#, fuzzy, c-format
+msgid "                      version %s\n"
+msgstr "                      URL %s\n"
+
+#: src/splashy_config-functions.c:400
+#, c-format
+msgid "                      URLs %s\n"
+msgstr "                      URL %s\n"
+
+#: src/splashy_config-functions.c:402
+#, c-format
+msgid "                      by %s\n"
+msgstr "                      vytvoril %s\n"
+
+#: src/splashy_config-functions.c:405
+#, c-format
+msgid ">Installed themes:\n"
+msgstr ">Nainštalované témy:\n"
+
+#: src/splashy_config-functions.c:445
+#, c-format
+msgid ""
+"<!> Insufficient priviledges <!>\n"
+"Root priviledges required for this function\n"
+msgstr ""
+"<!> Nedostatočné oprávnenia <!>\n"
+"Táto funkcia vyžaduje oprávnenia úrovne root\n"
+
+#: src/splashy_config-functions.c:458
+#, c-format
+msgid ">Create theme "
+msgstr ">Vytvoriť tému "
+
+#: src/splashy_config-functions.c:463
+#, c-format
+msgid "This file does not exist: %s\n"
+msgstr "Tento súbor neexistuje: %s\n"
+
+#: src/splashy_config-functions.c:491
+#, c-format
+msgid "The boot image does not seem to be an image\n"
+msgstr "Zdá sa, že obrázok štartovacej obrazovky nie je obrázok\n"
+
+#: src/splashy_config-functions.c:508
+#, c-format
+msgid "The shutdown image does not seem to be an image\n"
+msgstr "Zdá sa, že obrázok vypínacej obrazovky nie je obrázok\n"
+
+#: src/splashy_config-functions.c:524
+#, c-format
+msgid "The error image does not seem to be an image\n"
+msgstr "Zdá sa, že obrázok chybovej obrazovky nie je obrázok\n"
+
+#: src/splashy_config-functions.c:541
+#, c-format
+msgid "The resume image does not seem to be an image\n"
+msgstr "Zdá sa, že obrázok obrazovky obnovenia systému nie je obrázok\n"
+
+#: src/splashy_config-functions.c:558
+#, c-format
+msgid "The suspend image does not seem to be an image\n"
+msgstr "Zdá sa, že obrázok obrazovky pozastavenia systému nie je obrázok\n"
+
+#: src/splashy_config-functions.c:595
+#, c-format
+msgid "Error! Can't create theme directory %s\n"
+msgstr "Chyba! Nie je možné vytvoriť adresár témy %s\n"
+
+#: src/splashy_config-functions.c:598
+#, c-format
+msgid "Writing theme %s to current directory\n"
+msgstr "Do aktuálneho adresára sa zapisuje téma %s\n"
+
+#: src/splashy_config-functions.c:603
+#, c-format
+msgid "Error! Can't create directory %s\n"
+msgstr "Chyba! Nie je možné vytvoriť adresár %s\n"
+
+#: src/splashy_config-functions.c:623 src/splashy_config-functions.c:647
+#: src/splashy_config-functions.c:671 src/splashy_config-functions.c:695
+#: src/splashy_config-functions.c:719 src/splashy_config-functions.c:746
+#, c-format
+msgid ""
+"Error! Unable to use the picture %s.\n"
+"Aborting\n"
+msgstr ""
+"Chyba! Nie je možné použiť obrázok %s\n"
+"Ruší sa\n"
+
+#: src/splashy_config-functions.c:783
+#, c-format
+msgid "You tried to create a theme without a name\n"
+msgstr "Pokúsili ste sa vytvoriť tému bez názvu\n"
+
+#: src/splashy_config-functions.c:808
+msgid "* Name"
+msgstr "* Názov"
+
+#: src/splashy_config-functions.c:820
+msgid "* Boot image"
+msgstr "* Obrázok štartovacej obrzovky"
+
+#: src/splashy_config-functions.c:832
+msgid "* Shutdown image"
+msgstr "* Obrázok vypínacej obrazovky"
+
+#: src/splashy_config-functions.c:844
+msgid "* Error image"
+msgstr "* Obrázok chybovej obrazovky"
+
+#: src/splashy_config-functions.c:856
+msgid "* Resume image"
+msgstr "* Obrázok obrazovky obnovenia systému"
+
+#: src/splashy_config-functions.c:868
+msgid "* Suspend image"
+msgstr "* Obrázok obrazovky pozastavenia systému"
+
+#: src/splashy_config-functions.c:875
+msgid ""
+"Do you want to set the resolution (height & width) of these images ? (yes|no)"
+msgstr "Chcete nastaviť rozlíšenie (výšku a šírku) týchto obrázkov? (yes|no)"
+
+#: src/splashy_config-functions.c:884
+msgid " Width"
+msgstr " Šírka"
+
+#: src/splashy_config-functions.c:888
+msgid " Height"
+msgstr " Výška"
+
+#. Version
+#: src/splashy_config-functions.c:893
+msgid "Version"
+msgstr "Verzia"
+
+#. Description
+#: src/splashy_config-functions.c:896
+msgid "Description"
+msgstr "Popis"
+
+#. URLs
+#: src/splashy_config-functions.c:899
+msgid "URLs"
+msgstr "URL"
+
+#. Author
+#: src/splashy_config-functions.c:902
+msgid "Author"
+msgstr "Autor"
+
+#. Progressbaronboot
+#: src/splashy_config-functions.c:905
+msgid "Do you want to see a progress bar on boot ? (yes|no)"
+msgstr "Chcete počas štartu vidieť ukazovateľ priebehu? (yes|no)"
+
+#: src/splashy_config-functions.c:910 src/splashy_config-functions.c:920
+#: src/splashy_config-functions.c:930 src/splashy_config-functions.c:940
+msgid " Direction ? (forward|backward)"
+msgstr " Smer? (forward|backward)"
+
+#: src/splashy_config-functions.c:915
+msgid "Do you want to see a progress bar on shutdown ? (yes|no)"
+msgstr "Chcete počas vypínania vidieť ukazovateľ priebehu? (yes|no)"
+
+#: src/splashy_config-functions.c:925
+msgid "Do you want to see a progress bar on resume ? (yes|no)"
+msgstr "Chcete počas obnovovania vidieť ukazovateľ priebehu? (yes|no)"
+
+#: src/splashy_config-functions.c:935
+msgid "Do you want to see a progress bar on suspend ? (yes|no)"
+msgstr "Chcete počas pozastavovania vidieť ukazovateľ priebehu? (yes|no)"
+
+#: src/splashy_config-functions.c:949
+#, c-format
+msgid "Progress bar\n"
+msgstr "Ukazovateľ priebehu\n"
+
+#: src/splashy_config-functions.c:954 src/splashy_config-functions.c:1075
+msgid " X position in pixel units"
+msgstr " Pozícia X v pixeloch"
+
+#: src/splashy_config-functions.c:959 src/splashy_config-functions.c:1080
+msgid " X position in percentage"
+msgstr " Pozícia X v percentách"
+
+#: src/splashy_config-functions.c:966 src/splashy_config-functions.c:1088
+msgid " Y position in pixel units"
+msgstr " Pozícia Y v pixeloch"
+
+#: src/splashy_config-functions.c:971 src/splashy_config-functions.c:1093
+msgid " Y position in percentage"
+msgstr " Pozícia Y v percentách"
+
+#: src/splashy_config-functions.c:980 src/splashy_config-functions.c:1102
+msgid " Width in pixel units"
+msgstr " Šírka v pixeloch"
+
+#: src/splashy_config-functions.c:985 src/splashy_config-functions.c:1107
+msgid " Width in percentage"
+msgstr " Šírka v percentách"
+
+#: src/splashy_config-functions.c:995 src/splashy_config-functions.c:1117
+msgid " Height in pixel units"
+msgstr " Výška v pixeloch"
+
+#: src/splashy_config-functions.c:1000 src/splashy_config-functions.c:1122
+msgid " Height in percentage"
+msgstr " Výška v percentách"
+
+#: src/splashy_config-functions.c:1005 src/splashy_config-functions.c:1127
+#, c-format
+msgid " Color\n"
+msgstr " Farba\n"
+
+#. Red
+#: src/splashy_config-functions.c:1008 src/splashy_config-functions.c:1022
+#: src/splashy_config-functions.c:1044 src/splashy_config-functions.c:1130
+#: src/splashy_config-functions.c:1151 src/splashy_config-functions.c:1189
+msgid "  Red"
+msgstr "  Červená"
+
+#. Green
+#: src/splashy_config-functions.c:1011 src/splashy_config-functions.c:1025
+#: src/splashy_config-functions.c:1047 src/splashy_config-functions.c:1133
+#: src/splashy_config-functions.c:1154 src/splashy_config-functions.c:1192
+msgid "  Green"
+msgstr "  Zelená"
+
+#. Blue
+#: src/splashy_config-functions.c:1014 src/splashy_config-functions.c:1028
+#: src/splashy_config-functions.c:1050 src/splashy_config-functions.c:1136
+#: src/splashy_config-functions.c:1158 src/splashy_config-functions.c:1195
+msgid "  Blue"
+msgstr "  Modrá"
+
+#. Alpha
+#: src/splashy_config-functions.c:1017 src/splashy_config-functions.c:1031
+#: src/splashy_config-functions.c:1053 src/splashy_config-functions.c:1139
+#: src/splashy_config-functions.c:1162 src/splashy_config-functions.c:1198
+msgid "  Alpha"
+msgstr "  Priesvitnosť"
+
+#: src/splashy_config-functions.c:1019
+#, c-format
+msgid " Background color\n"
+msgstr " Farba pozadia\n"
+
+#: src/splashy_config-functions.c:1035
+msgid " Do you want a border around the progress bar? (yes|no)"
+msgstr " Chcete okraj okolo ukazovateľa priebehu? (yes|no)"
+
+#: src/splashy_config-functions.c:1041
+#, c-format
+msgid " Border color\n"
+msgstr " Farba okraja\n"
+
+#. if border
+#. if progressbar
+#. Auto verbose
+#: src/splashy_config-functions.c:1059
+msgid "Pass in verbose mode on error? (yes|no)"
+msgstr "Po chybe prejsť do výrečného režimu? (yes|no)"
+
+#. Text box or not
+#: src/splashy_config-functions.c:1063
+msgid "Do you want to see a text box? (yes|no)"
+msgstr "Chcete vidieť pole s textom? (yes|no)"
+
+#: src/splashy_config-functions.c:1070
+#, c-format
+msgid "Text box\n"
+msgstr "Pole s textom\n"
+
+#: src/splashy_config-functions.c:1143
+msgid " Do you want a border around the text box ? (yes|no)"
+msgstr " Chcete okraj okolo poľa s textom? (yes|no)"
+
+#: src/splashy_config-functions.c:1148
+#, c-format
+msgid "  Border color\n"
+msgstr "  Farab okraja\n"
+
+#: src/splashy_config-functions.c:1174
+msgid " Text font file"
+msgstr " Súbor písma textu"
+
+#: src/splashy_config-functions.c:1183
+msgid " Font size"
+msgstr " Veľkosť písma"
+
+#: src/splashy_config-functions.c:1186
+#, c-format
+msgid " Text color\n"
+msgstr " Farba textu\n"
+
+#. Fade in ?
+#: src/splashy_config-functions.c:1203
+msgid "Do you want a fade-in? (yes|no)"
+msgstr "Chcete roztmievačku? (yes|no)"
+
+#. Fade out ?
+#: src/splashy_config-functions.c:1206
+msgid "Do you want a fade-out? (yes|no)"
+msgstr "Chcete stmievačku? (yes|no)"
+
+#: src/splashy_config-functions.c:1241
+#, c-format
+msgid "Failed to read the file: %s"
+msgstr "Nepodarilo sa prečítať súbor: %s"
+
+#: src/splashy_config-functions.c:1249
+#, c-format
+msgid "Error opening destination file %s\n"
+msgstr "Chyba pri otváraní cieľového súboru %s\n"
+
+#: src/splashy_config-functions.c:1257
+#, c-format
+msgid "Failed to write the file: %s"
+msgstr "Nepodarilo sa zapísať súbor: %s"
+
+#: src/splashy_config-functions.c:1359
+msgid "Author <author@mail.com>"
+msgstr "Autor <autor@email.com>"
+
+#: src/splashy_config-main.c:52
+#, fuzzy, c-format
+msgid ""
+"A Splashy Configuration Tool\n"
+"\n"
+"usage: %s [option] arg \n"
+"\n"
+"-h, --help                          Display this help\n"
+"-g, --get-key XPATH                 Returns the value of a key from Splashy "
+"config file, or the current theme\n"
+"-s, --set-theme THEME               Set THEME as the Splashy theme\n"
+"-i, --install-theme THEME.tar.gz    Install the THEME from a tarball\n"
+"-r, --remove-theme THEME            Remove the THEME\n"
+"    --info                          Display some information\n"
+"-c, --create-theme  [args...]       Create a theme in an interactive mode if "
+"no arguments were given\n"
+"                                    Inline mode arguments, the following "
+"arguments are obligatory\n"
+"                                    see the man page for a complete list\n"
+"            --name  NAME                 Set the NAME of the new Splashy "
+"theme\n"
+"            --boot-image PATH            Upload the boot image located at "
+"the specified PATH\n"
+"            --shutdown-image PATH        Upload the shutdown image located "
+"at the specified PATH\n"
+"            --error-image PATH           Upload the error image located at "
+"the specified PATH\n"
+msgstr ""
+"Nástroj na konfiguráciu Splashy\n"
+"\n"
+"použitie: %s [voľba] arg \n"
+"\n"
+"-h, --help                          Zobraziť tohto pomocníka\n"
+"-g, --get-key XPATH                 Vráti hodnotu kľúča z konfiguračného "
+"súboru Splashy alebo aktuálnu tému\n"
+"-s, --set-theme TÉMA                Nastaviť TÉMU pre Splashy\n"
+"-i, --install-theme TÉMA.tar.gz     Nainštalovať TÉMU z tarballu\n"
+"-r, --remove-theme TÉMA             Odstrániť TÉMU\n"
+"    --info                          Zobraziť informácie\n"
+"-c, --create-theme  [args...]       Vytvoriť tému v interaktívnom režime ak "
+"nie sú uvedené argumenty\n"
+"                                    V neinteraktívnomrežime sú povinné "
+"nasledovné argumenty;\n"
+"                                    úplný zoznam nájdete v manuálovej "
+"stránke\n"
+"            --name  NÁZOV                Nastaviť NÁZOV novej témy Splashy\n"
+"            --boot-image CESTA            Nahrať obrázok štartovacej "
+"obrazovky z uvedenej CESTY\n"
+"            --shutdown-image CESTA        Nahrať obrázok vypínacej obrazovky "
+"z uvedenej CESTY\n"
+"            --error-image CESTA           Nahrať obrázok chybovej obrazovky "
+"z uvedenej CESTY\n"
+
+#: src/splashy_config-main.c:70
+#, c-format
+msgid ""
+"usage: %s [option] arg \n"
+"[-h, --help][-s, --set-theme THEME][-i, --install-theme THEME.tar.gz]\n"
+"[-r, --remove-theme THEME][--info][-c, --create-theme  [args...]]\n"
+"[-g, --get-key XPATH]\n"
+"See --help for more information\n"
+msgstr ""
+"použitie: %s [voľba] arg \n"
+"[-h, --help][-s, --set-theme TÉMA][-i, --install-theme TÉMA.tar.gz]\n"
+"[-r, --remove-theme TÉMA][--info][-c, --create-theme  [args...]]\n"
+"[-g, --get-key XPATH]\n"
+"Viac informácií získate pomocou --help\n"
+
+#: src/splashy_config-main.c:163
+msgid ""
+"Error occured while starting Splashy\n"
+"Make sure that you can read Splashy's configuration file\n"
+msgstr ""
+"Pri štarte Splashy sa vyskytka chyba\n"
+"Uistite sa, že je možné čítať konfiguračný súbor Splashy\n"
+
+#: src/splashy_config-main.c:178
+#, c-format
+msgid "Missing arguments\n"
+msgstr "Chýbajú argumenty\n"
+
+#: src/xml_functions.c:128
+#, c-format
+msgid "Error: Could not open theme file for writing\n"
+msgstr "Chyba: Nebolo možné otvoriť súbor témy pre zápis\n"
+
+#~ msgid "   Red"
+#~ msgstr "   Červená"
+
+#~ msgid "   Green"
+#~ msgstr "   Zelená"
+
+#~ msgid "   Blue"
+#~ msgstr "   Modrá"
+
+#~ msgid "   Alpha"
+#~ msgstr "   Priesvitnosť"

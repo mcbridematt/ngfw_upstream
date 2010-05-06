@@ -1,0 +1,9 @@
+--- a/scripts/initramfs-tools/scripts/local-premount/splashy
++++ b/scripts/initramfs-tools/scripts/local-premount/splashy
+@@ -35,3 +35,6 @@
+ grep -q '\(VESA\|VGA\)' /proc/fb || exit
+ 
+ /sbin/splashy boot
++
++# workaround for Debian bug #505270
++sleep 1

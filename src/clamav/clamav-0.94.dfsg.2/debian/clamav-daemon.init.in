@@ -1,0 +1,166 @@
+#! /bin/sh
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian GNU/Linux
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#               Clamav version by Magnus Ekdahl <magnus@debian.org>
+#               Heavily reworked by Stephen Gran <sgran@debian.org>
+#
+### BEGIN INIT INFO
+# Provides:          clamav-daemon
+# Required-Start:    $syslog
+# Should-Start:      
+# Required-Stop:
+# Should-Stop:       
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 6
+# Short-Description: ClamAV daemon
+# Description:       Clam AntiVirus userspace daemon
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/clamd
+NAME="clamd"
+DESC="ClamAV daemon"
+CLAMAVCONF=/etc/clamav/clamd.conf
+SUPERVISOR=/usr/bin/daemon
+SUPERVISORNAME=daemon
+SUPERVISORPIDFILE="/var/run/clamav/daemon-clamd.pid"
+SUPERVISORARGS="--name=$NAME --respawn $DAEMON -F $SUPERVISORPIDFILE"
+
+[ -x "$DAEMON" ] || exit 0
+[ -r /etc/default/clamav-daemon ] && . /etc/default/clamav-daemon
+. /lib/lsb/init-functions
+
+if [ ! -f "$CLAMAVCONF" ]; then
+  log_failure_msg "There is no configuration file for Clamav."
+  log_failure_msg "Please either dpkg-reconfigure $DESC, or copy the example from"
+  log_failure_msg "/usr/share/doc/clamav-base/examples/ to $CLAMAVCONF and run"
+  log_failure_msg "'/etc/init.d/clamav-daemon start'"
+  exit 1;
+fi
+
+#COMMON-FUNCTIONS#
+
+slurp_config "$CLAMAVCONF"
+
+if [ -n "$Example" ]; then
+  log_failure_msg "Clamav is not configured."
+  log_failure_msg "Please edit $CLAMAVCONF and run  '/etc/init.d/clamav-daemon start'"
+  exit 0
+fi
+
+if is_true "$Foreground"; then
+  if [ ! -x "$SUPERVISOR" ] ; then
+     log_failure_msg "Foreground specified, but $SUPERVISORNAME not found"
+     exit 0
+  else
+     RUN_SUPERVISED=1
+  fi
+fi
+
+[ -n "$User" ] || User=clamav
+[ -n "$DataBaseDirectory" ] || DataBaseDirectory=/var/run/clamav
+
+make_dir "$DataBaseDirectory"
+
+THEPIDFILE="`grep ^PidFile $CLAMAVCONF | awk '{print $2}'`"
+[ -n "$THEPIDFILE" ] || THEPIDFILE='/var/run/clamav/clamd.pid'
+
+if [ -f "$THEPIDFILE" ]; then
+  CLAMDPID=`pidofproc -p $THEPIDFILE $DAEMON`
+  RUNNING=$?
+else
+  CLAMDPID=`pidofproc $DAEMON`
+  RUNNING=$?
+fi
+
+if [ -z "$RUN_SUPERVISED" ]; then
+  PID="$CLAMDPID"
+else
+  [ -e "$SUPERVISORPIDFILE" ] && PID=`cat $SUPERVISORPIDFILE`
+fi
+
+[ "$PID" = '1' ] && unset PID
+
+case "$1" in
+  start)
+  OPTIND=1
+  if [ -z "$RUN_SUPERVISED" ] ; then
+    log_daemon_msg "Starting $DESC" "$NAME "
+    su "$User" -p -s /bin/sh -c ". /lib/lsb/init-functions && start_daemon -p $THEPIDFILE $DAEMON"
+    ret=$?
+  else 
+    log_daemon_msg "Starting $DESC" "$NAME (supervised) "
+    $SUPERVISOR $SUPERVISORARGS
+    ret=$?
+  fi
+  log_end_msg $ret
+  ;;
+  stop)
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  OPTIND=1
+  if [ -n "$PID" ]; then
+    kill -15 -"$PID"
+    ret=$?
+    sleep 1
+    if kill -0 "$PID" 2>/dev/null; then
+      ret=$?
+      log_progress_msg "Waiting . "
+      cnt=0
+      while kill -0 "$PID" 2>/dev/null; do
+        ret=$?
+        cnt=`expr "$cnt" + 1`
+        if [ "$cnt" -gt 15 ]; then
+          kill -9 -"$PID"
+          break
+        fi
+        sleep 2
+        log_progress_msg ". "
+      done
+    fi
+  else
+    if [ -z "$RUN_SUPERVISED" ] ; then
+      killproc -p $THEPIDFILE
+      ret=$?
+    else
+      killproc -p $SUPERVISORPIDFILE
+      ret=$?
+    fi
+  fi
+  if [ -n "$ret" ]; then
+    log_end_msg $ret
+  else
+    log_end_msg $?
+  fi
+  ;;
+  status)
+  status_of_proc "$DAEMON" "$NAME"
+  exit $?
+  ;;
+  restart|force-reload)
+  $0 stop
+  $0 start
+  ;;
+  reload-database)
+  OPTIND=1
+  log_daemon_msg "Reloading database for $DESC" "$NAME"
+  if [ "$RUNNING" = 0 ] && [ -n "$CLAMDPID" ]; then
+    kill -USR2 $CLAMDPID
+  fi
+  log_end_msg $?
+  ;;
+  reload-log)
+  OPTIND=1
+  log_daemon_msg "Reloading log file for $DESC" "$NAME"
+  if [ "$RUNNING" = 0 ] && [ -n "$CLAMDPID" ]; then
+    kill -HUP $CLAMDPID
+  fi
+  log_end_msg $?
+  ;;
+  *)
+  log_failure_msg "Usage: $0 {start|stop|restart|force-reload|reload-log|reload-database|status}" >&2
+  exit 1
+  ;;
+esac
+
+exit 0

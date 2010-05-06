@@ -1,0 +1,233 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          splashy
+# Required-Start:    mountkernfs
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: A script to calculate the progress percentage for init scripts
+# Description:       This calculates the progress percentage for the scripts in
+#                    /etc/rcS.d and /etc/rc$CURRENT_RUNLEVEL.d. This will also
+#                    start Splashy at boot (if not already started from initramfs),
+#                    and at shutdown (yes, when "stop" argument is given,
+#                    which is really counter-intuitive).
+### END INIT INFO
+
+# Author: Tim Dijkstra <tim@famdijkstra.org>, 
+#         Luis Mondesi <lemsx1@gmail.com> 
+#         Luca Capello <luca@pca.it>
+#
+# If called in the rc[06].d runlevels with the stop target it will start 
+# splashy in 'shutdown' mode. In the rcS.d runlevel it will try 
+# to start splashy if it didn't start yet from initramfs.
+#
+# When it decides to start splashy it will first calculate the 
+# progress percentage which will be used by the calls to splashy_update 
+# in the log_end_msg functions.
+# This is really simple. We just count them and put them
+# in alpha-numeric order. Their percentage is then just
+# int( their number on the list * ( 100 / total number on list) )
+#
+# Of course not all packages use log_end_msg yet, but that
+# doesn't matter. The packages that do, will trigger the update
+# anyway. This may result in big jumps in the percentage.
+# The more scripts start using it, the more granular it will become.
+#
+#
+# This script also needs to detect if Splashy is running and if not
+# start it. It's assumed that this will only be run while halt/reboot
+# and at RUNLEVEL S.
+#
+
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+NAME="splashy"
+DESC="Boot splash manager"
+STEPS_DIR="/lib/init/rw/$NAME"
+DEBUG=0
+
+[ -r "/etc/default/$NAME" ] && . "/etc/default/$NAME"
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+if [ -r "/lib/lsb/init-functions" ]; then
+    . "/lib/lsb/init-functions"
+else
+    echo "Could not read file /lib/lsb/init-functions. Please install lsb-base"
+    exit 1
+fi
+
+set -e
+
+
+[ "$ENABLE" = "1" ] && log_warning_msg "To enable $NAME add 'splash' to the kernel command line. Use of ENABLE in /etc/default/$NAME is deprecated.";
+
+check_to_enable () {
+	ENABLE=0
+	SINGLE=false
+	SPLASH=false
+	FBMODESET=false
+
+	for x in $(cat /proc/cmdline); do
+	    case $x in
+		single)
+		    SINGLE="true"
+		;;
+		splash)
+		    SPLASH="true"
+		;;
+		nosplash)
+		    SPLASH="false"
+		;;
+		vga=*|video=*)
+		    FBMODESET="true"
+		;;
+	    esac
+	done
+	[ "$SPLASH" = "true" -a "$FBMODESET" = "true" ] && ENABLE=1
+	[ "$SINGLE" = "true" ] && ENABLE=0
+
+	if [ "$ENABLE" = "0" ]; then
+	    log_warning_msg "To enable $NAME on multiuser runlevel add 'splash' and a valid framebuffer videomode to the kernel command line"
+	    exit 0
+	fi
+}
+
+calculate_steps () {
+        log_daemon_msg "(Re)generating splash steps for"
+
+	[ -f /etc/inittab ] &&	RLVL=`sed -n 's/id:\([2345]\):initdefault:/\1/ p' /etc/inittab`
+
+        [ ! -d $STEPS_DIR ] && mkdir -p $STEPS_DIR
+	#
+	# Mount a tmpfs on $STEPS_DIR
+	#
+	# on Ubuntu our Steps dir gets umounted if using /dev/shm/splashy
+	# we will always use /lib/init/rw/splashy and mount a tmpfs there
+	SHM_OPT=
+	[ "${SHM_SIZE:=$TMPFS_SIZE}" ] && SHM_OPT="-osize=$SHM_SIZE"
+	mount -n -t tmpfs shmfs $STEPS_DIR
+
+        TMP=`mktemp -p $STEPS_DIR`
+
+        # While booting rcS will also be executed
+        # we only care about the scripts that actually call log_end_msg
+        # if not we could end up never completing our progressbar!
+        grep -l log_end_msg /etc/rcS.d/S* > $TMP 2> /dev/null || true
+
+        for ILVL in ${RLVL:=2} 0 6; do
+            # in debian rc.local runs log_end_msg conditionally. we simply skip that
+            grep -l log_end_msg /etc/rc$ILVL.d/[KS]* 2> /dev/null | grep -v rc.local >> $TMP  || true
+            
+            NR=`sed -n -e '$=' $TMP`
+	    I=1
+	    for SCR in `cat $TMP`; do
+		echo "$SCR $(($I*100/$NR))"
+		I=$(($I+1))
+	    done > "$STEPS_DIR/$ILVL-progress"
+
+            # Truncate $TMP file
+            echo -n > $TMP
+            log_action_cont_msg " rc$ILVL.d"
+        done
+
+        # In the first stage of booting RUNLEVEL will be S
+        ln -sf "$STEPS_DIR/${RLVL:=2}-progress" "$STEPS_DIR/S-progress"
+        rm -f $TMP
+
+        log_action_end_msg 0
+}
+
+# Bug #400598,#401999
+if [ -z "${RUNLEVEL:-}" ]; then
+    # we need only the current level
+    RUNLEVEL=`runlevel | sed 's/^. //'`
+fi
+
+case "$1" in
+    start)
+	check_to_enable
+
+	# We start splashy in rcS.d if we haven't already in initramfs
+	[ "x$RUNLEVEL" = "xN S" -o "x$RUNLEVEL" = "xS" ] || exit 0
+        calculate_steps
+
+        log_daemon_msg "Starting $DESC" $NAME
+        if [ "$DEBUG" = "1" ]; then
+            pidof $NAME > /dev/null || \
+            echo "$0: Splashy not running?" >> $STEPS_DIR/splashy.log
+        fi
+        if (pidof $NAME > /dev/null); then
+            # as suggested by John Hughes <john@calva.com> Bug# 462626
+            # Splashy is running and we want to avoid our TTY to be corrupted
+            stty -icanon -clocal
+        else
+            /sbin/$NAME boot
+            sleep 0.2
+        fi
+        # Before X starts we need to turn off the cursor to avoid artifacts:
+        for i in 7 8 9 10 11 12; do
+            if [ -c /dev/tty$i ]; then
+                setterm -cursor off > /dev/tty$i || true
+            fi
+        done
+        log_end_msg $?
+    ;;
+    stop)
+	check_to_enable
+        
+        # avoid displaying ugly text at shutdown
+        clear >/dev/tty8
+        clear >/dev/tty1
+        # wait for all gdm servers to exit (DBTS# 504389)
+        COUNTER=0
+        ATTEMPTS=10
+        set +e
+        while [ $COUNTER -lt $ATTEMPTS ]; do
+            ps -C "gdm"
+            if [ $? -eq 0 ]; then
+                sleep 0.5
+                COUNTER=`expr $COUNTER + 1` #works in dash
+            else
+                break
+            fi
+        done
+        set -e
+        if [ $COUNTER -eq $ATTEMPTS ]; then
+            echo "$NAME stopping because gdm is still active"
+            exit
+        fi
+
+        /sbin/splashy_chvt 8 
+
+	calculate_steps
+
+        # sanity check, kill Splashy if running (old bug)
+        pidof $NAME > /dev/null && splashy_update "exit" && pkill -9 splashy
+
+        log_daemon_msg "Starting $DESC" $NAME
+        /sbin/$NAME shutdown
+        sleep 0.2
+        # tell killall5 to not kill us too early at shutdown/restart:
+        pidof $NAME >> /var/run/sendsigs.omit
+        RET=$?
+        [ -d /lib/init/rw/sendsigs.omit.d ] || mkdir -p /lib/init/rw/sendsigs.omit.d
+        cat /var/run/sendsigs.omit >> /lib/init/rw/sendsigs.omit.d/splashy
+        # log_end_msg calls splashy_update, so we need to allow Splashy to start
+        sleep 0.5
+        log_end_msg $RET
+
+    ;;
+
+    restart|force-reload)
+        calculate_steps $RUNLEVEL
+        ;;
+
+    *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+

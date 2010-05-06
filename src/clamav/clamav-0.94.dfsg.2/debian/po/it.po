@@ -1,0 +1,677 @@
+# Italian translation of the clamav debconf template
+# This file is distributed under the same license as the clamav package
+# Cristian Rigamonti <cri@linux.it>, 2004-2005-2006-2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: clamav 0.91.2-3\n"
+"Report-Msgid-Bugs-To: clamav@packages.debian.org\n"
+"POT-Creation-Date: 2008-11-12 16:08+0100\n"
+"PO-Revision-Date: 2007-10-05 09:15+0200\n"
+"Last-Translator: Cristian Rigamonti <cri@linux.it>\n"
+"Language-Team: Italian <tp@lists.linux.it>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: select
+#. Choices
+#: ../clamav-freshclam.templates:2001
+msgid "daemon"
+msgstr "demone"
+
+#. Type: select
+#. Choices
+#: ../clamav-freshclam.templates:2001
+msgid "manual"
+msgstr "manuale"
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:2002
+msgid "Virus database update method:"
+msgstr "Metodo di aggiornamento del database dei virus:"
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:2002
+msgid "Please choose the method for virus database updates."
+msgstr "Selezionare il metodo da usare per aggiornare il database dei virus."
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:2002
+msgid ""
+" daemon:  freshclam is running as a daemon all the time. You should choose\n"
+"          this option if you have a permanent network connection;\n"
+" ifup.d:  freshclam will be running as a daemon as long as your Internet\n"
+"          connection is up. Choose this one if you use a dialup Internet\n"
+"          connection and don't want freshclam to initiate new connections;\n"
+" cron:    freshclam is started from cron. Choose this if you want full "
+"control\n"
+"          of when the database is updated;\n"
+" manual:  no automatic invocation of freshclam. This is not recommended,\n"
+"          as ClamAV's database is constantly updated."
+msgstr ""
+" demone  : freshclam resta in esecuzione permanente come demone.\n"
+"           Scegliere questo metodo se si dispone di una connessione di\n"
+"           rete permanente;\n"
+" ifup.d  : freshclam viene eseguito come demone fintanto che la \n"
+"           connessione internet è attiva. Scegliere questo metodo se si\n"
+"           dispone di una connessione dialup e non si vuole che freshclam\n"
+"           avvii nuove connessioni;\n"
+" cron    : freshclam viene avviato da cron. Scegliere questo metodo se si\n"
+"           vuole controllare in modo preciso il momento in cui il database\n"
+"           viene aggiornato;\n"
+" manuale : freshclam non viene eseguito automaticamente. Questo metodo\n"
+"           non è raccomandato, visto che il database centrale di clamav\n"
+"           viene costantemente aggiornato."
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:3001
+msgid "Local database mirror site:"
+msgstr "Sito mirror per il database:"
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:3001
+msgid "Please select the closest local mirror site."
+msgstr "Selezionare il sito mirror più vicino."
+
+#. Type: select
+#. Description
+#: ../clamav-freshclam.templates:3001
+msgid ""
+"Freshclam updates its database from a world wide network of mirror sites. "
+"Please select the closest mirror. If you leave the default setting, an "
+"attempt will be made to guess a nearby mirror."
+msgstr ""
+"Freshclam aggiorna il suo database utilizzando una rete globale di siti "
+"mirror. Si prega di scegliere il mirror più vicino. Lasciando l'impostazione "
+"predefinita, il programma cercherà di scegliere un mirror vicino."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:4001
+msgid "HTTP proxy information (leave blank for none):"
+msgstr "Informazioni sul proxy HTTP (lasciare in bianco se non serve):"
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:4001
+msgid ""
+"If you need to use an HTTP proxy to access the outside world, enter the "
+"proxy information here. Otherwise, leave this blank."
+msgstr ""
+"Se occorre usare un proxy HTTP per accedere all'esterno, inserire qui le "
+"informazioni relative, altrimenti lasciare in bianco."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:4001
+msgid "Please use URL syntax (\"http://host[:port]\") here."
+msgstr "Si prega di usare la sintassi per gli URL (\"http://host[:porta]\")."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:5001
+msgid "Proxy user information (leave blank for none):"
+msgstr "Informazioni sull'utente del proxy (lasciare in bianco se non serve):"
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:5001
+msgid ""
+"If you need to supply a username and password to the proxy, enter it here. "
+"Otherwise, leave this blank."
+msgstr ""
+"Se occorre inserire un nome utente e una password per accedere al proxy, "
+"inserirla qui, altrimenti lasciare in bianco."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:5001
+msgid "When entering user information, use the standard form of \"user:pass\"."
+msgstr ""
+"Per inserire le informazioni relative all'utente, si usi la forma standard "
+"\"utente:password\"."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:6001
+msgid "Number of freshclam updates per day:"
+msgstr "Numero di aggiornamenti giornalieri di freshclam:"
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:7001
+msgid "Network interface connected to the Internet:"
+msgstr "Interfaccia di rete collegata a internet:"
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:7001
+msgid ""
+"Please enter the name of the network interface connected to the Internet. "
+"Example: eth0."
+msgstr ""
+"Inserire il nome dell'interfaccia di rete collegata a internet. Ad esempio: "
+"eth0."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:7001
+msgid ""
+"If the daemon runs when the network is down, the log file will be filled "
+"with entries like 'ERROR: Connection with database.clamav.net failed.', "
+"making it easy to miss when freshclam really can't update the database."
+msgstr ""
+"Se il demone viene eseguito mentre manca la connessione di rete, il file di "
+"log si riempirà di messaggi del tipo \"ERROR: Connection with database."
+"clamav.net failed.\", rendendo difficile capire quando effettivamente "
+"freshclam non riesce ad aggiornare il database."
+
+#. Type: string
+#. Description
+#: ../clamav-freshclam.templates:7001
+msgid ""
+"You can leave this field blank and the daemon will be started from the "
+"initialization scripts instead. You should then make sure the computer is "
+"permanently connected to the Internet to avoid filling the log files."
+msgstr ""
+"È possibile lasciare in bianco questo campo, e il demone verrà avviato dagli "
+"script di inizializzazione. Bisognerà quindi assicurarsi che il computer sia "
+"sempre connesso a internet per evitare i messaggi di errore nei file di log."
+
+#. Type: boolean
+#. Description
+#: ../clamav-freshclam.templates:8001
+msgid "Should clamd be notified after updates?"
+msgstr "Si desidera avvisare clamd dopo ogni aggiornamento del database?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-freshclam.templates:8001
+msgid ""
+"Please confirm whether clamd should be notified to reload the database after "
+"successful updates."
+msgstr ""
+"Confermare se clamd deve rileggere il database subito dopo ogni "
+"aggiornamento di quest'ultimo."
+
+#. Type: boolean
+#. Description
+#: ../clamav-freshclam.templates:8001
+msgid ""
+"If you do not choose this option, clamd's database reloads will be notably "
+"delayed (it performs this check every 6 hours by default), posing the risk "
+"that a new virus may slip through even if the database is up to date. Do not "
+"use this if you do not use clamd, as it will produce errors."
+msgstr ""
+"Se non si abilita questa opzione, clamd rileggerà il database con un certo "
+"ritardo (il valore predefinito è ogni 6 ore) esponendo al rischio che un "
+"nuovo virus non venga identificato, anche se è incluso nel database "
+"aggiornato. Non abilitare questa opzione se non si usa clamd, altrimenti si "
+"verificheranno degli errori."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:2001
+msgid "Handle the configuration file automatically?"
+msgstr "Gestire il file di configurazione automaticamente?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:2001
+msgid "Some options must be configured for clamav-base."
+msgstr "Occorre configurare alcune opzioni di clamav-base."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:2001
+msgid ""
+"The ClamAV suite won't work if it isn't configured. If you do not configure "
+"it automatically, you'll have to configure /etc/clamav/clamd.conf manually "
+"or run 'dpkg-reconfigure clamav-base' later. In any case, manual changes in /"
+"etc/clamav/clamd.conf will be respected."
+msgstr ""
+"La suite ClamAV non funzionerà se non viene configurata. Se non viene "
+"configurata automaticamente, occorrerà modificare /etc/clamav/clamd.conf "
+"manualmente o eseguire \"dpkg-reconfigure clamav-base\" in seguito. In ogni "
+"caso, sarà sempre possibile modificare manualmente /etc/clamav/clamd.conf"
+
+#. Type: select
+#. Description
+#: ../clamav-base.templates:3001
+msgid "Socket type:"
+msgstr "Tipo di socket"
+
+#. Type: select
+#. Description
+#: ../clamav-base.templates:3001
+msgid "Please choose the type of socket clamd will be listening on."
+msgstr "Scegliere il tipo di socket su cui clamd sta in ascolto."
+
+#. Type: select
+#. Description
+#: ../clamav-base.templates:3001
+msgid ""
+"If you choose TCP, clamd can be accessed remotely. If you choose local UNIX "
+"sockets, clamd can be accessed through a file. Local UNIX sockets are "
+"recommended for security reasons."
+msgstr ""
+"Scegliendo TCP, clamd può essere contattato da remoto. Scegliendo la socket "
+"UNIX locale, l'accesso a clamd avviene tramite un file speciale. La socket "
+"UNIX locale è raccomandata per motivi si sicurezza."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:4001
+msgid "Local (UNIX) socket clamd will listen on:"
+msgstr "Socket locale (UNIX) su cui clamd deve stare in ascolto:"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:5001
+msgid "Gracefully handle left-over UNIX socket files?"
+msgstr ""
+"Il demone deve gestire automaticamente i file UNIX socket inutilizzati?"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:6001
+msgid "TCP port clamd will listen on:"
+msgstr "Porta TCP su cui clamd deve stare in ascolto:"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:7001
+msgid "IP address clamd will listen on:"
+msgstr "Indirizzo IP su cui clamd deve accettare connessioni:"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:7001
+msgid ""
+"Enter \"any\" to listen on every IP address configured. If you want to "
+"listen on a single address or host name, enter it here."
+msgstr ""
+"Inserire \"any\" per accettare connessioni su uno qualunque degli indirizzi "
+"IP configurati. Se si desidera accettare solo connessioni destinate ad un "
+"indirizzo o a un nome host specifico, inserirlo qui."
+
+#. Type: error
+#. Description
+#: ../clamav-base.templates:8001
+msgid "Mandatory numeric value"
+msgstr "Valore numerico obbligatorio"
+
+#. Type: error
+#. Description
+#: ../clamav-base.templates:8001
+msgid "This question requires a numeric answer."
+msgstr "Questa domanda richiede di indicare un valore numerico."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:9001
+msgid "Do you want to enable mail scanning?"
+msgstr "Abilitare l'analisi delle email?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:9001
+msgid ""
+"This option enables scanning mail contents for viruses. You need this option "
+"enabled if you want to use clamav-milter. It is recommended that you use a "
+"separate unpacker to extract any MIME parts of email messages if you want to "
+"scan email."
+msgstr ""
+"Questa opzione abilita l'analisi del contenuto delle email alla ricerca di "
+"virus. Occorre abilitarla se si intende usare clamav-milter. Si raccomanda "
+"di usare un programma separato per estrarre le parti MIME dai messaggi email."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:10001
+msgid "Do you want to enable archive scanning?"
+msgstr "Abilitare la scansione degli archivi?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:10001
+msgid ""
+"If archive scanning is enabled, the daemon will extract archives such as "
+"bz2, tar.gz, deb and many more, to check their contents for viruses."
+msgstr ""
+"Abilitando la scansione degli archivi, il demone estrarrà archivi in formato "
+"bz2, tar.gz, deb e molti altri, per controllarne il contenuto alla ricerca "
+"di virus."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:10001
+msgid ""
+"For more information about what archives are supported, see /usr/share/doc/"
+"clamav-docs/clamdoc.pdf or the manpage clamscan(5)."
+msgstr ""
+"Per maggiori informazioni sui formati di archivi supportati si veda /usr/"
+"share/doc/clamav-docs/clamdoc.pdf o la pagina di manuale clamscan(5)."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:11001
+msgid "Maximum stream length (unit Mb) allowed:"
+msgstr "Massima lunghezza consentita degli stream (in Mb)?"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:11001
+msgid "You can set a limit on the stream length that can be scanned."
+msgstr ""
+"È possibile impostare un limite di lunghezza per gli stream da analizzare."
+
+#. Type: string
+#. Description
+#. Type: string
+#. Description
+#: ../clamav-base.templates:11001 ../clamav-base.templates:12001
+msgid "Entering '0' will disable this limit."
+msgstr "Il valore \"0\" disabilita il limite di dimensione."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:12001
+msgid "Maximum directory depth that will be allowed:"
+msgstr "Massimo livello di profondità per le directory da analizzare:"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:12001
+msgid ""
+"This value must be set if you want to allow the daemon to follow directory "
+"symlinks."
+msgstr ""
+"Occorre impostare questo valore se si desidera che il demone segua i link "
+"simbolici alle directory."
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:13001
+msgid "Do you want the daemon to follow directory symlinks?"
+msgstr "Si desidera che il demone segua i link simbolici alle directory?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:14001
+msgid "Do you want the daemon to follow regular file symlinks?"
+msgstr "Si desidera che il demone segua i link simbolici ai file regolari?"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:15001
+msgid "Timeout for stopping the thread-scanner (seconds):"
+msgstr "Limite di tempo per l'analizzatore (secondi):"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:15001
+msgid "Entering '0' will disable the timeout."
+msgstr "Il valore \"0\" disabilita il limite di tempo."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:16001
+msgid "Number of threads for the daemon:"
+msgstr "Numero di thread per il demone:"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:17001
+msgid "Number of pending connections allowed:"
+msgstr "Numero di connessioni contemporanee che possono essere gestite:"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:18001
+msgid "Do you want to use the system logger?"
+msgstr "Si desidera utilizzare il log di sistema?"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:18001
+msgid ""
+"It is possible to log the daemon activity to the system logger. This can be "
+"done independently of whether you want to log activity to a special file."
+msgstr ""
+"È possibile registrare l'attività del demone usando il log di sistema, e in "
+"modo indipendente registrarla su un altro file."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:19001
+msgid "Log file for clamav-daemon (enter none to disable):"
+msgstr "File di log per clamav-daemon (lasciare in bianco per disabilitarlo):"
+
+#. Type: boolean
+#. Description
+#: ../clamav-base.templates:20001
+msgid "Do you want to log time information with each message?"
+msgstr "Si desidera registrare anche l'orario nei messaggi di log?"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:21001
+msgid "Delay in seconds between daemon self checks:"
+msgstr "Ritardo in secondi tra i controlli automatici del demone (SelfCheck):"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:21001
+msgid ""
+"During the SelfCheck the daemon checks if it needs to reload the virus "
+"database. It also tries to repair problems caused by bugs in the daemon, "
+"(that is, in some cases it's able to repair broken data structures)."
+msgstr ""
+"Durante il SelfCheck il demone controlla se deve rileggere il database dei "
+"virus e se deve rimediare a problemi causati da bug nel demone (ad es. in "
+"alcuni casi è in grado di riparare strutture dati danneggiate)."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:22001
+msgid "User to run clamav-daemon as:"
+msgstr "Utente che deve eseguire clamav-daemon:"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:22001
+msgid ""
+"It is recommended to run the ClamAV programs as a non-privileged user. This "
+"will work with most MTAs with a little tweaking, but if you want to use "
+"clamd for filesystem scans, running as root is probably unavoidable. Please "
+"see README.Debian in the clamav-base package for details."
+msgstr ""
+"Si raccomanda di far eseguire i programmi di ClamAV da un utente non "
+"privilegiato. Questa impostazione funziona con i principali MTA (potrebbe "
+"essere necessaria qualche correzione alla configurazione), mentre se si "
+"vuole usare clamd per analizzare il proprio filesystem è molto probabile che "
+"occorra farlo eseguire dall'utente root. Si veda \"README.Debian\" nel "
+"pacchetto clamav-base per i dettagli."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:23001
+msgid "Groups for clamav-daemon (space-separated):"
+msgstr "Gruppi per clamav-daemon (separati da spazi):"
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:23001
+msgid "Please enter any extra groups for clamd."
+msgstr "Inserire eventuali gruppi aggiuntivi per clamd."
+
+#. Type: string
+#. Description
+#: ../clamav-base.templates:23001
+msgid ""
+"By default, clamd runs as a non-privileged user. If you need clamd to be "
+"able to access files owned by another user (e.g., in combination with an "
+"MTA), then you will need to add clamd to the group for that piece of "
+"software. Please see README.Debian in the clamav-base package for details."
+msgstr ""
+"In modo predefinito, clamd viene eseguito da un utente non privilegiato. Se "
+"occorre che clamd abbia accesso a file di proprietà di altri utenti o gruppi "
+"(ad esempio perchè si usa clamd in combinazione con un MTA) occorre "
+"aggiungere l'utente clamd ai gruppi necessari. Si veda \"README.Debian\" nel "
+"pacchetto clamav-base per i dettagli."
+
+#~ msgid "Do you want to enable RAR archive scanning?"
+#~ msgstr "Si desidera abilitare l'analisi degli archivi RAR?"
+
+#~ msgid ""
+#~ "This enables the builtin RAR archiver. Use with caution, as the RAR code "
+#~ "may have memory leaks. Clamscan can also use external RAR programs, such "
+#~ "as unrar, although clamd does not."
+#~ msgstr ""
+#~ "In questo modo si abilita il codice interno per l'estrazione degli "
+#~ "archivi RAR. Da usare con cautela, visto che il codice RAR può causare "
+#~ "perdite di memoria. Clamscan può anche usare programmi RAR esterni, come "
+#~ "unrar, mentre clamd non può."
+
+#~ msgid "Limit on the Archive recursion:"
+#~ msgstr "Livello massimo di ricorsività degli archivi:"
+
+#~ msgid ""
+#~ "This setting places a limit on recursion within archives, for example, a "
+#~ "tar file that is also gzipped."
+#~ msgstr ""
+#~ "Questa impostazione limita la profondità di ricerca all'interno degli "
+#~ "archivi (ad esempio dei file tar compressi con gzip)."
+
+#~ msgid "Limit on Archive compression:"
+#~ msgstr "Livello massimo di compressione degli archivi:"
+
+#~ msgid ""
+#~ "This setting places a limit on compression within archives, to guard "
+#~ "against archive bombs (small files that expand to massive ones, a form of "
+#~ "Denial of Service attack). However, this limit may be too low for some "
+#~ "settings."
+#~ msgstr ""
+#~ "Questa impostazione pone un limite alla compressione all'interno degli "
+#~ "archivi, per proteggersi dagli \"archivi bomba\" (piccoli file che "
+#~ "espansi diventano giganteschi, causando un attacco Denial of Service). "
+#~ "Questo limite potrebbe essere troppo basso per alcune situazioni."
+
+#~ msgid "Limit for the maximum number of files in an archive:"
+#~ msgstr "Massimo numero di file in un archivio:"
+
+#~ msgid "Largest file size in Mb you will scan inside archives:"
+#~ msgstr ""
+#~ "Dimensione massima (in Mb) per i file da analizzare all'interno degli "
+#~ "archivi:"
+
+#~| msgid "The use of mirrors.txt is no longer supported"
+#~ msgid "Use of mirrors.txt no longer supported"
+#~ msgstr "L'uso del file \"mirrors.txt\" non è più supportato"
+
+#~| msgid ""
+#~| "During the transition to handling its mirror database through DNS, the "
+#~| "clamav team dropped support for the 'mirrors.txt' config file."
+#~ msgid ""
+#~ "During the transition to handling its mirror database through DNS, the "
+#~ "ClamAV team dropped support for the 'mirrors.txt' configuration file."
+#~ msgstr ""
+#~ "Da quando i mirror vengono gestiti tramite DNS, il file di configurazione "
+#~ "\"mirrors.txt\" non è più utilizzato."
+
+#~| msgid ""
+#~| "If you have entered additional mirrors there, your file will be backed "
+#~| "up as /var/lib/clamav/mirrors.txt.BACKUP."
+#~ msgid ""
+#~ "If additional mirrors are mentioned there, this file will be backed up "
+#~ "as /var/lib/clamav/mirrors.txt.BACKUP."
+#~ msgstr ""
+#~ "Se al file sono stati aggiunti dei mirror, ne verrà fatta una copia come /"
+#~ "var/lib/clamav/mirrors.txt.BACKUP."
+
+#~| msgid ""
+#~| "If your file was modified, your old mirrors (which may be way too many) "
+#~| "will be added to the new /etc/clamav/freshclam.conf configuration file, "
+#~| "using the DatabaseMirror keyword. Please examine freshclam.conf "
+#~| "carefully after the update is through."
+#~ msgid ""
+#~ "If the file was modified, old mirrors (which may be way too many) will be "
+#~ "added to the new /etc/clamav/freshclam.conf configuration file, using the "
+#~ "DatabaseMirror keyword. Please examine freshclam.conf carefully after the "
+#~ "update completes."
+#~ msgstr ""
+#~ "Se il file è stato modificato, i vecchi mirror (che potrebbero essere "
+#~ "anche molti) saranno aggiunti al nuovo file di configurazione /etc/clamav/"
+#~ "freshclam.conf usando il parametro DatabaseMirror. Si consiglia di "
+#~ "esaminare freshclam.conf con cura dopo l'aggiornamento."
+
+#~| msgid "Clamav sockets and pids now in /var/run/clamav"
+#~ msgid "ClamAV sockets and PID files now in /var/run/clamav"
+#~ msgstr "Socket e file PID di ClamAV spostati in /var/run/clamav"
+
+#~| msgid ""
+#~| "ClamAV now runs as the non-priviledged user clamav by default.  If your "
+#~| "previous configuration relied on a socket or pid in /var/run, clam will "
+#~| "not start after this upgrade.  Please run dpkg-reconfigure clamav-base, "
+#~| "and when asked about the socket, please change its location to /var/run/"
+#~| "clamav/, and update the configuration of any software that uses this "
+#~| "socket (e.g., exim, amavis)."
+#~ msgid ""
+#~ "ClamAV now runs as the non-privileged user clamav by default. If the "
+#~ "previous configuration relied on a socket or pid in /var/run, clam will "
+#~ "not start after this upgrade. Please run 'dpkg-reconfigure clamav-base', "
+#~ "and when asked about the socket, change its location to /var/run/clamav/, "
+#~ "and update the configuration of any software that uses this socket (e.g., "
+#~ "Exim, AMaVis)."
+#~ msgstr ""
+#~ "ClamAV ora viene eseguito in modo predefinito dall'utente non "
+#~ "privilegiato clamav. Se la configurazione precedente prevedeva un socket "
+#~ "o un pid in /var/run, clam non verrà avviato dopo questo aggiornamento. "
+#~ "Si prega di eseguire \"dpkg-reconfigure clamav-base\" e, alla domanda "
+#~ "riguardante il socket, modificare la posizione a /var/run/clamav/; "
+#~ "occorre anche aggiornare la configurazione dei programmi che usano questo "
+#~ "socket (ad es. Exim, AMaVis)."
+
+#~ msgid "daemon, ifup.d, cron, manual"
+#~ msgstr "demone, ifup.d, cron, manuale"
+
+#~ msgid ""
+#~ "If you don't know what network interface you use to connect to the "
+#~ "internet leave this field blank and the daemon will be started from the "
+#~ "init scripts instead."
+#~ msgstr ""
+#~ "Se non si conosce l'interfaccia di rete usata per connettersi a internet, "
+#~ "lasciare in bianco questo campo; il demone verrà avviato dagli script di "
+#~ "init."
+
+#~ msgid ""
+#~ "If you do leave it blank make sure the computer is connected to the "
+#~ "internet at all times or your logs will be really hard to interpret."
+#~ msgstr ""
+#~ "Se si lascia in bianco, assicurarsi che il computer sia connesso a "
+#~ "internet in modo permanente, altrimenti i file di log saranno di "
+#~ "difficile interpretazione."
+
+#~ msgid "Example: eth0"
+#~ msgstr "Esempio: eth0"
+
+#~ msgid "A numeric value is mandatory"
+#~ msgstr "È obbligatorio un valore numerico"
+
+#~ msgid "A non numerical answer to this question cannot be understood."
+#~ msgstr "A questa domanda si può rispondere solo con un valore numerico."
+
+#~ msgid ""
+#~ "You need to answer this question if you want to allow the daemon to "
+#~ "follow directory symlinks.  The value 0 disables maximal directory depth "
+#~ "limit."
+#~ msgstr ""
+#~ "Occorre rispondere a questa domanda se si vuole che il demone segua i "
+#~ "link simbolici alle directory. Il valore 0 disabilita il limite di "
+#~ "profondità dei link."
