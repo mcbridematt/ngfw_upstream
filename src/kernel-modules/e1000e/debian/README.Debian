@@ -1,0 +1,25 @@
+BCM5700 kernel module source for Debian GNU/Linux
+=================================================
+
+The BCM5700 kernel module must be compiled for your specific kernel. To be
+able to do this, you'll need make-kpkg from the kernel-package package as well
+as an unpacked source tree of the Linux kernel you wish to use.
+
+The package will install a file /usr/src/e1000e.tar.gz. When you unpack the
+file:
+
+  cd /usr/src && tar xfz e1000e.tar.gz
+
+the ./modules/e1000e subdirectory will be made, and the source will be ready
+for building with make-kpkg. Please refer to the documentation of make-kpkg
+for further information on the process of building the modules for you kernel.
+The module name is e1000e, so this is what you will need to pass to the
+--added_patches option of make-kpkg.
+
+The source code reveals how to use "hardware accelerated" VLAN tagging. The
+driver works with Ben Greear's VLAN patches.
+
+Please refer to the README.support document for information on support for
+this driver.
+
+ -- martin f. krafft <madduck@debian.org>  Wed, 20 Aug 2003 05:31:47 +0100

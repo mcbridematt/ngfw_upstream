@@ -1,0 +1,14 @@
+Source: e1000e-source
+Section: non-free/net
+Priority: optional
+Maintainer: Markus Schade <markus.schade@gmail.com>
+Build-Depends: debhelper (>= 5.0.37), debconf-utils, module-assistant
+Standards-Version: 3.7.2
+
+Package: e1000e-module-_KVERS_
+Architecture: i386 ia64 amd64
+Depends: modutils | module-init-tools
+Recommends: linux-image-_KVERS_
+Description: e1000e ethernet driver for kernel _KVERS_ (binary module)
+ This package provides the source code for the e1000e module provided
+ by Broadcom, made for the Linux kernel _KVERS_.
