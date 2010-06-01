@@ -1,4 +1,0 @@
-EXAMPLES.txt
-GUIDE.txt
-README.txt
-lib
