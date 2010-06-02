@@ -1,0 +1,16 @@
+Source: igb-source
+Section: upstream
+Priority: extra
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>= 5.0.37), dpatch
+Build-Depends-Indep: debconf-utils
+Standards-Version: 3.7.2
+
+Package: igb-source
+Architecture: all
+Depends: module-assistant
+Recommends:  dpkg-dev, kernel-package, debhelper (>= 5.0.37), debconf-utils
+Description: module source for igb
+ This package provides the source code for the igb module.. You
+ will need make-kpkg from kernel-package to be able to compile modules
+ usable with a Debian kernel.
