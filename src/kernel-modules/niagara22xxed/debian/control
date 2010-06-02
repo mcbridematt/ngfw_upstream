@@ -6,6 +6,12 @@ Build-Depends: debhelper (>= 5.0.37), dpatch
 Build-Depends-Indep: debconf-utils
 Standards-Version: 3.7.2
 
+Package: niagara22xxed
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: niagara utils
+ Niagara utils
+
 Package: niagara22xxed-source
 Architecture: all
 Depends: module-assistant
