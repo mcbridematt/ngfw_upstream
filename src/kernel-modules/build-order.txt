@@ -1,0 +1,5 @@
+ipset           					lenny,sid
+niagara22xxed                                           lenny,sid
+e1000e                                                  lenny,sid
+e1000                                                   lenny,sid
+igb                                                     lenny,sid
