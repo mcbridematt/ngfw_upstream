@@ -50,9 +50,9 @@ install: build
 	cp $(NAME).tar.gz $(CURDIR)/debian/$(NAME)-source/usr/src
 	chmod 0644 $(CURDIR)/debian/$(NAME)-source/usr/src/$(NAME).tar.gz
 
-binary-arch: build install
-
 binary-indep: build install
+
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs 
