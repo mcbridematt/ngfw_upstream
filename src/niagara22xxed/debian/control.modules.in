@@ -1,13 +1,14 @@
 Source: niagara22xxed-source
-Section: non-free/net
+Section: upstream
 Priority: optional
-Maintainer: Markus Schade <markus.schade@gmail.com>
+Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5.0.37), debconf-utils, module-assistant
 Standards-Version: 3.7.2
 
 Package: niagara22xxed-module-_KVERS_
-Architecture: i386 ia64 amd64
+Architecture: any
 Depends: modutils | module-init-tools
+Provides: niagara22xxed-kernel
 Recommends: linux-image-_KVERS_
 Description: niagara22xxed ethernet driver for kernel _KVERS_ (binary module)
  This package provides the source code for the niagara22xxed module provided
