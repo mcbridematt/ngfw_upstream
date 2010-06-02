@@ -1,3 +1,9 @@
+e1000-source (8.0.19-2) unstable; urgency=low
+
+  * Minor corrections.
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 02 Jun 2010 02:48:41 -0700
+
 e1000-source (8.0.19-1) unstable; urgency=low
 
   * Initial release.
