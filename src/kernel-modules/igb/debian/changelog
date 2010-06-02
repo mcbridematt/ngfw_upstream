@@ -1,5 +1,6 @@
-igb-source (1.1.2.1a-1) unstable; urgency=low
+igb-source (8.0.19-1) unstable; urgency=low
 
   * Initial release.
 
- -- Sebastien Delafond <seb@untangle.com>  Tue, 01 Jun 2010 06:51:08 -0700
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 02 Jun 2010 01:04:45 -0700
+
