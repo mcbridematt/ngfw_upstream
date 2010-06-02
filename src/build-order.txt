@@ -6,3 +6,4 @@ libmicrohttpd/libmicrohttpd-0.3.1			sid
 splashy/splashy-0.3.13					lenny
 
 kernel-modules/e1000e                                   lenny,sid
+kernel-modules/e1000                                    lenny,sid

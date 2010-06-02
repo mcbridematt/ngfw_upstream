@@ -1,3 +1,15 @@
+ipset (7.3.0~svn20091221r25305main+seb20100601T080222-1lenny) seb; urgency=low
+
+  * auto build
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 01 Jun 2010 08:02:23 -0700
+
+ipset (7.3.0~svn20091221r25305main-1lenny) chaos; urgency=low
+
+  * auto build
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 01 Jun 2010 08:01:22 -0700
+
 ipset (2.5.0-1) unstable; urgency=low
 
   * New upstream release; closes: #503683.
