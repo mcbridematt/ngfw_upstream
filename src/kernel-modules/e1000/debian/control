@@ -1,5 +1,5 @@
 Source: e1000-source
-Section: upstream
+Section: upstream/kernel
 Priority: extra
 Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5.0.37), dpatch

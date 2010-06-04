@@ -1,7 +1,7 @@
 Source: ipset
-Section: net
+Section: upstream/kernel
 Priority: extra
-Maintainer: Robert S. Edmonds <edmonds@debian.org>
+Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5)
 Standards-Version: 3.8.1
 
