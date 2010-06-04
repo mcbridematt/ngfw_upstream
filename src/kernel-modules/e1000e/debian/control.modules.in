@@ -11,5 +11,5 @@ Depends: modutils | module-init-tools
 Provides: e1000e-kernel
 Recommends: linux-image-_KVERS_
 Description: e1000e ethernet driver for kernel _KVERS_ (binary module)
- This package provides the source code for the e1000e module provided
- by Broadcom, made for the Linux kernel _KVERS_.
+ This package provides the source code for the e1000e module made for
+ the Linux kernel _KVERS_.

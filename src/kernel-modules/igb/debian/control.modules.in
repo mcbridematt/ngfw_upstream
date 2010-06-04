@@ -11,5 +11,5 @@ Depends: modutils | module-init-tools
 Provides: igb-kernel
 Recommends: linux-image-_KVERS_
 Description: igb ethernet driver for kernel _KVERS_ (binary module)
- This package provides the source code for the igb module provided
- by Broadcom, made for the Linux kernel _KVERS_.
+ This package provides the source code for the igb module made for the
+ Linux kernel _KVERS_.

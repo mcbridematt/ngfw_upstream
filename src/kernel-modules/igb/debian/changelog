@@ -1,3 +1,9 @@
+igb-source (8.0.19+untangle4-1) unstable; urgency=low
+
+  * Correct description for binary module packages.
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 04 Jun 2010 04:05:47 -0700
+
 igb-source (8.0.19+untangle3-1) unstable; urgency=low
 
   * Correct section and maintainer scripts.
