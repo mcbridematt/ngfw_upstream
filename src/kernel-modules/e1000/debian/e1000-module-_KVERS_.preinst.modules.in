@@ -1,26 +1,13 @@
 #! /bin/sh
-# postinst script
 
 set -e
 set -x
 
 KVERS=$(echo $DPKG_MAINTSCRIPT_PACKAGE | perl -pe 's/.+-2.6/2.6/')
 
-case "$1" in
-    configure)
-      while read mod ; do
-        find /lib/modules/$KVERS -name $mod -exec rm -f "{}" \;
-      done < /usr/share/doc/$DPKG_MAINTSCRIPT_PACKAGE/list
-    ;;
-
-    abort-upgrade|abort-remove|abort-deconfigure)
-    ;;
-
-    *)
-      echo "postinst called with unknown argument \`$1'" >&2
-      exit 0
-    ;;
-esac
+while read mod ; do
+  find /lib/modules/$KVERS -name $mod -exec rm -f "{}" \;
+done < /usr/share/doc/$DPKG_MAINTSCRIPT_PACKAGE/list
 
 #DEBHELPER#
 
