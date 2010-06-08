@@ -3,7 +3,7 @@ Section: upstream/kernel
 Priority: optional
 Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5)
-Standards-Version: 3.8.1
+Standards-Version: 3.8.2
 
 Package: ipset-modules-_KVERS_
 Architecture: any
