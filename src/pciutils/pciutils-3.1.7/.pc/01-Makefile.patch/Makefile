@@ -1,7 +1,7 @@
 # Makefile for The PCI Utilities
 # (c) 1998--2010 Martin Mares <mj@ucw.cz>
 
-OPT=-O2 -g
+OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
 VERSION=3.1.7
@@ -52,9 +52,7 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
 
-pcimod-$(PCI_OS_LINUX) := pcimodules
-pcimod8-$(PCI_OS_LINUX) := pcimodules.8
-all: lib/$(PCILIB) lspci setpci example lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS) $(pcimod-1) $(pcimod8-1)
+all: lib/$(PCILIB) lspci setpci example lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
 
 lib/$(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -66,7 +64,6 @@ lib/config.h lib/config.mk:
 
 lspci: lspci.o ls-vpd.o ls-caps.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o common.o lib/$(PCILIB)
 setpci: setpci.o common.o lib/$(PCILIB)
-pcimodules: pcimodules.o common.o lib/$(PCILIB)
 
 LSPCIINC=lspci.h pciutils.h $(PCIINC)
 lspci.o: lspci.c $(LSPCIINC)
@@ -78,11 +75,10 @@ ls-tree.o: ls-tree.c $(LSPCIINC)
 ls-map.o: ls-map.c $(LSPCIINC)
 
 setpci.o: setpci.c pciutils.h $(PCIINC)
-pcimodules.o: pcimodules.c pciutils.h $(PCIINC)
 common.o: common.c pciutils.h $(PCIINC)
 
 update-pciids: update-pciids.sh
-	sed <$< >$@ "s@^FILE=.*@FILE=$(IDSDIR)/pci.ids@"
+	sed <$< >$@ "s@^DEST=.*@DEST=$(IDSDIR)/$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@"
 	chmod +x $@
 
 # The example of use of libpci
@@ -98,7 +94,6 @@ example.o: example.c $(PCIINC)
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
 	rm -f update-pciids lspci setpci example lib/config.* *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.*
-	rm -f pcimodules
 	rm -rf maint/dist
 
 distclean: clean
@@ -106,10 +101,10 @@ distclean: clean
 install: all
 # -c is ignored on Linux, but required on FreeBSD
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7
-	$(INSTALL) -c -m 755 $(STRIP) lspci setpci $(pcimod-1) $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -c -m 755 $(STRIP) lspci setpci $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
-	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(pcimod8-1) $(DESTDIR)$(MANDIR)/man8
+	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -c -m 644 pcilib.7 $(DESTDIR)$(MANDIR)/man7
 ifeq ($(SHARED),yes)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
@@ -130,7 +125,6 @@ uninstall: all
 	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
-	rm -f $(DESTDIR)$(SBINDIR)/pcimodules $(DESTDIR)$(MANDIR)/man8/pcimodules.8
 	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
 ifeq ($(SHARED),yes)
 	rm -f $(DESTDIR)$(LIBDIR)/$(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so$(ABI_VERSION)

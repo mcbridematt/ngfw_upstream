@@ -42,20 +42,18 @@ ifdef PCI_HAVE_PM_NBSD_LIBPCI
 OBJS += nbsd-libpci
 endif
 
-PCILIBA=libpci.a
+all: $(PCILIB) $(PCILIBPC)
 
-all: $(PCILIB) $(PCILIBA) $(PCILIBPC)
-
-#ifeq ($(SHARED),no)
-$(PCILIBA): $(addsuffix .o,$(OBJS))
+ifeq ($(SHARED),no)
+$(PCILIB): $(addsuffix .o,$(OBJS))
 	rm -f $@
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
-#else
+else
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,--version-script=libpci.ver -o $@ $^ $(LIB_LDLIBS)
-#endif
+endif
 
 $(PCILIBPC): libpci.pc.in
 	sed <$< >$@ -e 's,@PREFIX@,$(PREFIX),' \
