@@ -41,15 +41,3 @@ Description: Linux PCI Utilities (shared library)
  .
  The libpci library provides portable access to configuration
  registers of devices connected to the PCI bus.
-
-Package: pciutils-udeb
-XC-Package-Type: udeb
-Section: debian-installer
-Architecture: any
-Priority: standard
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Linux PCI Utilities (udeb)
- This package contains various utilities for inspecting and setting of
- devices connected to the PCI bus. 
- .
- This is a minimal version for use in debian-installer.
