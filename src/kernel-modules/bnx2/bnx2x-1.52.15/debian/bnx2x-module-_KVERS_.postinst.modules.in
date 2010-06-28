@@ -1,0 +1,14 @@
+#! /bin/sh
+
+set -e
+set -x
+
+KVERS=$(echo $DPKG_MAINTSCRIPT_PACKAGE | perl -pe 's/.+-2.6/2.6/')
+
+while read mod ; do
+  find /lib/modules/$KVERS -name $mod -a ! -path "*extra*" -exec rm -f "{}" \;
+done < /usr/share/doc/$DPKG_MAINTSCRIPT_PACKAGE/list
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,16 @@
+Source: bnx2x-source
+Section: upstream/kernel
+Priority: extra
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>= 5.0.37), dpatch
+Build-Depends-Indep: debconf-utils
+Standards-Version: 3.7.2
+
+Package: bnx2x-source
+Architecture: all
+Depends: module-assistant
+Recommends:  dpkg-dev, kernel-package, debhelper (>= 5.0.37), debconf-utils
+Description: module source for bnx2x
+ This package provides the source code for the bnx2x module.. You
+ will need make-kpkg from kernel-package to be able to compile modules
+ usable with a Debian kernel.

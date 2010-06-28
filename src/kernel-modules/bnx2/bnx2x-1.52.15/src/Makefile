@@ -9,28 +9,7 @@ endif
 # PREFIX may be set by the RPM build to set the effective root.
 PREFIX =
 
-# paths
-KERNEL_DIR = /lib/modules/$(KVER)/build
-ifeq ($(shell ls /lib/modules/$(KVER)/updates > /dev/null 2>&1 && echo 1),1)
-    DRV_DIR = updates
-else
-    ifeq ($(shell grep -q "search.*[[:space:]]updates" /etc/depmod.conf > /dev/null 2>&1 && echo 1),1)
-        DRV_DIR = updates
-    else
-        ifeq ($(shell grep -q "search.*[[:space:]]updates" /etc/depmod.d/* > /dev/null 2>&1 && echo 1),1)
-            DRV_DIR = updates
-        else
-            DRV_DIR = kernel/drivers/net
-        endif
-    endif
-endif
-
-ifeq ($(shell [ -e /etc/SuSE-release ] && echo 1),1)
-	SUSE_VER = $(shell grep VERSION /etc/SuSE-release | sed -e 's/.*= //')
-	ifeq ($(shell [ $(SUSE_VER) -ge 11 ] && echo 1),1)
-		SUSE_SUPPORT = Module.supported
-	endif
-endif
+KERNEL_DIR = /usr/src/linux-headers-$(KVER)
 
 MAN_DIR = $(PREFIX)/usr/share/man/man4
 
