@@ -1,3 +1,4 @@
+tg3                                                     lenny,sid
 ipset/ipset-2.5.0     					lenny,sid
 niagara22xxed                                           lenny,sid
 e1000e                                                  lenny,sid

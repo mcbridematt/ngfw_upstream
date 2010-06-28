@@ -1,0 +1,15 @@
+Source: tg3-source
+Section: upstream/kernel
+Priority: optional
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>= 5.0.37), debconf-utils, module-assistant
+Standards-Version: 3.7.2
+
+Package: tg3-module-_KVERS_
+Architecture: any
+Depends: modutils | module-init-tools
+Provides: tg3-kernel
+Recommends: linux-image-_KVERS_
+Description: tg3 ethernet driver for kernel _KVERS_ (binary module)
+ This package provides the source code for the tg3 module
+ made for the Linux kernel _KVERS_.
