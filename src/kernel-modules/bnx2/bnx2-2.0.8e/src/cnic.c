@@ -61,8 +61,8 @@
 #include "../../bnx2x/src/bnx2x_reg.h"
 #include "../../bnx2x/src/bnx2x_fw_defs.h"
 #include "../../bnx2x/src/bnx2x_hsi.h"
-#include "../../current/driver/57xx_iscsi_constants.h"
-#include "../../current/driver/57xx_iscsi_hsi.h"
+#include "../../bnx2i/driver/57xx_iscsi_constants.h"
+#include "../../bnx2i/driver/57xx_iscsi_hsi.h"
 #include "cnic.h"
 #include "cnic_defs.h"
 

@@ -159,11 +159,6 @@ typedef int netdev_tx_t;
 #define __releases(x)
 #endif
 
-#ifndef HAVE_LE32
-typedef u32 __le32;
-typedef u32 __be32;
-#endif
-
 #ifndef USEC_PER_SEC
 #define USEC_PER_SEC	1000000L
 #endif
@@ -295,35 +290,6 @@ static inline int skb_is_gso(const struct sk_buff *skb)
 #define NETIF_F_TSO_ECN	0
 #endif
 
-#ifndef HAVE_IP_HDR
-static inline struct iphdr *ip_hdr(const struct sk_buff *skb)
-{
-	return skb->nh.iph;
-}
-#endif
-
-#ifndef NEW_SKB
-static inline int skb_transport_offset(const struct sk_buff *skb)
-{
-	return (int) (skb->h.raw - skb->data);
-}
-
-static inline unsigned int ip_hdrlen(const struct sk_buff *skb)
-{
-	return ip_hdr(skb)->ihl * 4;
-}
-
-static inline struct tcphdr *tcp_hdr(const struct sk_buff *skb)
-{
-	return skb->h.th;
-}
-
-static inline unsigned int tcp_optlen(const struct sk_buff *skb)
-{
-	return (tcp_hdr(skb)->doff - 5) * 4;
-}
-
-#endif
 #endif /* #ifdef NETIF_F_TSO */
 
 #ifndef VMWARE_ESX_40_DDK
@@ -422,12 +388,6 @@ static inline unsigned long bnx2_msleep_interruptible(unsigned int msecs)
 	return msleep_interruptible(msecs);
 #endif
 }
-
-#ifndef HAVE_BOOL
-typedef int bool;
-#define false 0
-#define true  1
-#endif
 
 #if defined (__VMKLNX__)
 /**

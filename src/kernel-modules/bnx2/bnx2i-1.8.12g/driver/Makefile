@@ -8,28 +8,8 @@ endif
 
 # PREFIX may be set by the RPM build to set the effective root.
 PREFIX=
-ifeq ($(shell ls /lib/modules/$(KVER)/build > /dev/null 2>&1 && echo build),)
-# SuSE source RPMs
-  _KVER=$(shell echo $(KVER) | cut -d "-" -f1,2)
-  _KFLA=$(shell echo $(KVER) | cut -d "-" -f3)
-  _ARCH=$(shell file -b /lib/modules/$(shell uname -r)/build | cut -d "/" -f5)
-  ifeq ($(_ARCH),)
-    _ARCH=$(shell uname -m)
-  endif
-  ifeq ($(shell ls /usr/src/linux-$(_KVER)-obj > /dev/null 2>&1 && echo linux),)
-    LINUX=
-  else
-    LINUX=/usr/src/linux-$(_KVER)-obj/$(_ARCH)/$(_KFLA)
-    LINUXSRC=/usr/src/linux-$(_KVER)
-  endif
-else
-  LINUX=/lib/modules/$(KVER)/build
-  ifeq ($(shell ls /lib/modules/$(KVER)/source > /dev/null 2>&1 && echo source),)
-    LINUXSRC=$(LINUX)
-  else
-    LINUXSRC=/lib/modules/$(KVER)/source
-  endif
-endif
+LINUX=/usr/src/linux-headers-$(KVER)
+LINUXSRC=$(LINUX)
 
 # Make sure only one bnx2? DKMS RPM is installed.
 #ifneq ($(shell rpm -qa | grep -v "bnx2i-*" | grep "netxtreme2-.*dkms" | wc -l), 1)

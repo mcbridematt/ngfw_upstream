@@ -1,0 +1,20 @@
+Debianised BCM5700 Linux kernel module
+======================================
+
+This package includes the GPL'd driver of Broadcom for the BCM5700 chip.
+
+There are a number of reasons why this driver is not in the mainstream kernel.
+The biggest reason is coding style, since nobody really understood anything
+about it. Although the code is not bad, it does not conform to the coding
+style used throughout the kernel, and hence can not be included in the
+mainstream source.
+
+It supports the kernel VLAN API as well as the Broadcom-specific NICE API.
+
+The source code reveals how to use "hardware accelerated" VLAN tagging. The
+driver works with Ben Greear's VLAN patches.
+
+Please refer to the README.support document for information on support for 
+this driver.
+
+ -- martin f. krafft <madduck@debian.org>  Wed, 05 Jul 2003 11:00:47 +0100
