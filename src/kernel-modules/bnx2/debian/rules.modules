@@ -25,9 +25,9 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	cd /usr/src/ ; tar xzf bnx2x.tar.gz # nasty
-	cd /usr/src/ ; tar xzf bnx2i.tar.gz # nasty
-	$(ROOT_CMD) $(MAKE) -C src
+	$(ROOT_CMD) $(MAKE) -C bnx2-2.0.8e/src
+	$(ROOT_CMD) $(MAKE) -C bnx2i-1.8.12g/driver
+	$(ROOT_CMD) $(MAKE) -C bnx2x-1.52.15/src
 
 	dh_installdirs lib/modules/$(KVERS)/extra
 

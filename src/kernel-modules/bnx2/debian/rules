@@ -5,7 +5,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-NAME=bnx2i
+NAME=bnx2
 
 configure: configure-stamp
 configure-stamp:
@@ -22,7 +22,7 @@ modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
 	chmod -R ug=rwX,o=rX modules
 
 $(NAME).tar.gz: modules/$(NAME)
-	tar cf - modules | gzip -9 > $(NAME).tar.gz
+	tar cf - . | gzip -9 > $(NAME).tar.gz
 
 build-stamp: $(NAME).tar.gz configure-stamp 
 	dh_testdir

@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 
 Package: bnx2-source
 Architecture: all
-Depends: module-assistant, bnx2x-source, bnx2i-source
+Depends: module-assistant
 Recommends:  dpkg-dev, kernel-package, debhelper (>= 5.0.37), debconf-utils
 Description: module source for bnx2
  This package provides the source code for the bnx2 module.. You
