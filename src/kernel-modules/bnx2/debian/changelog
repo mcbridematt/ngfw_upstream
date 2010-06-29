@@ -1,3 +1,9 @@
+bnx2-source (1:1.8.12g+untangle4-1) unstable; urgency=low
+
+  * Right.
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 29 Jun 2010 06:55:53 -0700
+
 bnx2-source (1.8.12g+untangle3-1) unstable; urgency=low
 
   * Backtracking: seems I can't split those up at all.
