@@ -1,7 +1,4 @@
-ipset/ipset-2.5.0     					lenny,sid
-bnx2/bnx2x-1.52.15                                      lenny,sid
-bnx2/bnx2i-1.8.12g                                      lenny,sid
-bnx2/bnx2-2.0.8e                                        lenny,sid
+bnx2                                                    lenny,sid
 tg3                                                     lenny,sid
 niagara22xxed                                           lenny,sid
 e1000e                                                  lenny,sid
