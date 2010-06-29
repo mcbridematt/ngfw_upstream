@@ -1,15 +1,16 @@
 #!/usr/bin/make
 # Makefile for building Linux Broadcom 10-Gigabit ethernet driver as a module.
 
-KVER =
-ifeq ($(KVER),)
-    KVER = $(shell uname -r)
+ifeq (,$(BUILD_KERNEL))
+BUILD_KERNEL=$(shell uname -r)
 endif
+
+KVER = $(BUILD_KERNEL)
 
 # PREFIX may be set by the RPM build to set the effective root.
 PREFIX =
 
-KERNEL_DIR = /usr/src/linux-headers-$(KVER)
+KERNEL_DIR = /usr/src/linux #-headers-$(KVER)
 
 MAN_DIR = $(PREFIX)/usr/share/man/man4
 

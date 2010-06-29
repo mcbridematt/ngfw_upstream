@@ -8,7 +8,7 @@ endif
 
 # PREFIX may be set by the RPM build to set the effective root.
 PREFIX=
-LINUX=/usr/src/linux-headers-$(KVER)
+LINUX=/usr/src/linux
 LINUXSRC=$(LINUX)
 
 # Make sure only one bnx2? DKMS RPM is installed.
