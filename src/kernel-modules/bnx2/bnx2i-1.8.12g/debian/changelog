@@ -1,3 +1,9 @@
+bnx2i-source (1.8.12g+untangle1-1) unstable; urgency=low
+
+  * New makefiles.
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 29 Jun 2010 04:54:51 -0700
+
 bnx2i-source (1.8.12g-1) unstable; urgency=low
 
   * Initial release.

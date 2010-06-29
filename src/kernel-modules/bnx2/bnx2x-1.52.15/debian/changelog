@@ -1,3 +1,9 @@
+bnx2x-source (1.52.15+untangle1-1) unstable; urgency=low
+
+  * New makefiles.
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 29 Jun 2010 04:55:06 -0700
+
 bnx2x-source (1.52.15-1) unstable; urgency=low
 
   * Initial release.
