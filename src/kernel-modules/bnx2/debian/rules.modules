@@ -25,9 +25,10 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	$(ROOT_CMD) $(MAKE) -C bnx2-2.0.8e/src
-	$(ROOT_CMD) $(MAKE) -C bnx2i-1.8.12g/driver
-	$(ROOT_CMD) $(MAKE) -C bnx2x-1.52.15/src
+#	$(ROOT_CMD) $(MAKE) -C bnx2-2.0.8e/src
+#	$(ROOT_CMD) $(MAKE) -C bnx2x-1.52.15/src
+#	$(ROOT_CMD) $(MAKE) -C bnx2i-1.8.12g/driver
+	$(ROOT_CMD) $(MAKE)
 
 	dh_installdirs lib/modules/$(KVERS)/extra
 
@@ -37,7 +38,7 @@ binary-modules: kdist_config
 	   install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/extra ; \
 	done
 
-	dh_installdocs list README*
+	dh_installdocs list
 	dh_installmodules
 	dh_installchangelogs
 	dh_compress

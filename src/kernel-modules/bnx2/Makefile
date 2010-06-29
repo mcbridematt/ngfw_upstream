@@ -1,9 +1,10 @@
 #!/usr/bin/make
 
-KVER=
-ifeq ($(KVER),)
-    KVER=$(shell uname -r)
-endif
+KVER = $(KVERS)
+
+# ifeq ($(KVER),)
+#     KVER=$(shell uname -r)
+# endif
 
 # ifeq ($(shell test -f /etc/redhat-release > /dev/null 2>&1 || echo notfound),)
 #     MAJVER := $(shell sed -e 's/.*release \([0-9]\).*/\1/' /etc/redhat-release)
