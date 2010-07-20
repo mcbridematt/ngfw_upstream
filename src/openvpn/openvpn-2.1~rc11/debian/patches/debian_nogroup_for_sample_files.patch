@@ -1,0 +1,66 @@
+--- openvpn-2.1~rc7.orig/sample-config-files/server.conf
++++ openvpn-2.1~rc7/sample-config-files/server.conf
+@@ -252,7 +252,7 @@
+ # You can uncomment this out on
+ # non-Windows systems.
+ ;user nobody
+-;group nobody
++;group nogroup
+ 
+ # The persist options will try to avoid
+ # accessing certain resources on restart
+--- openvpn-2.1~rc7.orig/sample-config-files/tls-home.conf
++++ openvpn-2.1~rc7/sample-config-files/tls-home.conf
+@@ -51,7 +51,7 @@
+ # "nobody" after initialization
+ # for extra security.
+ ; user nobody
+-; group nobody
++; group nogroup
+ 
+ # If you built OpenVPN with
+ # LZO compression, uncomment
+--- openvpn-2.1~rc7.orig/sample-config-files/static-home.conf
++++ openvpn-2.1~rc7/sample-config-files/static-home.conf
+@@ -40,7 +40,7 @@
+ # "nobody" after initialization
+ # for extra security.
+ ; user nobody
+-; group nobody
++; group nogroup
+ 
+ # If you built OpenVPN with
+ # LZO compression, uncomment
+--- openvpn-2.1~rc7.orig/sample-config-files/static-office.conf
++++ openvpn-2.1~rc7/sample-config-files/static-office.conf
+@@ -37,7 +37,7 @@
+ # "nobody" after initialization
+ # for extra security.
+ ; user nobody
+-; group nobody
++; group nogroup
+ 
+ # If you built OpenVPN with
+ # LZO compression, uncomment
+--- openvpn-2.1~rc7.orig/sample-config-files/client.conf
++++ openvpn-2.1~rc7/sample-config-files/client.conf
+@@ -59,7 +59,7 @@
+ 
+ # Downgrade privileges after initialization (non-Windows only)
+ ;user nobody
+-;group nobody
++;group nogroup
+ 
+ # Try to preserve some state across restarts.
+ persist-key
+--- openvpn-2.1~rc7.orig/sample-config-files/tls-office.conf
++++ openvpn-2.1~rc7/sample-config-files/tls-office.conf
+@@ -51,7 +51,7 @@
+ # "nobody" after initialization
+ # for extra security.
+ ; user nobody
+-; group nobody
++; group nogroup
+ 
+ # If you built OpenVPN with
+ # LZO compression, uncomment

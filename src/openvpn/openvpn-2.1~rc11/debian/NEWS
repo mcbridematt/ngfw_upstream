@@ -1,0 +1,15 @@
+openvpn (2.1~rc9-3) unstable; urgency=low
+
+  * Calling of external commands/scripts 
+
+    Starting with version 2.1~rc9, openvpn has a new option to control the
+    ability to execute external commands (--script-security).
+
+    By default (script-security 1) it will only allow the execution of
+    built-in commands (ip, ifconfig, route,...). If you require the execution
+    of external commands, such as /etc/openvpn/update-resolv-conf, you'll have
+    to include the following option in your configuration file:
+    script-security 2
+
+ -- Alberto Gonzalez Iniesta <agi@inittab.org>  Sat, 16 Aug 2008 13:34:24 +0200
+
