@@ -1,7 +1,7 @@
 Source: openvpn
 Section: net
 Priority: optional
-Maintainer: Alberto Gonzalez Iniesta <agi@inittab.org>
+Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 4.1.16), libssl-dev (>> 0.9.8g-9), liblzo2-dev, libpam0g-dev, quilt, libpkcs11-helper1-dev
 Standards-Version: 3.7.3
 
