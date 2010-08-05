@@ -18,9 +18,9 @@ include /usr/share/quilt/quilt.make
 
 build: patch debian/stamp-build
 debian/stamp-build:
-	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter/xt_IMQ.h /usr/include/linux/netfilter/
-	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter_ipv4/ipt_IMQ.h /usr/include/linux/netfilter_ipv4/
-	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter_ipv6/ip6t_IMQ.h /usr/include/linux/netfilter_ipv6/
+	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter/xt_IMQ.h include/linux/netfilter/
+	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter_ipv4/ipt_IMQ.h include/linux/netfilter_ipv4/
+	ln -sf /usr/src/linux-headers-2.6.26-2-common-untangle/include/linux/netfilter_ipv6/ip6t_IMQ.h include/linux/netfilter_ipv6/
 	dh build --before dh_auto_configure
 	autoreconf -fi
 	dh_auto_configure -- $(configure)
