@@ -1,8 +1,8 @@
 Source: iptables
 Section: net
 Priority: important
-Maintainer: Laurence J. Lane <ljlane@debian.org>
-Build-Depends: debhelper (>>7.0), quilt, autoconf, automake, libtool
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>>7.0), quilt, autoconf, automake, libtool, linux-headers-2.6.26-2-common-untangle
 Standards-Version: 3.8.0
 Homepage: http://www.netfilter.org/
 
