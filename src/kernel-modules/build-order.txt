@@ -4,3 +4,4 @@ e1000                                                   lenny,sid
 igb                                                     lenny,sid
 bnx2                                                    lenny,sid
 tg3                                                     lenny,sid
+ipset/ipset-2.5.0                                       lenny,sid
