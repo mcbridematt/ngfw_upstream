@@ -1,6 +1,7 @@
-iptables/iptables-1.4.2                                 lenny
-openvpn/openvpn-2.1~rc11                                lenny
-pciutils/pciutils-3.1.7                                 lenny
+conntrack/conntrack-0.9.7                               lenny,sid
+iptables/iptables-1.4.2                                 lenny,sid
+openvpn/openvpn-2.1~rc11                                lenny,sid
+pciutils/pciutils-3.1.7                                 lenny,sid
 jslint/jslint-0.1.0					lenny,sid
 monit/monit-5.0.3					lenny,sid
 libjson/libjson-0.7					lenny,sid
