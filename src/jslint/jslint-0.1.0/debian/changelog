@@ -1,3 +1,9 @@
+jslint (0.2.2-2) unstable; urgency=low
+
+  * Make /usr/bin/jslint executable.
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 28 Oct 2010 08:58:58 -0700
+
 jslint (0.2.2-1) unstable; urgency=low
 
   * Fixed faulty ignore mechanism.
