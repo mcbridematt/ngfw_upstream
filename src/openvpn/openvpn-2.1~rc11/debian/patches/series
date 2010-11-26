@@ -5,4 +5,3 @@ debian_nogroup_for_sample_files.patch
 debian_openssl_vulnkeys.patch
 attemping_typo
 lladdr-is-not-ip.patch
-push-limit.patch
