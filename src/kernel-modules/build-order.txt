@@ -1,4 +1,4 @@
-virtualbox-guest                                        lenny,sid
+virtualbox-ose-guest                                    lenny,sid
 niagara22xxed                                           lenny,sid
 e1000e                                                  lenny,sid
 e1000                                                   lenny,sid
