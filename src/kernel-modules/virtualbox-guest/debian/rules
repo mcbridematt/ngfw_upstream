@@ -15,15 +15,14 @@ configure-stamp:
 build: build-stamp
 
 modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
-	mkdir -p modules/$(NAME)/debian
-	cp -dR include r0* vbox* modules/$(NAME)
+	mkdir -p modules/$(NAME)/debian	modules/$(NAME)/src
+	cp -dR Makefile include r0* vbox* modules/$(NAME)/src/
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
 	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
-	cp README* modules/$(NAME)
 	chmod -R ug=rwX,o=rX modules
 
 $(NAME).tar.gz: modules/$(NAME)
-	tar cf - modules | gzip -9 > $(NAME).tar.gz
+	tar --exclude .svn -cf - modules | gzip -9 > $(NAME).tar.gz
 
 build-stamp: $(NAME).tar.gz configure-stamp 
 	dh_testdir
@@ -41,6 +40,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
+	mkdir -p $(CURDIR)/debian/$(NAME)-source/usr/src
 	cp $(NAME).tar.gz $(CURDIR)/debian/$(NAME)-source/usr/src
 	chmod 0644 $(CURDIR)/debian/$(NAME)-source/usr/src/$(NAME).tar.gz
 

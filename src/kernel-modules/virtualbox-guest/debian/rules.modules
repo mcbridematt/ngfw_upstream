@@ -16,7 +16,7 @@ MINORKVERS=$(shell echo $(KVERS) | cut -f 2 -d .)
 
 kdist_clean:
 	-rm -f build-stamp configure-stamp
-	test -f src/Makefile && $(ROOT_CMD) $(MAKE) clean || true
+	test -f src/Makefile && $(ROOT_CMD) $(MAKE) -C src clean || true
 	-dh_clean
 	-rm -f debian/control
 	-rm -f list
@@ -25,7 +25,7 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	$(ROOT_CMD) $(MAKE) obj-m
+	$(ROOT_CMD) $(MAKE) -C src obj-m
 
 	dh_installdirs lib/modules/$(KVERS)/extra
 
