@@ -1,5 +1,5 @@
 Source: virtualbox-ose-guest
-Section: misc
+Section: upstream/kernel
 Priority: extra
 Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5.0.44~), dpatch
