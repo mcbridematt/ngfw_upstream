@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -21,10 +21,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___VBox_log_h
@@ -87,18 +83,28 @@ typedef enum LOGGROUP
     LOG_GROUP_DEV_APIC,
     /** Audio Device group. */
     LOG_GROUP_DEV_AUDIO,
+    /** BusLogic SCSI host adapter group. */
+    LOG_GROUP_DEV_BUSLOGIC,
     /** DMA Controller group. */
     LOG_GROUP_DEV_DMA,
     /** Gigabit Ethernet Device group. */
     LOG_GROUP_DEV_E1000,
+    /** Extensible Firmware Interface Device group. */
+    LOG_GROUP_DEV_EFI,
     /** Floppy Controller Device group. */
     LOG_GROUP_DEV_FDC,
+    /** High Precision Event Timer Device group. */
+    LOG_GROUP_DEV_HPET,
     /** IDE Device group. */
     LOG_GROUP_DEV_IDE,
     /** The internal networking IP stack Device group. */
     LOG_GROUP_DEV_INIP,
     /** KeyBoard Controller Device group. */
     LOG_GROUP_DEV_KBD,
+    /** Low Pin Count Device group. */
+    LOG_GROUP_DEV_LPC,
+    /** LsiLogic SCSI controller Device group. */
+    LOG_GROUP_DEV_LSILOGICSCSI,
     /** NE2000 Device group. */
     LOG_GROUP_DEV_NE2000,
     /** Parallel Device group */
@@ -121,10 +127,16 @@ typedef enum LOGGROUP
     LOG_GROUP_DEV_RTC,
     /** Serial Device group */
     LOG_GROUP_DEV_SERIAL,
+    /** System Management Controller Device group. */
+    LOG_GROUP_DEV_SMC,
     /** USB Device group. */
     LOG_GROUP_DEV_USB,
     /** VGA Device group. */
     LOG_GROUP_DEV_VGA,
+    /** Virtio PCI Device group. */
+    LOG_GROUP_DEV_VIRTIO,
+    /** Virtio Network Device group. */
+    LOG_GROUP_DEV_VIRTIO_NET,
     /** VMM Device group. */
     LOG_GROUP_DEV_VMM,
     /** VMM Device group for backdoor logging. */
@@ -141,6 +153,8 @@ typedef enum LOGGROUP
     LOG_GROUP_DRV_BLOCK,
     /** Char driver group. */
     LOG_GROUP_DRV_CHAR,
+    /** Disk integrity driver group. */
+    LOG_GROUP_DRV_DISK_INTEGRITY,
     /** Floppy media driver group. */
     LOG_GROUP_DRV_FLOPPY,
     /** Host Base block driver group. */
@@ -173,6 +187,10 @@ typedef enum LOGGROUP
     LOG_GROUP_DRV_NAT,
     /** Raw image driver group */
     LOG_GROUP_DRV_RAW_IMAGE,
+    /** SCSI driver group. */
+    LOG_GROUP_DRV_SCSI,
+    /** Host SCSI driver group. */
+    LOG_GROUP_DRV_SCSIHOST,
     /** Async transport driver group */
     LOG_GROUP_DRV_TRANSPORT_ASYNC,
     /** TUN network transport driver group */
@@ -219,6 +237,14 @@ typedef enum LOGGROUP
     LOG_GROUP_MM_PHYS,
     /** MM Page pool group. */
     LOG_GROUP_MM_POOL,
+    /** The NAT service group */
+    LOG_GROUP_NAT_SERVICE,
+    /** The network adaptor driver group. */
+    LOG_GROUP_NET_ADP_DRV,
+    /** The network filter driver group. */
+    LOG_GROUP_NET_FLT_DRV,
+    /** The common network service group */
+    LOG_GROUP_NET_SERVICE,
     /** PATM group. */
     LOG_GROUP_PATM,
     /** PDM group. */
@@ -235,14 +261,14 @@ typedef enum LOGGROUP
     LOG_GROUP_PDM_QUEUE,
     /** PGM group. */
     LOG_GROUP_PGM,
-    /** PGMCACHE group. */
-    LOG_GROUP_PGMCACHE,
     /** PGM physical group. */
     LOG_GROUP_PGM_PHYS,
     /** PGM physical access group. */
     LOG_GROUP_PGM_PHYS_ACCESS,
     /** PGM shadow page pool group. */
     LOG_GROUP_PGM_POOL,
+    /** PGM shared paging group. */
+    LOG_GROUP_PGM_SHARED,
     /** REM group. */
     LOG_GROUP_REM,
     /** REM disassembly handler group. */
@@ -259,6 +285,10 @@ typedef enum LOGGROUP
     LOG_GROUP_REM_RUN,
     /** SELM group. */
     LOG_GROUP_SELM,
+    /** Shared clipboard host service group. */
+    LOG_GROUP_SHARED_CLIPBOARD,
+    /** Chromium OpenGL host service group. */
+    LOG_GROUP_SHARED_CROPENGL,
     /** Shared folders host service group. */
     LOG_GROUP_SHARED_FOLDERS,
     /** OpenGL host service group. */
@@ -271,12 +301,24 @@ typedef enum LOGGROUP
     LOG_GROUP_STAM,
     /** SUP group. */
     LOG_GROUP_SUP,
+    /** SUPport driver group. */
+    LOG_GROUP_SUP_DRV,
     /** TM group. */
     LOG_GROUP_TM,
     /** TRPM group. */
     LOG_GROUP_TRPM,
+    /** USB driver group. */
+    LOG_GROUP_USB_DRV,
+    /** USBFilter group. */
+    LOG_GROUP_USB_FILTER,
+    /** USB keyboard device group. */
+    LOG_GROUP_USB_KBD,
+    /** MSD USB device group. */
+    LOG_GROUP_USB_MSD,
     /** Generic virtual disk layer. */
     LOG_GROUP_VD,
+    /** iSCSI virtual disk backend. */
+    LOG_GROUP_VD_ISCSI,
     /** Raw virtual disk backend. */
     LOG_GROUP_VD_RAW,
     /** VDI virtual disk backend. */
@@ -290,7 +332,11 @@ typedef enum LOGGROUP
     /** VMM group. */
     LOG_GROUP_VMM,
     /** VRDP group */
-    LOG_GROUP_VRDP
+    LOG_GROUP_VRDP,
+    /** VSCSI group */
+    LOG_GROUP_VSCSI,
+    /** Webservice group. */
+    LOG_GROUP_WEBSERVICE
     /* !!!ALPHABETICALLY!!! */
 } VBOX_LOGGROUP;
 
@@ -324,12 +370,17 @@ typedef enum LOGGROUP
     "DEV_AHCI",     \
     "DEV_APIC",     \
     "DEV_AUDIO",    \
+    "DEV_BUSLOGIC", \
     "DEV_DMA",      \
     "DEV_E1000",    \
+    "DEV_EFI",      \
     "DEV_FDC",      \
+    "DEV_HPET",     \
     "DEV_IDE",      \
     "DEV_INIP",     \
     "DEV_KBD",      \
+    "DEV_LPC",      \
+    "DEV_LSILOGICSCSI", \
     "DEV_NE2000",   \
     "DEV_PARALLEL", \
     "DEV_PC",       \
@@ -341,8 +392,11 @@ typedef enum LOGGROUP
     "DEV_PIT",      \
     "DEV_RTC",      \
     "DEV_SERIAL",   \
+    "DEV_SMC",      \
     "DEV_USB",      \
     "DEV_VGA",      \
+    "DEV_VIRTIO",   \
+    "DEV_VIRTIO_NET", \
     "DEV_VMM",      \
     "DEV_VMM_BACKDOOR", \
     "DEV_VMM_STDERR",\
@@ -351,6 +405,7 @@ typedef enum LOGGROUP
     "DRV_ACPI",     \
     "DRV_BLOCK",    \
     "DRV_CHAR",     \
+    "DRV_DISK_INTEGRITY", \
     "DRV_FLOPPY",   \
     "DRV_HOST_BASE", \
     "DRV_HOST_DVD", \
@@ -367,6 +422,8 @@ typedef enum LOGGROUP
     "DRV_NAMEDPIPE", \
     "DRV_NAT",      \
     "DRV_RAW_IMAGE", \
+    "DRV_SCSI", \
+    "DRV_SCSIHOST", \
     "DRV_TRANSPORT_ASYNC", \
     "DRV_TUN",      \
     "DRV_USBPROXY", \
@@ -390,6 +447,10 @@ typedef enum LOGGROUP
     "MM_HYPER_HEAP",\
     "MM_PHYS",      \
     "MM_POOL",      \
+    "NAT_SERVICE",  \
+    "NET_ADP_DRV",  \
+    "NET_FLT_DRV",  \
+    "NET_SERVICE",  \
     "PATM",         \
     "PDM",          \
     "PDM_ASYNC_COMPLETION", \
@@ -398,10 +459,10 @@ typedef enum LOGGROUP
     "PDM_LDR",      \
     "PDM_QUEUE",    \
     "PGM",          \
-    "PGMCACHE",     \
     "PGM_PHYS",     \
     "PGM_PHYS_ACCESS",\
     "PGM_POOL",     \
+    "PGM_SHARED",   \
     "REM",          \
     "REM_DISAS",    \
     "REM_HANDLER",  \
@@ -410,15 +471,23 @@ typedef enum LOGGROUP
     "REM_PRINTF",   \
     "REM_RUN",      \
     "SELM",         \
+    "SHARED_CLIPBOARD",\
+    "SHARED_CROPENGL",\
     "SHARED_FOLDERS",\
     "SHARED_OPENGL",\
     "SRV_INTNET",   \
     "SSM",          \
     "STAM",         \
     "SUP",          \
+    "SUP_DRV",      \
     "TM",           \
     "TRPM",         \
+    "USB_DRV",      \
+    "USB_FILTER",   \
+    "USB_KBD",      \
+    "USB_MSD",      \
     "VD",           \
+    "VD_ISCSI",     \
     "VD_RAW",       \
     "VD_VDI",       \
     "VD_VHD",       \
@@ -426,8 +495,9 @@ typedef enum LOGGROUP
     "VM",           \
     "VMM",          \
     "VRDP",         \
+    "VSCSI",        \
+    "WEBSERVICE",   \
 }
 
 /** @} */
 #endif
-

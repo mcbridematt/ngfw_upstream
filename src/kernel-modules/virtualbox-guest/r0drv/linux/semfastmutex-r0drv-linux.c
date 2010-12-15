@@ -1,10 +1,10 @@
-/* $Id: semfastmutex-r0drv-linux.c 29978 2008-04-21 17:24:28Z umoeller $ */
+/* $Id: semfastmutex-r0drv-linux.c $ */
 /** @file
  * IPRT - Fast Mutex Semaphores, Ring-0 Driver, Linux.
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,18 +22,14 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
-
 
 
 /*******************************************************************************
 *   Header Files                                                               *
 *******************************************************************************/
 #include "the-linux-kernel.h"
+#include "internal/iprt.h"
 #include <iprt/semaphore.h>
 #include <iprt/alloc.h>
 #include <iprt/assert.h>
@@ -65,96 +61,86 @@ typedef struct RTSEMFASTMUTEXINTERNAL
 } RTSEMFASTMUTEXINTERNAL, *PRTSEMFASTMUTEXINTERNAL;
 
 
-RTDECL(int)  RTSemFastMutexCreate(PRTSEMFASTMUTEX pMutexSem)
+RTDECL(int)  RTSemFastMutexCreate(PRTSEMFASTMUTEX phFastMtx)
 {
     /*
      * Allocate.
      */
-    PRTSEMFASTMUTEXINTERNAL pFastInt;
-    pFastInt = (PRTSEMFASTMUTEXINTERNAL)RTMemAlloc(sizeof(*pFastInt));
-    if (!pFastInt)
+    PRTSEMFASTMUTEXINTERNAL pThis;
+    pThis = (PRTSEMFASTMUTEXINTERNAL)RTMemAlloc(sizeof(*pThis));
+    if (!pThis)
         return VERR_NO_MEMORY;
 
     /*
      * Initialize.
      */
-    pFastInt->u32Magic = RTSEMFASTMUTEX_MAGIC;
-    sema_init(&pFastInt->Semaphore, 1);
+    pThis->u32Magic = RTSEMFASTMUTEX_MAGIC;
+    sema_init(&pThis->Semaphore, 1);
 #ifdef IPRT_DEBUG_SEMS
-    pFastInt->Owner = NIL_RTNATIVETHREAD;
+    pThis->Owner = NIL_RTNATIVETHREAD;
 #endif
-    *pMutexSem = pFastInt;
+
+    *phFastMtx = pThis;
     return VINF_SUCCESS;
 }
+RT_EXPORT_SYMBOL(RTSemFastMutexCreate);
 
 
-RTDECL(int)  RTSemFastMutexDestroy(RTSEMFASTMUTEX MutexSem)
+RTDECL(int)  RTSemFastMutexDestroy(RTSEMFASTMUTEX hFastMtx)
 {
     /*
      * Validate.
      */
-    PRTSEMFASTMUTEXINTERNAL pFastInt = (PRTSEMFASTMUTEXINTERNAL)MutexSem;
-    if (!pFastInt)
-        return VERR_INVALID_PARAMETER;
-    if (pFastInt->u32Magic != RTSEMFASTMUTEX_MAGIC)
-    {
-        AssertMsgFailed(("pFastInt->u32Magic=%RX32 pMutexInt=%p\n", pFastInt->u32Magic, pFastInt));
-        return VERR_INVALID_PARAMETER;
-    }
+    PRTSEMFASTMUTEXINTERNAL pThis = hFastMtx;
+    if (pThis == NIL_RTSEMFASTMUTEX)
+        return VINF_SUCCESS;
+    AssertPtrReturn(pThis, VERR_INVALID_HANDLE);
+    AssertMsgReturn(pThis->u32Magic == RTSEMFASTMUTEX_MAGIC, ("u32Magic=%RX32 pThis=%p\n", pThis->u32Magic, pThis), VERR_INVALID_HANDLE);
 
-    ASMAtomicIncU32(&pFastInt->u32Magic);
-    RTMemFree(pFastInt);
+    ASMAtomicWriteU32(&pThis->u32Magic, RTSEMFASTMUTEX_MAGIC_DEAD);
+    RTMemFree(pThis);
     return VINF_SUCCESS;
 }
+RT_EXPORT_SYMBOL(RTSemFastMutexDestroy);
 
 
-RTDECL(int)  RTSemFastMutexRequest(RTSEMFASTMUTEX MutexSem)
+RTDECL(int)  RTSemFastMutexRequest(RTSEMFASTMUTEX hFastMtx)
 {
     /*
      * Validate.
      */
-    PRTSEMFASTMUTEXINTERNAL pFastInt = (PRTSEMFASTMUTEXINTERNAL)MutexSem;
-    if (    !pFastInt
-        ||  pFastInt->u32Magic != RTSEMFASTMUTEX_MAGIC)
-    {
-        AssertMsgFailed(("pFastInt->u32Magic=%RX32 pMutexInt=%p\n", pFastInt ? pFastInt->u32Magic : 0, pFastInt));
-        return VERR_INVALID_PARAMETER;
-    }
+    PRTSEMFASTMUTEXINTERNAL pThis = hFastMtx;
+    AssertPtrReturn(pThis, VERR_INVALID_HANDLE);
+    AssertMsgReturn(pThis->u32Magic == RTSEMFASTMUTEX_MAGIC, ("u32Magic=%RX32 pThis=%p\n", pThis->u32Magic, pThis), VERR_INVALID_HANDLE);
 
+    IPRT_DEBUG_SEMS_STATE(pThis, 'd');
+    down(&pThis->Semaphore);
 #ifdef IPRT_DEBUG_SEMS
-    snprintf(current->comm, TASK_COMM_LEN, "d%lx", IPRT_DEBUG_SEMS_ADDRESS(pFastInt));
-#endif
-    down(&pFastInt->Semaphore);
-#ifdef IPRT_DEBUG_SEMS
-    snprintf(current->comm, TASK_COMM_LEN, "o%lx", IPRT_DEBUG_SEMS_ADDRESS(pFastInt));
-    AssertRelease(pFastInt->Owner == NIL_RTNATIVETHREAD);
-    ASMAtomicUoWriteSize(&pFastInt->Owner, RTThreadNativeSelf());
+    IPRT_DEBUG_SEMS_STATE(pThis, 'o');
+    AssertRelease(pThis->Owner == NIL_RTNATIVETHREAD);
+    ASMAtomicUoWriteSize(&pThis->Owner, RTThreadNativeSelf());
 #endif
     return VINF_SUCCESS;
 }
+RT_EXPORT_SYMBOL(RTSemFastMutexRequest);
 
 
-RTDECL(int)  RTSemFastMutexRelease(RTSEMFASTMUTEX MutexSem)
+RTDECL(int)  RTSemFastMutexRelease(RTSEMFASTMUTEX hFastMtx)
 {
     /*
      * Validate.
      */
-    PRTSEMFASTMUTEXINTERNAL pFastInt = (PRTSEMFASTMUTEXINTERNAL)MutexSem;
-    if (    !pFastInt
-        ||  pFastInt->u32Magic != RTSEMFASTMUTEX_MAGIC)
-    {
-        AssertMsgFailed(("pFastInt->u32Magic=%RX32 pMutexInt=%p\n", pFastInt ? pFastInt->u32Magic : 0, pFastInt));
-        return VERR_INVALID_PARAMETER;
-    }
+    PRTSEMFASTMUTEXINTERNAL pThis = hFastMtx;
+    AssertPtrReturn(pThis, VERR_INVALID_HANDLE);
+    AssertMsgReturn(pThis->u32Magic == RTSEMFASTMUTEX_MAGIC, ("u32Magic=%RX32 pThis=%p\n", pThis->u32Magic, pThis), VERR_INVALID_HANDLE);
 
 #ifdef IPRT_DEBUG_SEMS
-    AssertRelease(pFastInt->Owner == RTThreadNativeSelf());
-    ASMAtomicUoWriteSize(&pFastInt->Owner, NIL_RTNATIVETHREAD);
+    AssertRelease(pThis->Owner == RTThreadNativeSelf());
+    ASMAtomicUoWriteSize(&pThis->Owner, NIL_RTNATIVETHREAD);
 #endif
-    up(&pFastInt->Semaphore);
-#ifdef IPRT_DEBUG_SEMS
-    snprintf(current->comm, TASK_COMM_LEN, "u%lx", IPRT_DEBUG_SEMS_ADDRESS(pFastInt));
-#endif
+    up(&pThis->Semaphore);
+    IPRT_DEBUG_SEMS_STATE(pThis, 'u');
     return VINF_SUCCESS;
 }
+RT_EXPORT_SYMBOL(RTSemFastMutexRelease);
 

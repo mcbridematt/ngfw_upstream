@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -21,10 +21,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___iprt_fs_h
@@ -35,7 +31,7 @@
 #include <iprt/time.h>
 
 
-__BEGIN_DECLS
+RT_C_DECLS_BEGIN
 
 /** @defgroup grp_rt_fs    RTFs - Filesystem and Volume
  * @ingroup grp_rt
@@ -55,8 +51,8 @@ __BEGIN_DECLS
  * synthesize it from the one given if it requires it.
  *
  * Both sets match their x86 ABIs, the DOS/NT one is simply shifted
- * up 16 bits. The DOS/NT range is bits 16 to 31 inclusivly. The
- * Unix range is bits 0 to 15 (inclusivly).
+ * up 16 bits. The DOS/NT range is bits 16 to 31 inclusively. The
+ * Unix range is bits 0 to 15 (inclusively).
  *
  * @{
  */
@@ -340,6 +336,8 @@ typedef const RTFSOBJINFO *PCRTFSOBJINFO;
  * @param   pcbFree         Where to store the remaining free space in the filesystem. (Optional)
  * @param   pcbBlock        Where to store the block size. (Optional)
  * @param   pcbSector       Where to store the sector size. (Optional)
+ *
+ * @sa      RTFileQueryFsSizes
  */
 RTR3DECL(int) RTFsQuerySizes(const char *pszFsPath, PRTFOFF pcbTotal, RTFOFF *pcbFree,
                              uint32_t *pcbBlock, uint32_t *pcbSector);
@@ -463,7 +461,7 @@ RTR3DECL(int) RTFsMountpointsEnum(PFNRTFSMOUNTPOINTENUM pfnCallback, void *pvUse
 
 /** @} */
 
-__END_DECLS
+RT_C_DECLS_END
 
 #endif /* ___iprt_fs_h */
 

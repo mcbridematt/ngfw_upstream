@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2009 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -21,10 +21,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___iprt_err_h
@@ -33,7 +29,7 @@
 #include <iprt/cdefs.h>
 #include <iprt/types.h>
 
-__BEGIN_DECLS
+RT_C_DECLS_BEGIN
 
 /** @defgroup grp_rt_err            RTErr - Status Codes
  * @ingroup grp_rt
@@ -45,6 +41,95 @@ __BEGIN_DECLS
  * @{
  */
 
+#ifdef __cplusplus
+/**
+ * Strict type validation class.
+ *
+ * This is only really useful for type checking the arguments to RT_SUCCESS,
+ * RT_SUCCESS_NP, RT_FAILURE and RT_FAILURE_NP.  The RTErrStrictType2
+ * constructor is for integration with external status code strictness regimes.
+ */
+class RTErrStrictType
+{
+protected:
+    int32_t m_rc;
+
+public:
+    /**
+     * Constructor for interaction with external status code strictness regimes.
+     *
+     * This is a special constructor for helping external return code validator
+     * classes interact cleanly with RT_SUCCESS, RT_SUCCESS_NP, RT_FAILURE and
+     * RT_FAILURE_NP while barring automatic cast to integer.
+     *
+     * @param   rcObj       IPRT status code object from an automatic cast.
+     */
+    RTErrStrictType(RTErrStrictType2 const rcObj)
+        : m_rc(rcObj.getValue())
+    {
+    }
+
+    /**
+     * Integer constructor used by RT_SUCCESS_NP.
+     *
+     * @param   rc          IPRT style status code.
+     */
+    RTErrStrictType(int32_t rc)
+        : m_rc(rc)
+    {
+    }
+
+#if 0 /** @todo figure where int32_t is long instead of int. */
+    /**
+     * Integer constructor used by RT_SUCCESS_NP.
+     *
+     * @param   rc          IPRT style status code.
+     */
+    RTErrStrictType(signed int rc)
+        : m_rc(rc)
+    {
+    }
+#endif
+
+    /**
+     * Test for success.
+     */
+    bool success() const
+    {
+        return m_rc >= 0;
+    }
+
+private:
+    /** @name Try ban a number of wrong types.
+     * @{ */
+    RTErrStrictType(uint8_t rc)         : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(uint16_t rc)        : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(uint32_t rc)        : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(uint64_t rc)        : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(int8_t rc)          : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(int16_t rc)         : m_rc(-999) { NOREF(rc); }
+    RTErrStrictType(int64_t rc)         : m_rc(-999) { NOREF(rc); }
+    /** @todo fight long here - clashes with int32_t/int64_t on some platforms. */
+    /** @} */
+};
+#endif /* __cplusplus */
+
+
+/** @def RTERR_STRICT_RC
+ * Indicates that RT_SUCCESS_NP, RT_SUCCESS, RT_FAILURE_NP and RT_FAILURE should
+ * make type enforcing at compile time.
+ *
+ * @remarks     Only define this for C++ code.
+ */
+#if defined(__cplusplus) \
+ && !defined(RTERR_STRICT_RC) \
+ && (   defined(DOXYGEN_RUNNING) \
+     || defined(DEBUG) \
+     || defined(RT_STRICT) )
+# define RTERR_STRICT_RC        1
+#endif
+
+
 /** @def RT_SUCCESS
  * Check for success. We expect success in normal cases, that is the code path depending on
  * this check is normally taken. To prevent any prediction use RT_SUCCESS_NP instead.
@@ -54,7 +139,7 @@ __BEGIN_DECLS
  *
  * @param   rc  The iprt status code to test.
  */
-#define RT_SUCCESS(rc)      ( RT_LIKELY((int)(rc) >= VINF_SUCCESS) )
+#define RT_SUCCESS(rc)      ( RT_LIKELY(RT_SUCCESS_NP(rc)) )
 
 /** @def RT_SUCCESS_NP
  * Check for success. Don't predict the result.
@@ -64,7 +149,11 @@ __BEGIN_DECLS
  *
  * @param   rc  The iprt status code to test.
  */
-#define RT_SUCCESS_NP(rc)   ( (int)(rc) >= VINF_SUCCESS )
+#ifdef RTERR_STRICT_RC
+# define RT_SUCCESS_NP(rc)   ( RTErrStrictType(rc).success() )
+#else
+# define RT_SUCCESS_NP(rc)   ( (int)(rc) >= VINF_SUCCESS )
+#endif
 
 /** @def RT_FAILURE
  * Check for failure. We don't expect in normal cases, that is the code path depending on
@@ -333,6 +422,8 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_ALREADY_LOADED                 (-9)
 /** Permission denied. */
 #define VERR_PERMISSION_DENIED              (-10)
+/** Permission denied. */
+#define VINF_PERMISSION_DENIED              10
 /** Version mismatch. */
 #define VERR_VERSION_MISMATCH               (-11)
 /** The request function is not implemented. */
@@ -360,8 +451,9 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_THREAD_NOT_WAITABLE            (-30)
 /** Pagetable not present. */
 #define VERR_PAGE_TABLE_NOT_PRESENT         (-31)
-/** Internal error - we're screwed if this happens. */
-#define VERR_INTERNAL_ERROR                 (-32)
+/** Invalid context.
+ * Typically an API was used by the wrong thread. */
+#define VERR_INVALID_CONTEXT                (-32)
 /** The per process timer is busy. */
 #define VERR_TIMER_BUSY                     (-33)
 /** Address conflict. */
@@ -404,25 +496,27 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_INVALID_UUID_FORMAT            (-49)
 /** The specified process was not found. */
 #define VERR_PROCESS_NOT_FOUND              (-50)
-/** The process specified to a non-block wait had not exitted. */
+/** The process specified to a non-block wait had not exited. */
 #define VERR_PROCESS_RUNNING                (-51)
 /** Retry the operation. */
 #define VERR_TRY_AGAIN                      (-52)
+/** Retry the operation. */
+#define VINF_TRY_AGAIN                      52
 /** Generic parse error. */
 #define VERR_PARSE_ERROR                    (-53)
 /** Value out of range. */
 #define VERR_OUT_OF_RANGE                   (-54)
-/** A numeric convertion encountered a value which was too big for the target. */
+/** A numeric conversion encountered a value which was too big for the target. */
 #define VERR_NUMBER_TOO_BIG                 (-55)
-/** A numeric convertion encountered a value which was too big for the target. */
+/** A numeric conversion encountered a value which was too big for the target. */
 #define VWRN_NUMBER_TOO_BIG                 55
 /** The number begin converted (string) contained no digits. */
 #define VERR_NO_DIGITS                      (-56)
 /** The number begin converted (string) contained no digits. */
 #define VWRN_NO_DIGITS                      56
-/** Encountered a '-' during convertion to an unsigned value. */
+/** Encountered a '-' during conversion to an unsigned value. */
 #define VERR_NEGATIVE_UNSIGNED              (-57)
-/** Encountered a '-' during convertion to an unsigned value. */
+/** Encountered a '-' during conversion to an unsigned value. */
 #define VWRN_NEGATIVE_UNSIGNED              57
 /** Error while characters translation (unicode and so). */
 #define VERR_NO_TRANSLATION                 (-58)
@@ -448,7 +542,7 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_TIMER_ACTIVE                   (-68)
 /** The timer can't be stopped because i's already suspended. */
 #define VERR_TIMER_SUSPENDED                (-69)
-/** The operation was cancelled by the user. */
+/** The operation was cancelled by the user (copy) or another thread (local ipc). */
 #define VERR_CANCELLED                      (-70)
 /** Failed to initialize a memory object.
  * Exactly what this means is OS specific. */
@@ -478,9 +572,55 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 /** Generic invalid state warning. */
 #define VWRN_INVALID_STATE                  79
 /** Generic out of resources error. */
-#define VERR_OUT_OF_RESOURCES              (-80)
+#define VERR_OUT_OF_RESOURCES               (-80)
 /** Generic out of resources warning. */
 #define VWRN_OUT_OF_RESOURCES               80
+/** No more handles available, too many open handles. */
+#define VERR_NO_MORE_HANDLES                (-81)
+/** Preemption is disabled.
+ * The requested operation can only be performed when preemption is enabled. */
+#define VERR_PREEMPT_DISABLED               (-82)
+/** End of string. */
+#define VERR_END_OF_STRING                  (-83)
+/** End of string. */
+#define VINF_END_OF_STRING                  83
+/** A page count is out of range. */
+#define VERR_PAGE_COUNT_OUT_OF_RANGE        (-84)
+/** Generic object destroyed status. */
+#define VERR_OBJECT_DESTROYED               (-85)
+/** Generic object was destroyed by the call status. */
+#define VINF_OBJECT_DESTROYED               85
+/** Generic dangling objects status. */
+#define VERR_DANGLING_OBJECTS               (-86)
+/** Generic dangling objects status. */
+#define VWRN_DANGLING_OBJECTS               86
+/** Invalid Base64 encoding. */
+#define VERR_INVALID_BASE64_ENCODING        (-87)
+/** Return instigated by a callback or similar. */
+#define VERR_CALLBACK_RETURN                (-88)
+/** Return instigated by a callback or similar. */
+#define VINF_CALLBACK_RETURN                88
+/** Authentication failure. */
+#define VERR_AUTHENTICATION_FAILURE         (-89)
+/** Not a power of two. */
+#define VERR_NOT_POWER_OF_TWO               (-90)
+/** Status code, typically given as a parameter, that isn't supposed to be used. */
+#define VERR_IGNORED                        (-91)
+/** Concurrent access to the object is not allowed. */
+#define VERR_CONCURRENT_ACCESS              (-92)
+/** The caller does not have a reference to the object.
+ * This status is used when two threads is caught sharing the same object
+ * reference. */
+#define VERR_CALLER_NO_REFERENCE            (-93)
+/** Invalid login data given. */
+#define VERR_LOGON_FAILURE                  (-94)
+/** Generic no change error. */
+#define VERR_NO_CHANGE                      (-95)
+/** Generic no change info. */
+#define VINF_NO_CHANGE                      95
+/** Out of memory condition when allocating executable memory. */
+#define VERR_NO_EXEC_MEMORY                 (-96)
+
 /** @} */
 
 
@@ -547,6 +687,27 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_IS_A_DIRECTORY                 (-127)
 /** Tried to grow a file beyond the limit imposed by the process or the filesystem. */
 #define VERR_FILE_TOO_BIG                   (-128)
+/** No pending request the aio context has to wait for completion. */
+#define VERR_FILE_AIO_NO_REQUEST            (-129)
+/** The request could not be canceled or prepared for another transfer
+ *  because it is still in progress. */
+#define VERR_FILE_AIO_IN_PROGRESS           (-130)
+/** The request could not be canceled because it already completed. */
+#define VERR_FILE_AIO_COMPLETED             (-131)
+/** The I/O context couldn't be destroyed because there are still pending requests. */
+#define VERR_FILE_AIO_BUSY                  (-132)
+/** The requests couldn't be submitted because that would exceed the capacity of the context. */
+#define VERR_FILE_AIO_LIMIT_EXCEEDED        (-133)
+/** The request was canceled. */
+#define VERR_FILE_AIO_CANCELED              (-134)
+/** The request wasn't submitted so it can't be canceled. */
+#define VERR_FILE_AIO_NOT_SUBMITTED         (-135)
+/** A request was not prepared and thus could not be submitted. */
+#define VERR_FILE_AIO_NOT_PREPARED          (-136)
+/** Not all requests could be submitted due to resource shortage. */
+#define VERR_FILE_AIO_INSUFFICIENT_RESSOURCES (-137)
+/** Device or resource is busy. */
+#define VERR_RESOURCE_BUSY                  (-138)
 /** @} */
 
 
@@ -567,6 +728,8 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_DISK_INVALID_FORMAT            (-155)
 /** Too many symbolic links. */
 #define VERR_TOO_MANY_SYMLINKS              (-156)
+/** The OS does not support setting the time stamps on a symbolic link. */
+#define VERR_NS_SYMLINK_SET_TIME            (-157)
 /** @} */
 
 
@@ -581,6 +744,31 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_NO_MORE_SEARCH_HANDLES         (-202)
 /** RTDirReadEx() failed to retrieve the extra data which was requested. */
 #define VWRN_NO_DIRENT_INFO                 203
+/** @} */
+
+
+/** @name Internal Processing Errors
+ * @{
+ */
+/** Internal error - we're screwed if this happens.  */
+#define VERR_INTERNAL_ERROR                 (-225)
+/** Internal error no. 2. */
+#define VERR_INTERNAL_ERROR_2               (-226)
+/** Internal error no. 3. */
+#define VERR_INTERNAL_ERROR_3               (-227)
+/** Internal error no. 4. */
+#define VERR_INTERNAL_ERROR_4               (-228)
+/** Internal error no. 5. */
+#define VERR_INTERNAL_ERROR_5               (-229)
+/** Internal error: Unexpected status code. */
+#define VERR_IPE_UNEXPECTED_STATUS          (-230)
+/** Internal error: Unexpected status code. */
+#define VERR_IPE_UNEXPECTED_INFO_STATUS     (-231)
+/** Internal error: Unexpected status code. */
+#define VERR_IPE_UNEXPECTED_ERROR_STATUS    (-232)
+/** Internal error: Uninitialized status code.
+ * @remarks This is used by value elsewhere.  */
+#define VERR_IPE_UNINITIALIZED_STATUS       (-233)
 /** @} */
 
 
@@ -663,6 +851,31 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_DEADLOCK                       (-365)
 /** Ping-Pong listen or speak out of turn error. */
 #define VERR_SEM_OUT_OF_TURN                (-366)
+/** Tried to take a semaphore in a bad context. */
+#define VERR_SEM_BAD_CONTEXT                (-367)
+/** Don't spin for the semaphore, but it is safe to try grab it. */
+#define VINF_SEM_BAD_CONTEXT                (367)
+/** Wrong locking order detected. */
+#define VERR_SEM_LV_WRONG_ORDER             (-368)
+/** Wrong release order detected. */
+#define VERR_SEM_LV_WRONG_RELEASE_ORDER     (-369)
+/** Attempt to recursively enter a non-recurisve lock. */
+#define VERR_SEM_LV_NESTED                  (-370)
+/** Invalid parameters passed to the lock validator. */
+#define VERR_SEM_LV_INVALID_PARAMETER       (-371)
+/** The lock validator detected a deadlock. */
+#define VERR_SEM_LV_DEADLOCK                (-372)
+/** The lock validator detected an existing deadlock.
+ * The deadlock was not caused by the current operation, but existed already. */
+#define VERR_SEM_LV_EXISTING_DEADLOCK       (-373)
+/** Not the lock owner according our records. */
+#define VERR_SEM_LV_NOT_OWNER               (-374)
+/** An illegal lock upgrade was attempted. */
+#define VERR_SEM_LV_ILLEGAL_UPGRADE         (-375)
+/** The thread is not a valid signaller of the event. */
+#define VERR_SEM_LV_NOT_SIGNALLER           (-376)
+/** Internal error in the lock validator or related components. */
+#define VERR_SEM_LV_INTERNAL_ERROR          (-377)
 /** @} */
 
 
@@ -744,6 +957,8 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_NET_HOST_DOWN                      (-464)
 /** No route to host. */
 #define VERR_NET_HOST_UNREACHABLE               (-465)
+/** Protocol error. */
+#define VERR_NET_PROTOCOL_ERROR                 (-466)
 /** @} */
 
 
@@ -754,6 +969,12 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_TCP_SERVER_STOP                    (-500)
 /** The server was stopped. */
 #define VINF_TCP_SERVER_STOP                    500
+/** The TCP server was shut down using RTTcpServerShutdown. */
+#define VERR_TCP_SERVER_SHUTDOWN                (-501)
+/** The TCP server was destroyed. */
+#define VERR_TCP_SERVER_DESTROYED               (-502)
+/** The TCP server has no client associated with it. */
+#define VINF_TCP_SERVER_NO_CLIENT               503
 /** @} */
 
 
@@ -828,20 +1049,32 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 #define VERR_IMAGE_TOO_BIG                      (-612)
 /** The image base address is to high for this image type. */
 #define VERR_IMAGE_BASE_TOO_HIGH                (-614)
+/** Mismatching architecture. */
+#define VERR_LDR_ARCH_MISMATCH                  (-615)
+/** Mismatch between IPRT and native loader. */
+#define VERR_LDR_MISMATCH_NATIVE                (-616)
+/** Failed to resolve an imported (external) symbol. */
+#define VERR_LDR_IMPORTED_SYMBOL_NOT_FOUND      (-617)
+/** Generic loader failure. */
+#define VERR_LDR_GENERAL_FAILURE                (-618)
+/** Code signing error.  */
+#define VERR_LDR_IMAGE_HASH                     (-619)
 /** The PE loader encountered delayed imports, a feature which hasn't been implemented yet. */
 #define VERR_LDRPE_DELAY_IMPORT                 (-620)
-/** The PE loader doesn't have a clue what the security data directory entry is all about. */
-#define VERR_LDRPE_SECURITY                     (-621)
+/** The PE loader encountered a malformed certificate. */
+#define VERR_LDRPE_CERT_MALFORMED               (-621)
+/** The PE loader encountered a certificate with an unsupported type or structure revision. */
+#define VERR_LDRPE_CERT_UNSUPPORTED             (-622)
 /** The PE loader doesn't know how to deal with the global pointer data directory entry yet. */
-#define VERR_LDRPE_GLOBALPTR                    (-622)
+#define VERR_LDRPE_GLOBALPTR                    (-623)
 /** The PE loader doesn't support the TLS data directory yet. */
-#define VERR_LDRPE_TLS                          (-623)
+#define VERR_LDRPE_TLS                          (-624)
 /** The PE loader doesn't grok the COM descriptor data directory entry. */
-#define VERR_LDRPE_COM_DESCRIPTOR               (-624)
+#define VERR_LDRPE_COM_DESCRIPTOR               (-625)
 /** The PE loader encountered an unknown load config directory/header size. */
-#define VERR_LDRPE_LOAD_CONFIG_SIZE             (-625)
+#define VERR_LDRPE_LOAD_CONFIG_SIZE             (-626)
 /** The PE loader encountered a lock prefix table, a feature which hasn't been implemented yet. */
-#define VERR_LDRPE_LOCK_PREFIX_TABLE            (-626)
+#define VERR_LDRPE_LOCK_PREFIX_TABLE            (-627)
 /** The ELF loader doesn't handle foreign endianness. */
 #define VERR_LDRELF_ODD_ENDIAN                  (-630)
 /** The ELF image is 'dynamic', the ELF loader can only deal with 'relocatable' images at present. */
@@ -869,9 +1102,52 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 /** @name Debug Info Reader Status Codes.
  * @{
  */
+/** The module contains no line number information. */
+#define VERR_DBG_NO_LINE_NUMBERS                (-650)
+/** The module contains no symbol information. */
+#define VERR_DBG_NO_SYMBOLS                     (-651)
 /** The specified segment:offset address was invalid. Typically an attempt at
- * addressing outside the segment boundrary. */
-#define VERR_DBGMOD_INVALID_ADDRESS             (-650)
+ * addressing outside the segment boundary. */
+#define VERR_DBG_INVALID_ADDRESS                (-652)
+/** Invalid segment index. */
+#define VERR_DBG_INVALID_SEGMENT_INDEX          (-653)
+/** Invalid segment offset. */
+#define VERR_DBG_INVALID_SEGMENT_OFFSET         (-654)
+/** Invalid image relative virtual address. */
+#define VERR_DBG_INVALID_RVA                    (-655)
+/** Invalid image relative virtual address. */
+#define VERR_DBG_SPECIAL_SEGMENT                (-656)
+/** Address conflict within a module/segment.
+ * Attempted to add a segment, symbol or line number that fully or partially
+ * overlaps with an existing one. */
+#define VERR_DBG_ADDRESS_CONFLICT               (-657)
+/** Duplicate symbol within the module.
+ * Attempted to add a symbol which name already exists within the module.  */
+#define VERR_DBG_DUPLICATE_SYMBOL               (-658)
+/** The segment index specified when adding a new segment is already in use. */
+#define VERR_DBG_SEGMENT_INDEX_CONFLICT         (-659)
+/** No line number was found for the specified address/ordinal/whatever. */
+#define VERR_DBG_LINE_NOT_FOUND                 (-660)
+/** The length of the symbol name is out of range.
+ * This means it is an empty string or that it's greater or equal to
+ * RTDBG_SYMBOL_NAME_LENGTH. */
+#define VERR_DBG_SYMBOL_NAME_OUT_OF_RANGE       (-661)
+/** The length of the file name is out of range.
+ * This means it is an empty string or that it's greater or equal to
+ * RTDBG_FILE_NAME_LENGTH. */
+#define VERR_DBG_FILE_NAME_OUT_OF_RANGE         (-662)
+/** The length of the segment name is out of range.
+ * This means it is an empty string or that it is greater or equal to
+ * RTDBG_SEGMENT_NAME_LENGTH. */
+#define VERR_DBG_SEGMENT_NAME_OUT_OF_RANGE      (-663)
+/** The specified address range wraps around. */
+#define VERR_DBG_ADDRESS_WRAP                   (-664)
+/** The file is not a valid NM map file. */
+#define VERR_DBG_NOT_NM_MAP_FILE                (-665)
+/** The file is not a valid /proc/kallsyms file. */
+#define VERR_DBG_NOT_LINUX_KALLSYMS             (-666)
+/** No debug module interpreter matching the debug info. */
+#define VERR_DBG_NO_MATCHING_INTERPRETER        (-667)
 /** @} */
 
 /** @name Request Packet Status Codes.
@@ -879,7 +1155,7 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
  */
 /** Invalid RT request type.
  * For the RTReqAlloc() case, the caller just specified an illegal enmType. For
- * all the other occurences it means indicates corruption, broken logic, or stupid
+ * all the other occurrences it means indicates corruption, broken logic, or stupid
  * interface user. */
 #define VERR_RT_REQUEST_INVALID_TYPE            (-700)
 /** Invalid RT request state.
@@ -919,19 +1195,81 @@ RTDECL(PCRTCOMERRMSG) RTErrCOMGet(uint32_t rc);
 
 /** @name RTGetOpt status codes
  * @{ */
-/** RTGetOpt: command line option not recognized. */
+/** RTGetOpt: Command line option not recognized. */
 #define VERR_GETOPT_UNKNOWN_OPTION              (-825)
-/** RTGetOpt: command line option needs argument. */
+/** RTGetOpt: Command line option needs argument. */
 #define VERR_GETOPT_REQUIRED_ARGUMENT_MISSING   (-826)
-/** RTGetOpt: command line option has argument with bad format. */
+/** RTGetOpt: Command line option has argument with bad format. */
 #define VERR_GETOPT_INVALID_ARGUMENT_FORMAT     (-827)
+/** RTGetOpt: Not an option. */
+#define VINF_GETOPT_NOT_OPTION                  828
+/** RTGetOpt: Command line option needs an index. */
+#define VERR_GETOPT_INDEX_MISSING               (-829)
+/** @} */
+
+/** @name RTCache status codes
+ * @{ */
+/** RTCache: cache is full. */
+#define VERR_CACHE_FULL                         (-850)
+/** RTCache: cache is empty. */
+#define VERR_CACHE_EMPTY                        (-851)
+/** @} */
+
+/** @name RTMemCache status codes
+ * @{ */
+/** Reached the max cache size. */
+#define VERR_MEM_CACHE_MAX_SIZE                 (-855)
+/** @} */
+
+/** @name RTS3 status codes
+ * @{ */
+/** Access denied error. */
+#define VERR_S3_ACCESS_DENIED                   (-875)
+/** The bucket/key wasn't found. */
+#define VERR_S3_NOT_FOUND                       (-876)
+/** Bucket already exists. */
+#define VERR_S3_BUCKET_ALREADY_EXISTS           (-877)
+/** Can't delete bucket with keys. */
+#define VERR_S3_BUCKET_NOT_EMPTY                (-878)
+/** The current operation was canceled. */
+#define VERR_S3_CANCELED                        (-879)
+/** @} */
+
+/** @name RTManifest status codes
+ * @{ */
+/** A digest type used in the manifest file isn't supported. */
+#define VERR_MANIFEST_UNSUPPORTED_DIGEST_TYPE   (-900)
+/** An entry in the manifest file couldn't be interpreted correctly. */
+#define VERR_MANIFEST_WRONG_FILE_FORMAT         (-901)
+/** A digest doesn't match the corresponding file. */
+#define VERR_MANIFEST_DIGEST_MISMATCH           (-902)
+/** The file list doesn't match to the content of the manifest file. */
+#define VERR_MANIFEST_FILE_MISMATCH             (-903)
+/** @} */
+
+/** @name RTTar status codes
+ * @{ */
+/** The checksum of a tar header record doesn't match. */
+#define VERR_TAR_CHKSUM_MISMATCH                (-925)
+/** @} */
+
+/** @name RTPoll status codes
+ * @{ */
+/** The handle is not pollable. */
+#define VERR_POLL_HANDLE_NOT_POLLABLE           (-950)
+/** The handle ID is already present in the poll set. */
+#define VERR_POLL_HANDLE_ID_EXISTS              (-951)
+/** The handle ID was not found in the set. */
+#define VERR_POLL_HANDLE_ID_NOT_FOUND           (-952)
+/** The poll set is full. */
+#define VERR_POLL_SET_IS_FULL                   (-953)
 /** @} */
 
 /* SED-END */
 
 /** @} */
 
-__END_DECLS
+RT_C_DECLS_END
 
 #endif
 

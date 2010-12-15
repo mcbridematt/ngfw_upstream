@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -21,10 +21,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___iprt_time_h
@@ -33,7 +29,7 @@
 #include <iprt/cdefs.h>
 #include <iprt/types.h>
 
-__BEGIN_DECLS
+RT_C_DECLS_BEGIN
 
 /** @defgroup grp_rt_time   RTTime - Time
  * @ingroup grp_rt
@@ -47,7 +43,7 @@ __BEGIN_DECLS
  *
  * The current representation is in nanoseconds relative to the unix epoch
  * (1970-01-01 00:00:00 UTC). This gives us an approximate span from
- * 1678 to 2262 without sacrifying the resolution offered by the various
+ * 1678 to 2262 without sacrificing the resolution offered by the various
  * host OSes (BSD & LINUX 1ns, NT 100ns).
  */
 typedef struct RTTIMESPEC
@@ -338,7 +334,7 @@ DECLINLINE(PRTTIMESPEC) RTTimeSpecSubSeconds(PRTTIMESPEC pTime, int64_t i64Secon
 
 
 /* PORTME: Add struct timeval guard macro here. */
-#if defined(RTTIME_INCL_TIMEVAL) || defined(_STRUCT_TIMEVAL) || defined(_SYS__TIMEVAL_H_) || defined(_SYS_TIME_H) || defined(_TIMEVAL)
+#if defined(RTTIME_INCL_TIMEVAL) || defined(_STRUCT_TIMEVAL) || defined(_SYS__TIMEVAL_H_) || defined(_SYS_TIME_H) || defined(_TIMEVAL) || defined(_LINUX_TIME_H)
 /**
  * Gets the time as POSIX timeval.
  *
@@ -354,7 +350,7 @@ DECLINLINE(struct timeval *) RTTimeSpecGetTimeval(PCRTTIMESPEC pTime, struct tim
     if (i32Micro < 0)
     {
         i32Micro += 1000000;
-        i64++;
+        i64--;
     }
     pTimeval->tv_sec = (time_t)i64;
     pTimeval->tv_usec = i32Micro;
@@ -392,7 +388,7 @@ DECLINLINE(struct timespec *) RTTimeSpecGetTimespec(PCRTTIMESPEC pTime, struct t
     if (i32Nano < 0)
     {
         i32Nano += 1000000000;
-        i64++;
+        i64--;
     }
     pTimespec->tv_sec = (time_t)i64;
     pTimespec->tv_nsec = i32Nano;
@@ -488,7 +484,7 @@ DECLINLINE(PRTTIMESPEC) RTTimeSpecSetNtFileTime(PRTTIMESPEC pTime, const FILETIM
  */
 DECLINLINE(int64_t) RTTimeSpecGetDosSeconds(PCRTTIMESPEC pTime)
 {
-    return (pTime->i64NanosecondsRelativeToUnixEpoch + RTTIME_OFFSET_DOS_TIME)
+    return (pTime->i64NanosecondsRelativeToUnixEpoch - RTTIME_OFFSET_DOS_TIME)
         / 1000000000;
 }
 
@@ -503,7 +499,7 @@ DECLINLINE(int64_t) RTTimeSpecGetDosSeconds(PCRTTIMESPEC pTime)
 DECLINLINE(PRTTIMESPEC) RTTimeSpecSetDosSeconds(PRTTIMESPEC pTime, int64_t i64Seconds)
 {
     pTime->i64NanosecondsRelativeToUnixEpoch = i64Seconds * 1000000000
-        - RTTIME_NT_TIME_OFFSET_UNIX;
+        + RTTIME_OFFSET_DOS_TIME;
     return pTime;
 }
 
@@ -601,9 +597,20 @@ typedef const RTTIME *PCRTTIME;
  * Gets the current system time (UTC).
  *
  * @returns pTime.
- * @param   pTime   Where to store the time.
+ * @param   pTime       Where to store the time.
  */
 RTDECL(PRTTIMESPEC) RTTimeNow(PRTTIMESPEC pTime);
+
+/**
+ * Sets the system time.
+ *
+ * @returns IPRT status code
+ * @param   pTime       The new system time (UTC).
+ *
+ * @remarks This will usually fail because changing the wall time is usually
+ *          requires extra privileges.
+ */
+RTDECL(int) RTTimeSet(PCRTTIMESPEC pTime);
 
 /**
  * Explodes a time spec (UTC).
@@ -704,6 +711,15 @@ RTDECL(PRTTIME) RTTimeLocalNormalize(PRTTIME pTime);
  * @param   cb          The size of the buffer.
  */
 RTDECL(char *) RTTimeToString(PCRTTIME pTime, char *psz, size_t cb);
+
+/**
+ * Checks if a year is a leap year or not.
+ *
+ * @returns true if it's a leap year.
+ * @returns false if it's a common year.
+ * @param   i32Year     The year in question.
+ */
+RTDECL(bool) RTTimeIsLeapYear(int32_t i32Year);
 
 /**
  * Gets the current nanosecond timestamp.
@@ -835,23 +851,23 @@ typedef struct RTTIMENANOTSDATAR0
 typedef RTTIMENANOTSDATA RTTIMENANOTSDATAR0;
 #endif
 
-#ifndef IN_GC
+#ifndef IN_RC
 /**
- * The GC layout of the RTTIMENANOTSDATA structure.
+ * The RC layout of the RTTIMENANOTSDATA structure.
  */
-typedef struct RTTIMENANOTSDATAGC
+typedef struct RTTIMENANOTSDATARC
 {
-    GCPTRTYPE(uint64_t volatile  *) pu64Prev;
-    DECLGCCALLBACKMEMBER(void, pfnBad,(PRTTIMENANOTSDATA pData, uint64_t u64NanoTS, uint64_t u64DeltaPrev, uint64_t u64PrevNanoTS));
-    DECLGCCALLBACKMEMBER(uint64_t, pfnRediscover,(PRTTIMENANOTSDATA pData));
-    RTGCPTR             pvDummy;
+    RCPTRTYPE(uint64_t volatile  *) pu64Prev;
+    DECLRCCALLBACKMEMBER(void, pfnBad,(PRTTIMENANOTSDATA pData, uint64_t u64NanoTS, uint64_t u64DeltaPrev, uint64_t u64PrevNanoTS));
+    DECLRCCALLBACKMEMBER(uint64_t, pfnRediscover,(PRTTIMENANOTSDATA pData));
+    RCPTRTYPE(void *)   pvDummy;
     uint32_t            c1nsSteps;
     uint32_t            cExpired;
     uint32_t            cBadPrev;
     uint32_t            cUpdateRaces;
-} RTTIMENANOTSDATAGC;
+} RTTIMENANOTSDATARC;
 #else
-typedef RTTIMENANOTSDATA RTTIMENANOTSDATAGC;
+typedef RTTIMENANOTSDATA RTTIMENANOTSDATARC;
 #endif
 
 /** Internal RTTimeNanoTS worker (assembly). */
@@ -923,7 +939,7 @@ RTDECL(uint64_t) RTTimeProgramStartNanoTS(void);
 
 /** @} */
 
-__END_DECLS
+RT_C_DECLS_END
 
 #endif
 

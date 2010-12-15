@@ -1,10 +1,10 @@
-/* $Id: alloc-r0drv.cpp 29978 2008-04-21 17:24:28Z umoeller $ */
+/* $Id: alloc-r0drv.cpp $ */
 /** @file
  * IPRT - Memory Allocation, Ring-0 Driver.
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,21 +22,35 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 
 /*******************************************************************************
 *   Header Files                                                               *
 *******************************************************************************/
-#include <iprt/string.h>
-#include <iprt/alloc.h>
+#include <iprt/mem.h>
+#include "internal/iprt.h"
+
+#if defined(RT_ARCH_AMD64) || defined(RT_ARCH_X86)
+# include <iprt/asm-amd64-x86.h>
+#endif
 #include <iprt/assert.h>
 #include <iprt/param.h>
+#include <iprt/string.h>
+#include <iprt/thread.h>
 #include "r0drv/alloc-r0drv.h"
+
+#undef RTMemTmpAlloc
+#undef RTMemTmpAllocZ
+#undef RTMemTmpFree
+#undef RTMemAlloc
+#undef RTMemAllocZ
+#undef RTMemAllocVar
+#undef RTMemAllocZVar
+#undef RTMemRealloc
+#undef RTMemFree
+#undef RTMemDup
+#undef RTMemDupEx
 
 
 /*******************************************************************************
@@ -79,10 +93,11 @@ static uint8_t const g_abFence[RTR0MEM_FENCE_EXTRA] =
  * @returns NULL on failure.
  * @param   cb      Size in bytes of the memory block to allocated.
  */
-RTDECL(void *)  RTMemTmpAlloc(size_t cb)
+RTDECL(void *)  RTMemTmpAlloc(size_t cb) RT_NO_THROW
 {
     return RTMemAlloc(cb);
 }
+RT_EXPORT_SYMBOL(RTMemTmpAlloc);
 
 
 /**
@@ -94,10 +109,11 @@ RTDECL(void *)  RTMemTmpAlloc(size_t cb)
  * @returns NULL on failure.
  * @param   cb      Size in bytes of the memory block to allocated.
  */
-RTDECL(void *)  RTMemTmpAllocZ(size_t cb)
+RTDECL(void *)  RTMemTmpAllocZ(size_t cb) RT_NO_THROW
 {
     return RTMemAllocZ(cb);
 }
+RT_EXPORT_SYMBOL(RTMemTmpAllocZ);
 
 
 /**
@@ -105,10 +121,11 @@ RTDECL(void *)  RTMemTmpAllocZ(size_t cb)
  *
  * @param   pv      Pointer to memory block.
  */
-RTDECL(void)    RTMemTmpFree(void *pv)
+RTDECL(void)    RTMemTmpFree(void *pv) RT_NO_THROW
 {
     return RTMemFree(pv);
 }
+RT_EXPORT_SYMBOL(RTMemTmpFree);
 
 
 /**
@@ -118,19 +135,23 @@ RTDECL(void)    RTMemTmpFree(void *pv)
  * @returns NULL on failure.
  * @param   cb      Size in bytes of the memory block to allocated.
  */
-RTDECL(void *)  RTMemAlloc(size_t cb)
+RTDECL(void *)  RTMemAlloc(size_t cb) RT_NO_THROW
 {
-    PRTMEMHDR pHdr = rtMemAlloc(cb + RTR0MEM_FENCE_EXTRA, 0);
+    PRTMEMHDR pHdr;
+    RT_ASSERT_INTS_ON();
+
+    pHdr = rtR0MemAlloc(cb + RTR0MEM_FENCE_EXTRA, 0);
     if (pHdr)
     {
 #ifdef RTR0MEM_STRICT
-        pHdr->cbReq = cb;
+        pHdr->cbReq = (uint32_t)cb; Assert(pHdr->cbReq == cb);
         memcpy((uint8_t *)(pHdr + 1) + cb, &g_abFence[0], RTR0MEM_FENCE_EXTRA);
 #endif
         return pHdr + 1;
     }
     return NULL;
 }
+RT_EXPORT_SYMBOL(RTMemAlloc);
 
 
 /**
@@ -144,13 +165,16 @@ RTDECL(void *)  RTMemAlloc(size_t cb)
  * @returns NULL on failure.
  * @param   cb      Size in bytes of the memory block to allocated.
  */
-RTDECL(void *)  RTMemAllocZ(size_t cb)
+RTDECL(void *)  RTMemAllocZ(size_t cb) RT_NO_THROW
 {
-    PRTMEMHDR pHdr = rtMemAlloc(cb + RTR0MEM_FENCE_EXTRA, RTMEMHDR_FLAG_ZEROED);
+    PRTMEMHDR pHdr;
+    RT_ASSERT_INTS_ON();
+
+    pHdr = rtR0MemAlloc(cb + RTR0MEM_FENCE_EXTRA, RTMEMHDR_FLAG_ZEROED);
     if (pHdr)
     {
 #ifdef RTR0MEM_STRICT
-        pHdr->cbReq = cb;
+        pHdr->cbReq = (uint32_t)cb; Assert(pHdr->cbReq == cb);
         memcpy((uint8_t *)(pHdr + 1) + cb, &g_abFence[0], RTR0MEM_FENCE_EXTRA);
         return memset(pHdr + 1, 0, cb);
 #else
@@ -159,6 +183,45 @@ RTDECL(void *)  RTMemAllocZ(size_t cb)
     }
     return NULL;
 }
+RT_EXPORT_SYMBOL(RTMemAllocZ);
+
+
+/**
+ * Wrapper around RTMemAlloc for automatically aligning variable sized
+ * allocations so that the various electric fence heaps works correctly.
+ *
+ * @returns See RTMemAlloc.
+ * @param   cbUnaligned         The unaligned size.
+ */
+RTDECL(void *) RTMemAllocVar(size_t cbUnaligned)
+{
+    size_t cbAligned;
+    if (cbUnaligned >= 16)
+        cbAligned = RT_ALIGN_Z(cbUnaligned, 16);
+    else
+        cbAligned = RT_ALIGN_Z(cbUnaligned, sizeof(void *));
+    return RTMemAlloc(cbAligned);
+}
+RT_EXPORT_SYMBOL(RTMemAllocVar);
+
+
+/**
+ * Wrapper around RTMemAllocZ for automatically aligning variable sized
+ * allocations so that the various electric fence heaps works correctly.
+ *
+ * @returns See RTMemAllocZ.
+ * @param   cbUnaligned         The unaligned size.
+ */
+RTDECL(void *) RTMemAllocZVar(size_t cbUnaligned)
+{
+    size_t cbAligned;
+    if (cbUnaligned >= 16)
+        cbAligned = RT_ALIGN_Z(cbUnaligned, 16);
+    else
+        cbAligned = RT_ALIGN_Z(cbUnaligned, sizeof(void *));
+    return RTMemAllocZ(cbAligned);
+}
+RT_EXPORT_SYMBOL(RTMemAllocZVar);
 
 
 /**
@@ -169,7 +232,7 @@ RTDECL(void *)  RTMemAllocZ(size_t cb)
  * @param   pvOld   The memory block to reallocate.
  * @param   cbNew   The new block size (in bytes).
  */
-RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew)
+RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew) RT_NO_THROW
 {
     if (!cbNew)
         RTMemFree(pvOld);
@@ -178,18 +241,20 @@ RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew)
     else
     {
         PRTMEMHDR pHdrOld = (PRTMEMHDR)pvOld - 1;
+        RT_ASSERT_PREEMPTIBLE();
+
         if (pHdrOld->u32Magic == RTMEMHDR_MAGIC)
         {
             PRTMEMHDR pHdrNew;
             if (pHdrOld->cb >= cbNew && pHdrOld->cb - cbNew <= 128)
                 return pvOld;
-            pHdrNew = rtMemAlloc(cbNew + RTR0MEM_FENCE_EXTRA, 0);
+            pHdrNew = rtR0MemAlloc(cbNew + RTR0MEM_FENCE_EXTRA, 0);
             if (pHdrNew)
             {
                 size_t cbCopy = RT_MIN(pHdrOld->cb, pHdrNew->cb);
                 memcpy(pHdrNew + 1, pvOld, cbCopy);
 #ifdef RTR0MEM_STRICT
-                pHdrNew->cbReq = cbNew;
+                pHdrNew->cbReq = (uint32_t)cbNew; Assert(pHdrNew->cbReq == cbNew);
                 memcpy((uint8_t *)(pHdrNew + 1) + cbNew, &g_abFence[0], RTR0MEM_FENCE_EXTRA);
                 AssertReleaseMsg(!memcmp((uint8_t *)(pHdrOld + 1) + pHdrOld->cbReq, &g_abFence[0], RTR0MEM_FENCE_EXTRA),
                                  ("pHdr=%p pvOld=%p cb=%zu cbNew=%zu\n"
@@ -199,7 +264,7 @@ RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew)
                                   RTR0MEM_FENCE_EXTRA, (uint8_t *)(pHdrOld + 1) + pHdrOld->cb,
                                   RTR0MEM_FENCE_EXTRA, &g_abFence[0]));
 #endif
-                rtMemFree(pHdrOld);
+                rtR0MemFree(pHdrOld);
                 return pHdrNew + 1;
             }
         }
@@ -209,6 +274,7 @@ RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew)
 
     return NULL;
 }
+RT_EXPORT_SYMBOL(RTMemRealloc);
 
 
 /**
@@ -216,9 +282,11 @@ RTDECL(void *) RTMemRealloc(void *pvOld, size_t cbNew)
  *
  * @param   pv      Pointer to memory block.
  */
-RTDECL(void) RTMemFree(void *pv)
+RTDECL(void) RTMemFree(void *pv) RT_NO_THROW
 {
     PRTMEMHDR pHdr;
+    RT_ASSERT_INTS_ON();
+
     if (!pv)
         return;
     pHdr = (PRTMEMHDR)pv - 1;
@@ -230,15 +298,16 @@ RTDECL(void) RTMemFree(void *pv)
                          ("pHdr=%p pv=%p cb=%zu\n"
                           "fence:    %.*Rhxs\n"
                           "expected: %.*Rhxs\n",
-                          pHdr, pv, pHdr->cb, pv,
+                          pHdr, pv, pHdr->cb,
                           RTR0MEM_FENCE_EXTRA, (uint8_t *)(pHdr + 1) + pHdr->cb,
                           RTR0MEM_FENCE_EXTRA, &g_abFence[0]));
 #endif
-        rtMemFree(pHdr);
+        rtR0MemFree(pHdr);
     }
     else
         AssertMsgFailed(("pHdr->u32Magic=%RX32 pv=%p\n", pHdr->u32Magic, pv));
 }
+RT_EXPORT_SYMBOL(RTMemFree);
 
 
 /**
@@ -248,19 +317,27 @@ RTDECL(void) RTMemFree(void *pv)
  * @returns NULL on failure.
  * @param   cb      Size in bytes of the memory block to allocate.
  */
-RTDECL(void *)    RTMemExecAlloc(size_t cb)
+RTDECL(void *)    RTMemExecAlloc(size_t cb) RT_NO_THROW
 {
-    PRTMEMHDR pHdr = rtMemAlloc(cb + RTR0MEM_FENCE_EXTRA, RTMEMHDR_FLAG_EXEC);
+    PRTMEMHDR pHdr;
+#ifdef RT_OS_SOLARIS /** @todo figure out why */
+    RT_ASSERT_INTS_ON();
+#else
+    RT_ASSERT_PREEMPTIBLE();
+#endif
+
+    pHdr = rtR0MemAlloc(cb + RTR0MEM_FENCE_EXTRA, RTMEMHDR_FLAG_EXEC);
     if (pHdr)
     {
 #ifdef RTR0MEM_STRICT
-        pHdr->cbReq = cb;
+        pHdr->cbReq = (uint32_t)cb; Assert(pHdr->cbReq == cb);
         memcpy((uint8_t *)(pHdr + 1) + cb, &g_abFence[0], RTR0MEM_FENCE_EXTRA);
 #endif
         return pHdr + 1;
     }
     return NULL;
 }
+RT_EXPORT_SYMBOL(RTMemExecAlloc);
 
 
 /**
@@ -268,9 +345,11 @@ RTDECL(void *)    RTMemExecAlloc(size_t cb)
  *
  * @param   pv      Pointer to memory block.
  */
-RTDECL(void)      RTMemExecFree(void *pv)
+RTDECL(void)      RTMemExecFree(void *pv) RT_NO_THROW
 {
     PRTMEMHDR pHdr;
+    RT_ASSERT_INTS_ON();
+
     if (!pv)
         return;
     pHdr = (PRTMEMHDR)pv - 1;
@@ -285,9 +364,10 @@ RTDECL(void)      RTMemExecFree(void *pv)
                           RTR0MEM_FENCE_EXTRA, (uint8_t *)(pHdr + 1) + pHdr->cb,
                           RTR0MEM_FENCE_EXTRA, &g_abFence[0]));
 #endif
-        rtMemFree(pHdr);
+        rtR0MemFree(pHdr);
     }
     else
         AssertMsgFailed(("pHdr->u32Magic=%RX32 pv=%p\n", pHdr->u32Magic, pv));
 }
+RT_EXPORT_SYMBOL(RTMemExecFree);
 

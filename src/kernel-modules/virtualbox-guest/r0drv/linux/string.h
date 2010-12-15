@@ -1,10 +1,10 @@
-/* $Id: string.h 29978 2008-04-21 17:24:28Z umoeller $ */
+/* $Id: string.h $ */
 /** @file
  * IPRT - wrapper for the linux kernel asm/string.h.
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,10 +22,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___string_h
@@ -33,7 +29,7 @@
 
 #include <iprt/cdefs.h>
 
-__BEGIN_DECLS
+RT_C_DECLS_BEGIN
 #ifndef bool /* Linux 2.6.19 C++ nightmare */
 #define bool bool_type
 #define true true_type
@@ -55,7 +51,7 @@ char *strpbrk(const char *pszStr, const char *pszChars)
 #endif
     ;
 
-__END_DECLS
+RT_C_DECLS_END
 
 #endif
 

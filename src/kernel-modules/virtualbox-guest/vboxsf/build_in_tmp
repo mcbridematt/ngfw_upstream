@@ -1,0 +1,108 @@
+#!/bin/sh
+
+#
+# Script to build a kernel module in /tmp. Useful if the module sources
+# are installed in read-only directory.
+#
+# Copyright (C) 2007 Oracle Corporation
+#
+# This file is part of VirtualBox Open Source Edition (OSE), as
+# available from http://www.virtualbox.org. This file is free software;
+# you can redistribute it and/or modify it under the terms of the GNU
+# General Public License (GPL) as published by the Free Software
+# Foundation, in version 2 as it comes in the "COPYING" file of the
+# VirtualBox OSE distribution. VirtualBox OSE is distributed in the
+# hope that it will be useful, but WITHOUT ANY WARRANTY of any kind.
+#
+
+# Set the build type
+export BUILD_TYPE=release
+
+# Attempt to build using DKMS first
+DKMS=`which dkms 2>/dev/null` 
+if [ "$1" = "--no-dkms" ]; then
+  shift
+  DKMS=""
+fi
+if [ -n "$DKMS" ]
+then
+    echo "Attempting to install using DKMS"
+    $DKMS status -m vboxsf | while read line
+    # first, remove _any_ old module
+    do
+        if echo "$line" | grep -q added > /dev/null ||
+           echo "$line" | grep -q built > /dev/null ||
+           echo "$line" | grep -q installed > /dev/null; then
+            # either 'vboxvideo, <version>: added' or 'vboxvideo, <version>, ...: installed'
+            version=`echo "$line" | sed "s/vboxsf,\([^,]*\)[,:].*/\1/;t;d"`
+            echo "  removing old DKMS module vboxsf version $version"
+            $DKMS remove -m vboxsf -v $version --all
+        fi
+    done
+    # there should not be any more matches
+    status=`$DKMS status -m vboxsf -v 3.2.4_OSE`
+    if echo $status | grep added > /dev/null ||
+        echo $status | grep built > /dev/null ||
+        echo $status | grep installed > /dev/null
+    then
+        $DKMS remove -m vboxsf -v 3.2.4_OSE --all
+    fi
+    # finally install the module
+    if $DKMS add -m vboxsf -v 3.2.4_OSE &&
+        $DKMS build -m vboxsf -v 3.2.4_OSE &&
+        $DKMS install -m vboxsf -v 3.2.4_OSE --force
+    then
+        exit 0
+    fi
+    echo "Failed to install using DKMS, attempting to install without"
+fi
+
+# find a unique temp directory
+num=0
+while true; do
+  tmpdir="/tmp/vbox.$num"
+  if mkdir -m 0755 "$tmpdir" 2> /dev/null; then
+    break
+  fi
+  num=`expr $num + 1`
+  if  [ $num -gt 200 ]; then
+    echo "Could not find a valid tmp directory"
+    exit 1
+  fi
+done
+
+if [ "$1" = "--save-module-symvers" ]; then
+  shift
+  SAVE_MOD_SYMVERS="$1"
+  shift
+fi
+
+if [ "$1" = "--use-module-symvers" ]; then
+  shift
+  USE_MOD_SYMVERS="$1"
+  shift
+fi
+
+# copy
+cp -a ${0%/*}/* $tmpdir/
+if [ -n "$USE_MOD_SYMVERS" ]; then
+  cp $USE_MOD_SYMVERS $tmpdir/Module.symvers
+fi
+
+# make, cleanup if success
+cd "$tmpdir"
+if make "$@"; then
+  if [ -n "$SAVE_MOD_SYMVERS" ]; then
+    if [ -f Module.symvers ]; then
+      cp -f Module.symvers $SAVE_MOD_SYMVERS
+    else
+      cat /dev/null > $SAVE_MOD_SYMVERS
+    fi
+  fi
+  rm -rf $tmpdir
+  exit 0
+fi
+
+# failure
+rm -rf $tmpdir
+exit 1

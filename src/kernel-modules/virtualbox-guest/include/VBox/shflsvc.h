@@ -1,10 +1,9 @@
 /** @file
- * Shared Folders:
- * Common header for host service and guest clients.
+ * Shared Folders: Common header for host service and guest clients. (ADD,HSvc)
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,22 +21,20 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___VBox_shflsvc_h
 #define ___VBox_shflsvc_h
 
 #include <VBox/types.h>
-#include <VBox/VBoxGuest.h>
+#include <VBox/VBoxGuest2.h>
+#include <VBox/VMMDev.h>
 #include <VBox/hgcmsvc.h>
 #include <iprt/fs.h>
 
 
-/** Some bit flag manipulation macros. to be moved to VBox/cdefs.h? */
+/** @name Some bit flag manipulation macros.
+ * @{  */
 #ifndef BIT_FLAG
 #define BIT_FLAG(__Field,__Flag)       ((__Field) & (__Flag))
 #endif
@@ -49,6 +46,7 @@
 #ifndef BIT_FLAG_CLEAR
 #define BIT_FLAG_CLEAR(__Field,__Flag) ((__Field) &= ~(__Flag))
 #endif
+/** @} */
 
 
 /**
@@ -126,6 +124,8 @@
  */
 typedef uint32_t SHFLROOT;
 
+#define SHFL_ROOT_NIL ((SHFLROOT)~0)
+
 
 /** A shared folders handle for an opened object. */
 typedef uint64_t SHFLHANDLE;
@@ -136,19 +136,22 @@ typedef uint64_t SHFLHANDLE;
 /** Hardcoded maximum number of shared folder mapping available to the guest. */
 #define SHFL_MAX_MAPPINGS    (64)
 
-/** Shared Folders strings. They can be either UTF8 or Unicode.
- *  @{
+/** @name Shared Folders strings. They can be either UTF-8 or UTF-16.
+ * @{
  */
 
+/**
+ * Shared folder string buffer structure.
+ */
 typedef struct _SHFLSTRING
 {
-    /** Size of string String buffer in bytes. */
+    /** Size of the String member in bytes. */
     uint16_t u16Size;
 
     /** Length of string without trailing nul in bytes. */
     uint16_t u16Length;
 
-    /** UTF8 or Unicode16 string. Nul terminated. */
+    /** UTF-8 or UTF-16 string. Nul terminated. */
     union
     {
         uint8_t  utf8[1];
@@ -156,15 +159,18 @@ typedef struct _SHFLSTRING
     } String;
 } SHFLSTRING;
 
+/** Pointer to a shared folder string buffer. */
 typedef SHFLSTRING *PSHFLSTRING;
+/** Pointer to a const shared folder string buffer. */
+typedef const SHFLSTRING *PCSHFLSTRING;
 
 /** Calculate size of the string. */
-DECLINLINE(uint32_t) ShflStringSizeOfBuffer (PSHFLSTRING pString)
+DECLINLINE(uint32_t) ShflStringSizeOfBuffer (PCSHFLSTRING pString)
 {
     return pString? sizeof (SHFLSTRING) - sizeof (pString->String) + pString->u16Size: 0;
 }
 
-DECLINLINE(uint32_t) ShflStringLength (PSHFLSTRING pString)
+DECLINLINE(uint32_t) ShflStringLength (PCSHFLSTRING pString)
 {
     return pString? pString->u16Length: 0;
 }
@@ -186,6 +192,42 @@ DECLINLINE(PSHFLSTRING) ShflStringInitBuffer(void *pvBuffer, uint32_t u32Size)
     }
 
     return pString;
+}
+
+/**
+ * Validates a HGCM string parameter.
+ *
+ * @returns true if valid, false if not.
+ *
+ * @param   pString     The string buffer pointer.
+ * @param   cbBuf       The buffer size from the parameter.
+ */
+DECLINLINE(bool) ShflStringIsValid(PCSHFLSTRING pString, uint32_t cbBuf)
+{
+    if (RT_UNLIKELY(cbBuf <= RT_UOFFSETOF(SHFLSTRING, String)))
+        return false;
+    if (RT_UNLIKELY((uint32_t)pString->u16Size + RT_UOFFSETOF(SHFLSTRING, String) > cbBuf))
+        return false;
+    if (RT_UNLIKELY(pString->u16Length >= pString->u16Size))
+        return false;
+    return true;
+}
+
+/**
+ * Validates an optional HGCM string parameter.
+ *
+ * @returns true if valid, false if not.
+ *
+ * @param   pString     The string buffer pointer. Can be NULL.
+ * @param   cbBuf       The buffer size from the parameter.
+ */
+DECLINLINE(bool) ShflStringIsValidOrNull(PCSHFLSTRING pString, uint32_t cbBuf)
+{
+    if (pString)
+        return ShflStringIsValid(pString, cbBuf);
+    if (RT_UNLIKELY(cbBuf > 0))
+        return false;
+    return true;
 }
 
 /** @} */
@@ -278,6 +320,20 @@ typedef enum _SHFLCREATERESULT
 /** Do not allow access. */
 #define SHFL_CF_ACCESS_DENYALL          (SHFL_CF_ACCESS_DENYREAD | SHFL_CF_ACCESS_DENYWRITE)
 
+/** Requested access to attributes of the object. */
+#define SHFL_CF_ACCESS_MASK_ATTR        (0x00030000)
+
+/** No access requested. */
+#define SHFL_CF_ACCESS_ATTR_NONE        (0x00000000)
+/** Read access requested. */
+#define SHFL_CF_ACCESS_ATTR_READ        (0x00010000)
+/** Write access requested. */
+#define SHFL_CF_ACCESS_ATTR_WRITE       (0x00020000)
+/** Read/Write access requested. */
+#define SHFL_CF_ACCESS_ATTR_READWRITE   (SHFL_CF_ACCESS_READ | SHFL_CF_ACCESS_WRITE)
+
+/** The file is opened in append mode. Ignored if SHFL_CF_ACCESS_WRITE is not set. */
+#define SHFL_CF_ACCESS_APPEND           (0x00040000)
 
 /** @} */
 
@@ -929,67 +985,23 @@ typedef struct _VBoxSFRename
 
 /**
  * SHFL_FN_ADD_MAPPING
+ * Host call, no guest structure is used.
  */
-
-/** Parameters structure. */
-typedef struct _VBoxSFAddMapping
-{
-    VBoxGuestHGCMCallInfo callInfo;
-
-    /** pointer, in: Folder name
-     * Points to SHFLSTRING buffer.
-     */
-    HGCMFunctionParameter folder;
-
-    /** pointer, in: Mapping name
-     * Points to SHFLSTRING buffer.
-     */
-    HGCMFunctionParameter mapping;
-
-    /** bool, in: Writable
-     * True (default) if the folder is writable.
-     */
-    HGCMFunctionParameter writable;
-
-} VBoxSFAddMapping;
 
 #define SHFL_CPARMS_ADD_MAPPING  (3)
 
-
 /**
  * SHFL_FN_REMOVE_MAPPING
+ * Host call, no guest structure is used.
  */
-
-/** Parameters structure. */
-typedef struct _VBoxSFRemoveMapping
-{
-    VBoxGuestHGCMCallInfo callInfo;
-
-    /** pointer, in: Guest name
-     * Points to SHFLSTRING buffer.
-     */
-    HGCMFunctionParameter path;
-
-} VBoxSFRemoveMapping;
 
 #define SHFL_CPARMS_REMOVE_MAPPING (1)
 
 
 /**
  * SHFL_FN_SET_STATUS_LED
+ * Host call, no guest structure is used.
  */
-
-/** Parameters structure. */
-typedef struct _VBoxSFSetStatusLed
-{
-    VBoxGuestHGCMCallInfo callInfo;
-
-    /** pointer, in: LED address
-     * Points to PPDMLED buffer.
-     */
-    HGCMFunctionParameter led;
-
-} VBoxSFSetStatusLed;
 
 #define SHFL_CPARMS_SET_STATUS_LED (1)
 

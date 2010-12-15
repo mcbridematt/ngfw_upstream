@@ -1,10 +1,10 @@
-/* $Id: alloc-r0drv-linux.c 29978 2008-04-21 17:24:28Z umoeller $ */
+/* $Id: alloc-r0drv-linux.c $ */
 /** @file
  * IPRT - Memory Allocation, Ring-0 Driver, Linux.
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,10 +22,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 
@@ -33,11 +29,13 @@
 *   Header Files                                                               *
 *******************************************************************************/
 #include "the-linux-kernel.h"
+#include "internal/iprt.h"
+
 #include <iprt/mem.h>
 #include <iprt/assert.h>
 #include "r0drv/alloc-r0drv.h"
 
-#if defined(RT_ARCH_AMD64) || defined(__DOXYGEN__)
+#if defined(RT_ARCH_AMD64) || defined(DOXYGEN_RUNNING)
 /**
  * We need memory in the module range (~2GB to ~0) this can only be obtained
  * thru APIs that are not exported (see module_alloc()).
@@ -104,6 +102,7 @@ RTR0DECL(int) RTR0MemExecDonate(void *pvMemory, size_t cb)
     }
     return rc;
 }
+RT_EXPORT_SYMBOL(RTR0MemExecDonate);
 #endif /* RTMEMALLOC_EXEC_HEAP */
 
 
@@ -111,7 +110,7 @@ RTR0DECL(int) RTR0MemExecDonate(void *pvMemory, size_t cb)
 /**
  * OS specific allocation function.
  */
-PRTMEMHDR rtMemAlloc(size_t cb, uint32_t fFlags)
+PRTMEMHDR rtR0MemAlloc(size_t cb, uint32_t fFlags)
 {
     /*
      * Allocate.
@@ -130,11 +129,13 @@ PRTMEMHDR rtMemAlloc(size_t cb, uint32_t fFlags)
             fFlags |= RTMEMHDR_FLAG_EXEC_HEAP;
         }
         else
-# endif
-            pHdr = (PRTMEMHDR)__vmalloc(cb + sizeof(*pHdr), GFP_KERNEL | __GFP_HIGHMEM, MY_PAGE_KERNEL_EXEC);
+            pHdr = NULL;
+# else  /* !RTMEMALLOC_EXEC_HEAP */
+        pHdr = (PRTMEMHDR)__vmalloc(cb + sizeof(*pHdr), GFP_KERNEL | __GFP_HIGHMEM, MY_PAGE_KERNEL_EXEC);
+# endif /* !RTMEMALLOC_EXEC_HEAP */
 
 #elif defined(PAGE_KERNEL_EXEC) && defined(CONFIG_X86_PAE)
-        pHdr = (PRTMEMHDR)__vmalloc(cb + sizeof(*pHdr), GFP_KERNEL | __GFP_HIGHMEM, MY_PAGE_KERNEL_EXEC); 
+        pHdr = (PRTMEMHDR)__vmalloc(cb + sizeof(*pHdr), GFP_KERNEL | __GFP_HIGHMEM, MY_PAGE_KERNEL_EXEC);
 #else
         pHdr = (PRTMEMHDR)vmalloc(cb + sizeof(*pHdr));
 #endif
@@ -167,7 +168,7 @@ PRTMEMHDR rtMemAlloc(size_t cb, uint32_t fFlags)
 /**
  * OS specific free function.
  */
-void rtMemFree(PRTMEMHDR pHdr)
+void rtR0MemFree(PRTMEMHDR pHdr)
 {
     pHdr->u32Magic += 1;
     if (pHdr->fFlags & RTMEMHDR_FLAG_KMALLOC)
@@ -233,10 +234,17 @@ RTR0DECL(void *) RTMemContAlloc(PRTCCPHYS pPhys, size_t cb)
     cb = RT_ALIGN_Z(cb, PAGE_SIZE);
     cPages = cb >> PAGE_SHIFT;
     cOrder = CalcPowerOf2Order(cPages);
-#ifdef RT_ARCH_AMD64 /** @todo check out if there is a correct way of getting memory below 4GB (physically). */
-    paPages = alloc_pages(GFP_DMA, cOrder);
+#if (defined(RT_ARCH_AMD64) || defined(CONFIG_X86_PAE)) && defined(GFP_DMA32)
+    /* ZONE_DMA32: 0-4GB */
+    paPages = alloc_pages(GFP_DMA32, cOrder);
+    if (!paPages)
+#endif
+#ifdef RT_ARCH_AMD64
+        /* ZONE_DMA; 0-16MB */
+        paPages = alloc_pages(GFP_DMA, cOrder);
 #else
-    paPages = alloc_pages(GFP_USER, cOrder);
+        /* ZONE_NORMAL: 0-896MB */
+        paPages = alloc_pages(GFP_USER, cOrder);
 #endif
     if (paPages)
     {
@@ -269,6 +277,7 @@ RTR0DECL(void *) RTMemContAlloc(PRTCCPHYS pPhys, size_t cb)
 
     return NULL;
 }
+RT_EXPORT_SYMBOL(RTMemContAlloc);
 
 
 /**
@@ -309,4 +318,5 @@ RTR0DECL(void) RTMemContFree(void *pv, size_t cb)
         __free_pages(paPages, cOrder);
     }
 }
+RT_EXPORT_SYMBOL(RTMemContFree);
 

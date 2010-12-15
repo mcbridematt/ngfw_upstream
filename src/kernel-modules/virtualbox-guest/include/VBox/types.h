@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -21,10 +21,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___VBox_types_h
@@ -50,15 +46,6 @@
  * @{
  */
 
-/** @deprecated
- * @{ */
-typedef RTHCPHYS    VBOXHCPHYS;
-typedef VBOXHCPHYS *PVBOXHCPHYS;
-#define NILVBOXHCPHYS NIL_RTHCPHYS
-typedef RTHCPTR     VBOXHCPTR;
-typedef VBOXHCPTR  *PVBOXHCPTR;
-/** @} */
-
 /** @} */
 
 
@@ -76,22 +63,83 @@ typedef VBOXHCPTR  *PVBOXHCPTR;
 typedef R0PTRTYPE(struct SUPDRVSESSION *) PSUPDRVSESSION;
 
 /** Pointer to a VM. */
-typedef struct VM              *PVM;
+typedef struct VM                  *PVM;
 /** Pointer to a VM - Ring-0 Ptr. */
-typedef R0PTRTYPE(struct VM *)  PVMR0;
+typedef R0PTRTYPE(struct VM *)      PVMR0;
 /** Pointer to a VM - Ring-3 Ptr. */
-typedef R3PTRTYPE(struct VM *)  PVMR3;
-/** Pointer to a VM - GC Ptr. */
-typedef GCPTRTYPE(struct VM *)  PVMGC;
+typedef R3PTRTYPE(struct VM *)      PVMR3;
+/** Pointer to a VM - RC Ptr. */
+typedef RCPTRTYPE(struct VM *)      PVMRC;
+
+/** Pointer to a virtual CPU structure. */
+typedef struct VMCPU *              PVMCPU;
+/** Pointer to a virtual CPU structure - Ring-3 Ptr. */
+typedef R3PTRTYPE(struct VMCPU *)   PVMCPUR3;
+/** Pointer to a virtual CPU structure - Ring-0 Ptr. */
+typedef R0PTRTYPE(struct VMCPU *)   PVMCPUR0;
+/** Pointer to a virtual CPU structure - RC Ptr. */
+typedef RCPTRTYPE(struct VMCPU *)   PVMCPURC;
 
 /** Pointer to a ring-0 (global) VM structure. */
-typedef R0PTRTYPE(struct GVM *) PGVM;
+typedef R0PTRTYPE(struct GVM *)     PGVM;
 
 /** Pointer to a ring-3 (user mode) VM structure. */
-typedef R3PTRTYPE(struct UVM *) PUVM;
+typedef R3PTRTYPE(struct UVM *)     PUVM;
+
+/** Pointer to a ring-3 (user mode) VMCPU structure. */
+typedef R3PTRTYPE(struct UVMCPU *)  PUVMCPU;
+
+/** Virtual CPU ID. */
+typedef uint32_t                    VMCPUID;
+/** Pointer to a virtual CPU ID. */
+typedef VMCPUID                    *PVMCPUID;
+/** @name Special CPU ID values.
+ * Most of these are for request scheduling.
+ *
+ * @{ */
+/** All virtual CPUs. */
+#define VMCPUID_ALL         UINT32_C(0xfffffff2)
+/** All virtual CPUs, descending order. */
+#define VMCPUID_ALL_REVERSE UINT32_C(0xfffffff3)
+/** Any virtual CPU.
+ * Intended for scheduling a VM request or some other task. */
+#define VMCPUID_ANY         UINT32_C(0xfffffff4)
+/** Any virtual CPU; always queue for future execution.
+ * Intended for scheduling a VM request or some other task. */
+#define VMCPUID_ANY_QUEUE   UINT32_C(0xfffffff5)
+/** The NIL value. */
+#define NIL_VMCPUID         UINT32_C(0xfffffffd)
+/** @} */
+
+/**
+ * Virtual CPU set.
+ */
+typedef struct VMCPUSET
+{
+    /** The bitmap data.  */
+    uint32_t    au32Bitmap[256/32];
+} VMCPUSET;
+/** Pointer to a Virtual CPU set. */
+typedef VMCPUSET *PVMCPUSET;
+/** Pointer to a const Virtual CPU set. */
+typedef VMCPUSET const *PCVMCPUSET;
+
+/** Tests if a valid CPU ID is present in the set.. */
+#define VMCPUSET_IS_PRESENT(pSet, idCpu)    ASMBitTest( &(pSet)->au32Bitmap, (idCpu))
+/** Adds a CPU to the set. */
+#define VMCPUSET_ADD(pSet, idCpu)           ASMBitSet(  &(pSet)->au32Bitmap, (idCpu))
+/** Deletes a CPU from the set. */
+#define VMCPUSET_DEL(pSet, idCpu)           ASMBitClear(&(pSet)->au32Bitmap, (idCpu))
+/** Empties the set. */
+#define VMCPUSET_EMPTY(pSet)                memset(&(pSet)->au32Bitmap[0], '\0', sizeof((pSet)->au32Bitmap))
+/** Filles the set. */
+#define VMCPUSET_FILL(pSet)                 memset(&(pSet)->au32Bitmap[0], 0xff, sizeof((pSet)->au32Bitmap))
+/** Filles the set. */
+#define VMCPUSET_IS_EQUAL(pSet1, pSet2)     (memcmp(&(pSet1)->au32Bitmap[0], &(pSet2)->au32Bitmap[0], sizeof((pSet1)->au32Bitmap)) == 0)
 
 
-/** VM State
+/**
+ * VM State
  */
 typedef enum VMSTATE
 {
@@ -99,22 +147,58 @@ typedef enum VMSTATE
     VMSTATE_CREATING = 0,
     /** The VM is created. */
     VMSTATE_CREATED,
-    /** The VM is runnning. */
-    VMSTATE_RUNNING,
     /** The VM state is being loaded from file. */
     VMSTATE_LOADING,
-    /** The VM is screwed because of a failed state loading. */
-    VMSTATE_LOAD_FAILURE,
-    /** The VM state is being saved to file. */
-    VMSTATE_SAVING,
-    /** The VM is suspended. */
-    VMSTATE_SUSPENDED,
+    /** The VM is being powered on */
+    VMSTATE_POWERING_ON,
+    /** The VM is being resumed. */
+    VMSTATE_RESUMING,
+    /** The VM is runnning. */
+    VMSTATE_RUNNING,
+    /** Live save: The VM is running and the state is being saved. */
+    VMSTATE_RUNNING_LS,
     /** The VM is being reset. */
     VMSTATE_RESETTING,
-    /** The VM is in guru meditation over a fatal failure. */
-    VMSTATE_GURU_MEDITATION,
+    /** Live save: The VM is being reset and immediately suspended. */
+    VMSTATE_RESETTING_LS,
+    /** The VM is being suspended. */
+    VMSTATE_SUSPENDING,
+    /** Live save: The VM is being suspended during a live save operation, either as
+     * part of the normal flow or VMR3Reset. */
+    VMSTATE_SUSPENDING_LS,
+    /** Live save: The VM is being suspended by VMR3Suspend during live save. */
+    VMSTATE_SUSPENDING_EXT_LS,
+    /** The VM is suspended. */
+    VMSTATE_SUSPENDED,
+    /** Live save: The VM has been suspended and is waiting for the live save
+     * operation to move on. */
+    VMSTATE_SUSPENDED_LS,
+    /** Live save: The VM has been suspended by VMR3Suspend during a live save. */
+    VMSTATE_SUSPENDED_EXT_LS,
+    /** The VM is suspended and its state is being saved by EMT(0). (See SSM) */
+    VMSTATE_SAVING,
+    /** The VM is being debugged. (See DBGF.) */
+    VMSTATE_DEBUGGING,
+    /** Live save: The VM is being debugged while the live phase is going on. */
+    VMSTATE_DEBUGGING_LS,
+    /** The VM is being powered off. */
+    VMSTATE_POWERING_OFF,
+    /** Live save: The VM is being powered off and the save cancelled. */
+    VMSTATE_POWERING_OFF_LS,
     /** The VM is switched off, awaiting destruction. */
     VMSTATE_OFF,
+    /** Live save: Waiting for cancellation and transition to VMSTATE_OFF. */
+    VMSTATE_OFF_LS,
+    /** The VM is powered off because of a fatal error. */
+    VMSTATE_FATAL_ERROR,
+    /** Live save: Waiting for cancellation and transition to FatalError. */
+    VMSTATE_FATAL_ERROR_LS,
+    /** The VM is in guru meditation over a fatal failure. */
+    VMSTATE_GURU_MEDITATION,
+    /** Live save: Waiting for cancellation and transition to GuruMeditation. */
+    VMSTATE_GURU_MEDITATION_LS,
+    /** The VM is screwed because of a failed state loading. */
+    VMSTATE_LOAD_FAILURE,
     /** The VM is being destroyed. */
     VMSTATE_DESTROYING,
     /** Terminated. */
@@ -123,10 +207,112 @@ typedef enum VMSTATE
     VMSTATE_MAKE_32BIT_HACK = 0x7fffffff
 } VMSTATE;
 
+/** @def VBOXSTRICTRC_STRICT_ENABLED
+ * Indicates that VBOXSTRICTRC is in strict mode.
+ */
+#if defined(__cplusplus) \
+ && ARCH_BITS == 64    /* cdecl requires classes and structs as hidden params. */ \
+ && !defined(_MSC_VER) /* trouble similar to 32-bit gcc. */ \
+ &&  (   defined(RT_STRICT) \
+      || defined(VBOX_STRICT) \
+      || defined(DEBUG) \
+      || defined(DOXYGEN_RUNNING) )
+# define VBOXSTRICTRC_STRICT_ENABLED 1
+# ifdef _MSC_VER
+#  pragma warning(disable:4190)
+# endif
+#endif
 
-/** Pointer to a PDM Driver Base Interface. */
+/** We need RTERR_STRICT_RC.  */
+#if defined(VBOXSTRICTRC_STRICT_ENABLED) && !defined(RTERR_STRICT_RC)
+# define RTERR_STRICT_RC 1
+#endif
+
+/**
+ * Strict VirtualBox status code.
+ *
+ * This is normally an 32-bit integer and the only purpose of the type is to
+ * highlight the special handling that is required.  But in strict build it is a
+ * class that causes compilation and runtime errors for some of the incorrect
+ * handling.
+ */
+#ifdef VBOXSTRICTRC_STRICT_ENABLED
+struct VBOXSTRICTRC
+{
+protected:
+    /** The status code. */
+    int32_t m_rc;
+
+public:
+    /** Default constructor setting the status to VERR_IPE_UNINITIALIZED_STATUS. */
+    VBOXSTRICTRC()
+#ifdef VERR_IPE_UNINITIALIZED_STATUS
+        : m_rc(VERR_IPE_UNINITIALIZED_STATUS)
+#else
+        : m_rc(-233 /*VERR_IPE_UNINITIALIZED_STATUS*/)
+#endif
+    {
+    }
+
+    /** Constructor for normal integer status codes. */
+    VBOXSTRICTRC(int32_t const rc)
+        : m_rc(rc)
+    {
+    }
+
+    /** Getter that VBOXSTRICTRC_VAL can use. */
+    int32_t getValue() const                    { return m_rc; }
+
+    /** @name Comparison operators
+     * @{ */
+    bool operator==(int32_t rc) const           { return m_rc == rc; }
+    bool operator!=(int32_t rc) const           { return m_rc != rc; }
+    bool operator<=(int32_t rc) const           { return m_rc <= rc; }
+    bool operator>=(int32_t rc) const           { return m_rc >= rc; }
+    bool operator<(int32_t rc) const            { return m_rc < rc; }
+    bool operator>(int32_t rc) const            { return m_rc > rc; }
+    /** @} */
+
+    /** Special automatic cast for RT_SUCCESS_NP. */
+    operator RTErrStrictType2() const           { return RTErrStrictType2(m_rc); }
+
+private:
+    /** @name Constructors that will prevent some of the bad types.
+     * @{ */
+    VBOXSTRICTRC(uint8_t  rc) : m_rc(-999)      { NOREF(rc); }
+    VBOXSTRICTRC(uint16_t rc) : m_rc(-999)      { NOREF(rc); }
+    VBOXSTRICTRC(uint32_t rc) : m_rc(-999)      { NOREF(rc); }
+    VBOXSTRICTRC(uint64_t rc) : m_rc(-999)      { NOREF(rc); }
+
+    VBOXSTRICTRC(int8_t rc)   : m_rc(-999)      { NOREF(rc); }
+    VBOXSTRICTRC(int16_t rc)  : m_rc(-999)      { NOREF(rc); }
+    VBOXSTRICTRC(int64_t rc)  : m_rc(-999)      { NOREF(rc); }
+    /** @} */
+};
+#else
+typedef int32_t VBOXSTRICTRC;
+#endif
+
+/** @def VBOXSTRICTRC_VAL
+ * Explicit getter.
+ * @param rcStrict  The strict VirtualBox status code.
+ */
+#ifdef VBOXSTRICTRC_STRICT_ENABLED
+# define VBOXSTRICTRC_VAL(rcStrict) ( (rcStrict).getValue() )
+#else
+# define VBOXSTRICTRC_VAL(rcStrict) (rcStrict)
+#endif
+
+/** @def VBOXSTRICTRC_TODO
+ * Returns that needs dealing with.
+ * @param rcStrict  The strict VirtualBox status code.
+ */
+#define VBOXSTRICTRC_TODO(rcStrict) VBOXSTRICTRC_VAL(rcStrict)
+
+
+/** Pointer to a PDM Base Interface. */
 typedef struct PDMIBASE *PPDMIBASE;
-/** Pointer to a pointer to a PDM Driver Base Interface. */
+/** Pointer to a pointer to a PDM Base Interface. */
 typedef PPDMIBASE *PPPDMIBASE;
 
 /** Pointer to a PDM Device Instance. */
@@ -137,8 +323,8 @@ typedef PPDMDEVINS *PPPDMDEVINS;
 typedef R3PTRTYPE(PPDMDEVINS) PPDMDEVINSR3;
 /** R0 pointer to a PDM Device Instance. */
 typedef R0PTRTYPE(PPDMDEVINS) PPDMDEVINSR0;
-/** GC pointer to a PDM Device Instance. */
-typedef GCPTRTYPE(PPDMDEVINS) PPDMDEVINSGC;
+/** RC pointer to a PDM Device Instance. */
+typedef RCPTRTYPE(PPDMDEVINS) PPDMDEVINSRC;
 
 /** Pointer to a PDM USB Device Instance. */
 typedef struct PDMUSBINS *PPDMUSBINS;
@@ -149,11 +335,22 @@ typedef PPDMUSBINS *PPPDMUSBINS;
 typedef struct PDMDRVINS *PPDMDRVINS;
 /** Pointer to a pointer to a PDM Driver Instance. */
 typedef PPDMDRVINS *PPPDMDRVINS;
+/** R3 pointer to a PDM Driver Instance. */
+typedef R3PTRTYPE(PPDMDRVINS) PPDMDRVINSR3;
+/** R0 pointer to a PDM Driver Instance. */
+typedef R0PTRTYPE(PPDMDRVINS) PPDMDRVINSR0;
+/** RC pointer to a PDM Driver Instance. */
+typedef RCPTRTYPE(PPDMDRVINS) PPDMDRVINSRC;
 
 /** Pointer to a PDM Service Instance. */
 typedef struct PDMSRVINS *PPDMSRVINS;
 /** Pointer to a pointer to a PDM Service Instance. */
 typedef PPDMSRVINS *PPPDMSRVINS;
+
+/** Pointer to a PDM critical section. */
+typedef union PDMCRITSECT *PPDMCRITSECT;
+/** Pointer to a const PDM critical section. */
+typedef const union PDMCRITSECT *PCPDMCRITSECT;
 
 /** R3 pointer to a timer. */
 typedef R3PTRTYPE(struct TMTIMER *) PTMTIMERR3;
@@ -165,18 +362,20 @@ typedef R0PTRTYPE(struct TMTIMER *) PTMTIMERR0;
 /** Pointer to a R3 pointer to a timer. */
 typedef PTMTIMERR0 *PPTMTIMERR0;
 
-/** GC pointer to a timer. */
-typedef GCPTRTYPE(struct TMTIMER *) PTMTIMERGC;
-/** Pointer to a GC pointer to a timer. */
-typedef PTMTIMERGC *PPTMTIMERGC;
+/** RC pointer to a timer. */
+typedef RCPTRTYPE(struct TMTIMER *) PTMTIMERRC;
+/** Pointer to a RC pointer to a timer. */
+typedef PTMTIMERRC *PPTMTIMERRC;
 
 /** Pointer to a timer. */
-typedef CTXALLSUFF(PTMTIMER)   PTMTIMER;
+typedef CTX_SUFF(PTMTIMER)     PTMTIMER;
 /** Pointer to a pointer to a timer. */
-typedef CTXALLSUFF(PPTMTIMER)  PPTMTIMER;
+typedef PTMTIMER              *PPTMTIMER;
 
 /** SSM Operation handle. */
 typedef struct SSMHANDLE *PSSMHANDLE;
+/** Pointer to a const SSM stream method table. */
+typedef struct SSMSTRMOPS const *PCSSMSTRMOPS;
 
 /** Pointer to a CPUMCTX. */
 typedef struct CPUMCTX *PCPUMCTX;
@@ -372,6 +571,8 @@ typedef union VBOXIDTE
 #pragma pack()
 /** Pointer to IDT Entry. */
 typedef VBOXIDTE *PVBOXIDTE;
+/** Pointer to IDT Entry. */
+typedef VBOXIDTE const *PCVBOXIDTE;
 
 #pragma pack(1)
 /** IDTR */
@@ -380,80 +581,30 @@ typedef struct VBOXIDTR
     /** Size of the IDT. */
     uint16_t    cbIdt;
     /** Address of the IDT. */
-    uint32_t    pIdt;
+    uint64_t     pIdt;
 } VBOXIDTR, *PVBOXIDTR;
 #pragma pack()
+
+#pragma pack(1)
+/** IDTR from version 1.6 */
+typedef struct VBOXIDTR_VER1_6
+{
+    /** Size of the IDT. */
+    uint16_t    cbIdt;
+    /** Address of the IDT. */
+    uint32_t     pIdt;
+} VBOXIDTR_VER1_6, *PVBOXIDTR_VER1_6;
+#pragma pack()
+
 /** @} */
 
 
-/** @defgroup grp_types_desc    Descriptor Table Entry.
- * @ingroup grp_types
- * @{ */
-
-#pragma pack(1)
-/**
- * Memory descriptor.
+/** @def VBOXIDTE_OFFSET
+ * Return the offset of an IDT entry.
  */
-typedef struct VBOXDESCGENERIC
-{
-    /**  0-15 - Limit - Low word. */
-    unsigned    u16LimitLow : 16;
-    /** 16-31 - Base address - lowe word.
-     * Don't try set this to 24 because MSC is doing studing things then. */
-    unsigned    u16BaseLow : 16;
-    /** 32-39 - Base address - first 8 bits of high word. */
-    unsigned    u8BaseHigh1 : 8;
-    /** 40-43 - Segment Type. */
-    unsigned    u4Type : 4;
-    /** 44    - Descriptor Type. System(=0) or code/data selector */
-    unsigned    u1DescType : 1;
-    /** 45-46 - Descriptor Privelege level. */
-    unsigned    u2Dpl : 2;
-    /** 47    - Flags selector present(=1) or not. */
-    unsigned    u1Present : 1;
-    /** 48-51 - Segment limit 16-19. */
-    unsigned    u4LimitHigh : 4;
-    /** 52    - Available for system software. */
-    unsigned    u1Available : 1;
-    /** 53    - Reserved - 0. In long mode this is the 'Long' (L) attribute bit. */
-    unsigned    u1Reserved : 1;
-    /** 54    - This flags meaning depends on the segment type. Try make sense out
-     * of the intel manual yourself.  */
-    unsigned    u1DefBig : 1;
-    /** 55    - Granularity of the limit. If set 4KB granularity is used, if
-     * clear byte. */
-    unsigned    u1Granularity : 1;
-    /** 56-63 - Base address - highest 8 bits. */
-    unsigned    u8BaseHigh2 : 8;
-} VBOXDESCGENERIC;
-#pragma pack()
-/** Pointer to a generic descriptor entry. */
-typedef VBOXDESCGENERIC *PVBOXDESCGENERIC;
-
-#pragma pack(1)
-/**
- * Descriptor table entry.
- */
-typedef union VBOXDESC
-{
-    /** Generic descriptor view. */
-    VBOXDESCGENERIC Gen;
-    /** IDT view. */
-    VBOXIDTE        Idt;
-
-    /** 8 bit unsigned interger view. */
-    uint8_t         au8[8];
-    /** 16 bit unsigned interger view. */
-    uint16_t        au16[4];
-    /** 32 bit unsigned interger view. */
-    uint32_t        au32[2];
-} VBOXDESC;
-#pragma pack()
-/** Pointer to descriptor table entry. */
-typedef VBOXDESC *PVBOXDESC;
-/** Pointer to const descriptor table entry. */
-typedef VBOXDESC const *PCVBOXDESC;
-
+#define VBOXIDTE_OFFSET(desc) \
+        (  ((uint32_t)((desc).Gen.u16OffsetHigh) << 16) \
+         | (           (desc).Gen.u16OffsetLow        ) )
 
 #pragma pack(1)
 /** GDTR */
@@ -462,88 +613,100 @@ typedef struct VBOXGDTR
     /** Size of the GDT. */
     uint16_t    cbGdt;
     /** Address of the GDT. */
-    uint32_t    pGdt;
+    uint64_t    pGdt;
 } VBOXGDTR;
 #pragma pack()
 /** Pointer to GDTR. */
 typedef VBOXGDTR *PVBOXGDTR;
 
+#pragma pack(1)
+/** GDTR from version 1.6 */
+typedef struct VBOXGDTR_VER1_6
+{
+    /** Size of the GDT. */
+    uint16_t    cbGdt;
+    /** Address of the GDT. */
+    uint32_t    pGdt;
+} VBOXGDTR_VER1_6;
+#pragma pack()
+
 /** @} */
 
 
 /**
- * Task Segment
+ * 32-bit Task Segment used in raw mode.
+ * @todo Move this to SELM! Use X86TSS32 instead.
  */
 #pragma pack(1)
 typedef struct VBOXTSS
 {
-    /** Back link to previous task. (static) */
+    /** 0x00 - Back link to previous task. (static) */
     RTSEL       selPrev;
     uint16_t    padding1;
-    /** Ring-0 stack pointer. (static) */
+    /** 0x04 - Ring-0 stack pointer. (static) */
     uint32_t    esp0;
-    /** Ring-0 stack segment. (static) */
+    /** 0x08 - Ring-0 stack segment. (static) */
     RTSEL       ss0;
     uint16_t    padding_ss0;
-    /** Ring-1 stack pointer. (static) */
+    /** 0x0c - Ring-1 stack pointer. (static) */
     uint32_t    esp1;
-    /** Ring-1 stack segment. (static) */
+    /** 0x10 - Ring-1 stack segment. (static) */
     RTSEL       ss1;
     uint16_t    padding_ss1;
-    /** Ring-2 stack pointer. (static) */
+    /** 0x14 - Ring-2 stack pointer. (static) */
     uint32_t    esp2;
-    /** Ring-2 stack segment. (static) */
+    /** 0x18 - Ring-2 stack segment. (static) */
     RTSEL       ss2;
     uint16_t    padding_ss2;
-    /** Page directory for the task. (static) */
+    /** 0x1c - Page directory for the task. (static) */
     uint32_t    cr3;
-    /** EIP before task switch. */
+    /** 0x20 - EIP before task switch. */
     uint32_t    eip;
-    /** EFLAGS before task switch. */
+    /** 0x24 - EFLAGS before task switch. */
     uint32_t    eflags;
-    /** EAX before task switch. */
+    /** 0x28 - EAX before task switch. */
     uint32_t    eax;
-    /** ECX before task switch. */
+    /** 0x2c - ECX before task switch. */
     uint32_t    ecx;
-    /** EDX before task switch. */
+    /** 0x30 - EDX before task switch. */
     uint32_t    edx;
-    /** EBX before task switch. */
+    /** 0x34 - EBX before task switch. */
     uint32_t    ebx;
-    /** ESP before task switch. */
+    /** 0x38 - ESP before task switch. */
     uint32_t    esp;
-    /** EBP before task switch. */
+    /** 0x3c - EBP before task switch. */
     uint32_t    ebp;
-    /** ESI before task switch. */
+    /** 0x40 - ESI before task switch. */
     uint32_t    esi;
-    /** EDI before task switch. */
+    /** 0x44 - EDI before task switch. */
     uint32_t    edi;
-    /** ES before task switch. */
+    /** 0x48 - ES before task switch. */
     RTSEL       es;
     uint16_t    padding_es;
-    /** CS before task switch. */
+    /** 0x4c - CS before task switch. */
     RTSEL       cs;
     uint16_t    padding_cs;
-    /** SS before task switch. */
+    /** 0x50 - SS before task switch. */
     RTSEL       ss;
     uint16_t    padding_ss;
-    /** DS before task switch. */
+    /** 0x54 - DS before task switch. */
     RTSEL       ds;
     uint16_t    padding_ds;
-    /** FS before task switch. */
+    /** 0x58 - FS before task switch. */
     RTSEL       fs;
     uint16_t    padding_fs;
-    /** GS before task switch. */
+    /** 0x5c - GS before task switch. */
     RTSEL       gs;
     uint16_t    padding_gs;
-    /** LDTR before task switch. */
+    /** 0x60 - LDTR before task switch. */
     RTSEL       selLdt;
     uint16_t    padding_ldt;
-    /** Debug trap flag */
+    /** 0x64 - Debug trap flag */
     uint16_t    fDebugTrap;
-    /** Offset relative to the TSS of the start of the I/O Bitmap
+    /** 0x66 -  Offset relative to the TSS of the start of the I/O Bitmap
      * and the end of the interrupt redirection bitmap. */
     uint16_t    offIoBitmap;
-    /** 32 bytes for the virtual interrupt redirection bitmap. (VME) */
+    /** 0x68 -  32 bytes for the virtual interrupt redirection bitmap. (VME) */
     uint8_t     IntRedirBitmap[32];
 } VBOXTSS;
 #pragma pack()
@@ -552,6 +715,163 @@ typedef VBOXTSS *PVBOXTSS;
 /** Pointer to const task segment. */
 typedef const VBOXTSS *PCVBOXTSS;
 
+
+/**
+ * Data transport buffer (scatter/gather)
+ */
+typedef struct PDMDATASEG
+{
+    /** Length of buffer in entry. */
+    size_t  cbSeg;
+    /** Pointer to the start of the buffer. */
+    void   *pvSeg;
+} PDMDATASEG;
+/** Pointer to a data transport segment. */
+typedef PDMDATASEG *PPDMDATASEG;
+/** Pointer to a const data transport segment. */
+typedef PDMDATASEG const *PCPDMDATASEG;
+
+
+/**
+ * Forms of generic segment offloading.
+ */
+typedef enum PDMNETWORKGSOTYPE
+{
+    /** Invalid zero value. */
+    PDMNETWORKGSOTYPE_INVALID = 0,
+    /** TCP/IPv4 - no CWR/ECE encoding. */
+    PDMNETWORKGSOTYPE_IPV4_TCP,
+    /** TCP/IPv6 - no CWR/ECE encoding. */
+    PDMNETWORKGSOTYPE_IPV6_TCP,
+    /** UDP/IPv4. */
+    PDMNETWORKGSOTYPE_IPV4_UDP,
+    /** UDP/IPv6. */
+    PDMNETWORKGSOTYPE_IPV6_UDP,
+    /** TCP/IPv6 over IPv4 tunneling - no CWR/ECE encoding.
+     * The header offsets and sizes relates to IPv4 and TCP, the IPv6 header is
+     * figured out as needed.
+     * @todo Needs checking against facts, this is just an outline of the idea. */
+    PDMNETWORKGSOTYPE_IPV4_IPV6_TCP,
+    /** UDP/IPv6 over IPv4 tunneling.
+     * The header offsets and sizes relates to IPv4 and UDP, the IPv6 header is
+     * figured out as needed.
+     * @todo Needs checking against facts, this is just an outline of the idea. */
+    PDMNETWORKGSOTYPE_IPV4_IPV6_UDP,
+    /** The end of valid GSO types. */
+    PDMNETWORKGSOTYPE_END
+} PDMNETWORKGSOTYPE;
+
+
+/**
+ * Generic segment offloading context.
+ *
+ * We generally follow the E1000 specs wrt to which header fields we change.
+ * However the GSO type implies where the checksum fields are and that they are
+ * always updated from scratch (no half done pseudo checksums).
+ *
+ * @remarks This is part of the internal network GSO packets.  Take great care
+ *          when making changes.  The size is expected to be exactly 8 bytes.
+ */
+typedef struct PDMNETWORKGSO
+{
+    /** The type of segmentation offloading we're performing (PDMNETWORKGSOTYPE). */
+    uint8_t             u8Type;
+    /** The total header size. */
+    uint8_t             cbHdrs;
+    /** The max segment size (MSS) to apply. */
+    uint16_t            cbMaxSeg;
+
+    /** Offset of the first header (IPv4 / IPv6).  0 if not not needed. */
+    uint8_t             offHdr1;
+    /** Offset of the second header (TCP / UDP).  0 if not not needed. */
+    uint8_t             offHdr2;
+    /** Unused. */
+    uint8_t             au8Unused[2];
+} PDMNETWORKGSO;
+/** Pointer to a GSO context. */
+typedef PDMNETWORKGSO *PPDMNETWORKGSO;
+/** Pointer to a const GSO context. */
+typedef PDMNETWORKGSO const *PCPDMNETWORKGSO;
+
+
+/**
+ * The current ROM page protection.
+ *
+ * @remarks This is part of the saved state.
+ */
+typedef enum PGMROMPROT
+{
+    /** The customary invalid value. */
+    PGMROMPROT_INVALID = 0,
+    /** Read from the virgin ROM page, ignore writes.
+     * Map the virgin page, use write access handler to ignore writes. */
+    PGMROMPROT_READ_ROM_WRITE_IGNORE,
+    /** Read from the virgin ROM page, write to the shadow RAM.
+     * Map the virgin page, use write access handler change the RAM. */
+    PGMROMPROT_READ_ROM_WRITE_RAM,
+    /** Read from the shadow ROM page, ignore writes.
+     * Map the shadow page read-only, use write access handler to ignore writes. */
+    PGMROMPROT_READ_RAM_WRITE_IGNORE,
+    /** Read from the shadow ROM page, ignore writes.
+     * Map the shadow page read-write, disabled write access handler. */
+    PGMROMPROT_READ_RAM_WRITE_RAM,
+    /** The end of valid values. */
+    PGMROMPROT_END,
+    /** The usual 32-bit type size hack. */
+    PGMROMPROT_32BIT_HACK = 0x7fffffff
+} PGMROMPROT;
+
+
+/**
+ * Page mapping lock.
+ *
+ * @remarks This doesn't work in structures shared between
+ *          ring-3, ring-0 and/or GC.
+ */
+typedef struct PGMPAGEMAPLOCK
+{
+    /** @todo see PGMPhysIsPageMappingLockValid for possibly incorrect assumptions */
+#if defined(IN_RC) || defined(VBOX_WITH_2X_4GB_ADDR_SPACE_IN_R0)
+    /** Just a dummy for the time being. */
+    uint32_t    u32Dummy;
+#else
+    /** Pointer to the PGMPAGE and lock type.
+     * bit-0 abuse: set=write, clear=read. */
+    uintptr_t   uPageAndType;
+/** Read lock type value. */
+# define PGMPAGEMAPLOCK_TYPE_READ    ((uintptr_t)0)
+/** Write lock type value. */
+# define PGMPAGEMAPLOCK_TYPE_WRITE   ((uintptr_t)1)
+/** Lock type mask. */
+# define PGMPAGEMAPLOCK_TYPE_MASK    ((uintptr_t)1)
+    /** Pointer to the PGMCHUNKR3MAP. */
+    void       *pvMap;
+#endif
+} PGMPAGEMAPLOCK;
+/** Pointer to a page mapping lock. */
+typedef PGMPAGEMAPLOCK *PPGMPAGEMAPLOCK;
+
+
+/** Configuration manager tree node - A key. */
+typedef struct CFGMNODE *PCFGMNODE;
+
+/** Configuration manager tree leaf - A value. */
+typedef struct CFGMLEAF *PCFGMLEAF;
+
+/**
+ * CPU modes.
+ */
+typedef enum CPUMMODE
+{
+    /** The usual invalid zero entry. */
+    CPUMMODE_INVALID = 0,
+    /** Real mode. */
+    CPUMMODE_REAL,
+    /** Protected mode (32-bit). */
+    CPUMMODE_PROTECTED,
+    /** Long mode (64-bit). */
+    CPUMMODE_LONG
+} CPUMMODE;
 
 /** @} */
 

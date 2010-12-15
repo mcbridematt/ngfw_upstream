@@ -1,10 +1,10 @@
-/* $Id: the-linux-kernel.h 33794 2008-07-29 15:25:05Z klaus $ */
+/* $Id: the-linux-kernel.h $ */
 /** @file
  * IPRT - Include all necessary headers for the Linux kernel.
  */
 
 /*
- * Copyright (C) 2006-2007 Sun Microsystems, Inc.
+ * Copyright (C) 2006-2007 Oracle Corporation
  *
  * This file is part of VirtualBox Open Source Edition (OSE), as
  * available from http://www.virtualbox.org. This file is free software;
@@ -22,10 +22,6 @@
  *
  * You may elect to license modified versions of this file under the
  * terms and conditions of either the GPL or the CDDL or both.
- *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 USA or visit http://www.sun.com if you need
- * additional information or have any questions.
  */
 
 #ifndef ___the_linux_kernel_h
@@ -38,7 +34,9 @@
 #include <iprt/types.h>
 #define bool linux_bool
 
-#include <linux/autoconf.h>
+#ifndef AUTOCONF_INCLUDED
+# include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 
 /* We only support 2.4 and 2.6 series kernels */
@@ -80,11 +78,20 @@
 #include <linux/mm.h>
 #include <linux/pagemap.h>
 #include <linux/slab.h>
+#include <linux/time.h>
+#include <linux/sched.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 7)
-# include <linux/time.h>
 # include <linux/jiffies.h>
 #endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 16)
+# include <linux/ktime.h>
+# include <linux/hrtimer.h>
+#endif
 #include <linux/wait.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 71)
+# include <linux/cpu.h>
+# include <linux/notifier.h>
+#endif
 /* For the basic additions module */
 #include <linux/pci.h>
 #include <linux/delay.h>
@@ -115,7 +122,7 @@
 #endif
 
 /*
- * 2.4 compatibility wrappers
+ * 2.4 / early 2.6 compatibility wrappers
  */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 7)
 
@@ -123,7 +130,7 @@
 #  define MAX_JIFFY_OFFSET ((~0UL >> 1)-1)
 # endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 4, 29) || LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0)
+# if LINUX_VERSION_CODE < KERNEL_VERSION(2, 4, 29) || LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0)
 
 DECLINLINE(unsigned int) jiffies_to_msecs(unsigned long cJiffies)
 {
@@ -153,33 +160,54 @@ DECLINLINE(unsigned long) msecs_to_jiffies(unsigned int cMillies)
 
 # endif  /* < 2.4.29 || >= 2.6.0 */
 
+#endif /* < 2.6.7 */
+
+/*
+ * 2.4 compatibility wrappers
+ */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 0)
+
 # define prepare_to_wait(q, wait, state) \
     do { \
-        set_current_state(state); \
         add_wait_queue(q, wait); \
+        set_current_state(state); \
+    } while (0)
+
+# define after_wait(wait) \
+    do { \
+        list_del_init(&(wait)->task_list); \
     } while (0)
 
 # define finish_wait(q, wait) \
     do { \
-        remove_wait_queue(q, wait); \
         set_current_state(TASK_RUNNING); \
+        remove_wait_queue(q, wait); \
     } while (0)
 
-#endif /* < 2.6.7 */
+#else /* >= 2.6.0 */
 
+# define after_wait(wait)       do {} while (0)
+
+#endif /* >= 2.6.0 */
+
+/** @def TICK_NSEC
+ * The time between ticks in nsec */
+#ifndef TICK_NSEC
+# define TICK_NSEC (1000000000UL / HZ)
+#endif
 
 /*
  * This sucks soooo badly on x86! Why don't they export __PAGE_KERNEL_EXEC so PAGE_KERNEL_EXEC would be usable?
  */
-#if defined(RT_ARCH_AMD64)
+#if   LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 8) && defined(RT_ARCH_AMD64)
 # define MY_PAGE_KERNEL_EXEC    PAGE_KERNEL_EXEC
-#elif defined(PAGE_KERNEL_EXEC) && defined(CONFIG_X86_PAE)
-# ifdef __PAGE_KERNEL_EXEC 
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 8) && defined(PAGE_KERNEL_EXEC) && defined(CONFIG_X86_PAE)
+# ifdef __PAGE_KERNEL_EXEC
    /* >= 2.6.27 */
-#  define MY_PAGE_KERNEL_EXEC   __pgprot(cpu_has_pge ? __PAGE_KERNEL_EXEC | _PAGE_GLOBAL : __PAGE_KERNEL_EXEC) 
-# else 
+#  define MY_PAGE_KERNEL_EXEC   __pgprot(cpu_has_pge ? __PAGE_KERNEL_EXEC | _PAGE_GLOBAL : __PAGE_KERNEL_EXEC)
+# else
 #  define MY_PAGE_KERNEL_EXEC   __pgprot(cpu_has_pge ? _PAGE_KERNEL_EXEC | _PAGE_GLOBAL : _PAGE_KERNEL_EXEC)
-# endif 
+# endif
 #else
 # define MY_PAGE_KERNEL_EXEC    PAGE_KERNEL
 #endif
@@ -252,8 +280,15 @@ DECLINLINE(unsigned long) msecs_to_jiffies(unsigned int cMillies)
     } while (0)
 #endif
 
-#ifndef PAGE_OFFSET_MASK
-# define PAGE_OFFSET_MASK (PAGE_SIZE - 1)
+/** @def ONE_MSEC_IN_JIFFIES
+ * The number of jiffies that make up 1 millisecond. Must be at least 1! */
+#if HZ <= 1000
+# define ONE_MSEC_IN_JIFFIES       1
+#elif !(HZ % 1000)
+# define ONE_MSEC_IN_JIFFIES       (HZ / 1000)
+#else
+# define ONE_MSEC_IN_JIFFIES       ((HZ + 999) / 1000)
+# error "HZ is not a multiple of 1000, the GIP stuff won't work right!"
 #endif
 
 /*
@@ -278,6 +313,37 @@ DECLINLINE(unsigned long) msecs_to_jiffies(unsigned int cMillies)
 # define IPRT_DEBUG_SEMS_ADDRESS(addr)  ( ((long)(addr) & (long)~UINT64_C(0xfffffff000000000)) )
 #else
 # define IPRT_DEBUG_SEMS_ADDRESS(addr)  ( (long)(addr) )
+#endif
+
+/**
+ * Puts semaphore info into the task_struct::comm field if IPRT_DEBUG_SEMS is
+ * defined.
+ */
+#ifdef IPRT_DEBUG_SEMS
+# define IPRT_DEBUG_SEMS_STATE(pThis, chState) \
+    snprintf(current->comm, sizeof(current->comm), "%c%lx", (chState), IPRT_DEBUG_SEMS_ADDRESS(pThis));
+#else
+# define IPRT_DEBUG_SEMS_STATE(pThis, chState)  do {  } while (0)
+#endif
+
+/**
+ * Puts semaphore info into the task_struct::comm field if IPRT_DEBUG_SEMS is
+ * defined.
+ */
+#ifdef IPRT_DEBUG_SEMS
+# define IPRT_DEBUG_SEMS_STATE_RC(pThis, chState, rc) \
+    snprintf(current->comm, sizeof(current->comm), "%c%lx:%d", (chState), IPRT_DEBUG_SEMS_ADDRESS(pThis), rc);
+#else
+# define IPRT_DEBUG_SEMS_STATE_RC(pThis, chState, rc)  do {  } while (0)
+#endif
+
+/*
+ * There are some conflicting defines in iprt/param.h, sort them out here.
+ */
+#ifndef ___iprt_param_h
+# undef PAGE_SIZE
+# undef PAGE_OFFSET_MASK
+# include <iprt/param.h>
 #endif
 
 #endif
