@@ -25,7 +25,9 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	$(ROOT_CMD) $(MAKE) -C src obj-m
+	$(ROOT_CMD) $(MAKE) -C src/vboxguest
+	$(ROOT_CMD) $(MAKE) -C src/vboxsf
+	$(ROOT_CMD) $(MAKE) -C src/vboxvideo
 
 	dh_installdirs lib/modules/$(KVERS)/extra
 
