@@ -8,7 +8,7 @@ Homepage: http://www.virtualbox.org/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-virtualbox/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-virtualbox/trunk
 
-Package: virtualbox-ose-guest-modules-_KVERS_
+Package: virtualbox-ose-guest-module-_KVERS_
 Architecture: i386 amd64
 Depends: linux-modules-_KVERS_ | linux-image-_KVERS_
 Recommends: virtualbox-ose-guest-utils
