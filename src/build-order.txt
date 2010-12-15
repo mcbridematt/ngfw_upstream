@@ -9,7 +9,6 @@ libjson/libjson-0.7					lenny,sid
 libmicrohttpd/libmicrohttpd-0.3.1			sid
 splashy/splashy-0.3.13					lenny
 
-kernel-modules/virtualbox-guest                         lenny,sid
 kernel-modules/bnx2                                     lenny,sid
 kernel-modules/tg3                                      lenny,sid
 kernel-modules/e1000e                                   lenny,sid
