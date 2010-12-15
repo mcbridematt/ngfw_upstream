@@ -1,69 +1,65 @@
 #!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
 
-# The short upstream name, used for the module source directory
-uname:=virtualbox-ose-guest-utils
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-### KERNEL SETUP
-### Setup the stuff needed for making kernel module packages
-### taken from /usr/share/kernel-package/sample.module.rules
+NAME=virtualbox-ose-guest
 
-# prefix of the target package name
-PACKAGE := virtualbox-ose-guest-modules
-# modifieable for experiments or debugging m-a
-MA_DIR ?= /usr/share/modass
-# load generic variable handling
--include $(MA_DIR)/include/generic.make
-# load default rules, including kdist, kdist_image, ...
--include $(MA_DIR)/include/common-rules.make
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	touch configure-stamp
 
-# module assistant calculates all needed things for us and sets
-# following variables:
-# KSRC (kernel source directory), KVERS (kernel version string), KDREV
-# (revision of the Debian kernel-image package), CC (the correct
-# compiler), VERSION (the final package version string), PKGNAME (full
-# package name with KVERS included), DEB_DESTDIR (path to store DEBs)
+build: build-stamp
 
-# The kdist_configure target is called by make-kpkg modules_config and
-# by kdist* rules by dependency. It should configure the module so it is
-# ready for compilation (mostly useful for calling configure).
-# prep-deb-files from module-assistant creates the neccessary debian/ files
-kdist_configure: prep-deb-files
+modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
+	mkdir -p modules/$(NAME)/debian
+	cp -dR src modules/$(NAME)
+	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
+	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
+	cp README* modules/$(NAME)
+	chmod -R ug=rwX,o=rX modules
 
-# the kdist_clean target is called by make-kpkg modules_clean and from
-# kdist* rules. It is responsible for cleaning up any changes that have
-# been made by the other kdist_commands (except for the .deb files created)
-kdist_clean: clean
-	$(MAKE) $(MFLAGS) -f debian/rules clean
-#
-### end  KERNEL SETUP
+$(NAME).tar.gz: modules/$(NAME)
+	tar cf - modules | gzip -9 > $(NAME).tar.gz
 
-MAKE:=kmk
+build-stamp: $(NAME).tar.gz configure-stamp 
+	dh_testdir
+	touch build-stamp
 
 clean:
-	$(MAKE) -C vboxguest clean
-	$(MAKE) -C vboxsf clean
-	$(MAKE) -C vboxvideo clean
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	rm -rf $(NAME).tar.gz modules
 	dh_clean
 
-binary-modules: prep-deb-files
+install: build
+	dh_testdir
 	dh_testroot
 	dh_clean -k
-	# Build the modules
-	$(MAKE) -C $(KSRC) M=$(CURDIR)
-	# Install the modules
-	dh_install vboxguest/vboxguest.ko /lib/modules/$(KVERS)/misc/
-	dh_install vboxsf/vboxsf.ko /lib/modules/$(KVERS)/misc/
-	dh_install vboxvideo/vboxvideo.ko /lib/modules/$(KVERS)/misc/
-	dh_installudev
+	dh_installdirs
+	cp $(NAME).tar.gz $(CURDIR)/debian/$(NAME)-source/usr/src
+	chmod 0644 $(CURDIR)/debian/$(NAME)-source/usr/src/$(NAME).tar.gz
+
+binary-arch: build install
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
 	dh_installdocs
-	dh_installchangelogs
+	dh_link
+	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_installmodules
 	dh_installdeb
-	dh_gencontrol -- -v$(VERSION)
+	dh_shlibdeps
+	dh_gencontrol
 	dh_md5sums
-	dh_builddeb --destdir=$(DEB_DESTDIR)
-	dh_clean -k
+	dh_builddeb
 
-.PHONY: build clean binary-arch binary-indep binary install binary-modules kdist kdist_configure kdist_image kdist_clean
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure
