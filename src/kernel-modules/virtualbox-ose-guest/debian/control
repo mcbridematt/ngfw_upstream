@@ -1,4 +1,4 @@
-Source: virtualbox-ose
+Source: virtualbox-ose-guest
 Section: misc
 Priority: extra
 Maintainer: Sebastien Delafond <seb@untangle.com>
