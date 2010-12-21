@@ -1,3 +1,9 @@
+virtualbox-ose-guest (3.2.4-dfsg-1~bpo50+6) unstable; urgency=low
+
+  * Build dependencies.
+
+ -- Sebastien Delafond <seb@untangle.com>  Tue, 21 Dec 2010 04:39:12 -0800
+
 virtualbox-ose-guest (3.2.4-dfsg-1~bpo50+5) unstable; urgency=low
 
   * Update document list.
