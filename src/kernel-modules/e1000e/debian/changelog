@@ -1,3 +1,9 @@
+e1000e-source (1.2.20+untangle1-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Sebastien Delafond <seb@untangle.com>  Sun, 26 Dec 2010 07:44:47 -0800
+
 e1000e-source (1.1.2.1a+untangle5-1) unstable; urgency=low
 
   * Fix maintainer scripts.

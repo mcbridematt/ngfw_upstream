@@ -79,10 +79,14 @@ struct e1000_hw;
 #define E1000_DEV_ID_ICH10_R_BM_V             0x10CE
 #define E1000_DEV_ID_ICH10_D_BM_LM            0x10DE
 #define E1000_DEV_ID_ICH10_D_BM_LF            0x10DF
+#define E1000_DEV_ID_ICH10_D_BM_V             0x1525
+
 #define E1000_DEV_ID_PCH_M_HV_LM              0x10EA
 #define E1000_DEV_ID_PCH_M_HV_LC              0x10EB
 #define E1000_DEV_ID_PCH_D_HV_DM              0x10EF
 #define E1000_DEV_ID_PCH_D_HV_DC              0x10F0
+#define E1000_DEV_ID_PCH2_LV_LM               0x1502
+#define E1000_DEV_ID_PCH2_LV_V                0x1503
 #define E1000_REVISION_0 0
 #define E1000_REVISION_1 1
 #define E1000_REVISION_2 2
@@ -107,6 +111,7 @@ enum e1000_mac_type {
 	e1000_ich9lan,
 	e1000_ich10lan,
 	e1000_pchlan,
+	e1000_pch2lan,
 	e1000_num_macs  /* List is 1-based, so subtract 1 for true count. */
 };
 
@@ -144,6 +149,7 @@ enum e1000_phy_type {
 	e1000_phy_bm,
 	e1000_phy_82578,
 	e1000_phy_82577,
+	e1000_phy_82579,
 };
 
 enum e1000_bus_type {
@@ -217,6 +223,15 @@ enum e1000_serdes_link_state {
 	e1000_serdes_link_forced_up
 };
 
+#ifndef __le16
+#define __le16 u16
+#endif
+#ifndef __le32
+#define __le32 u32
+#endif
+#ifndef __le64
+#define __le64 u64
+#endif
 /* Receive Descriptor */
 struct e1000_rx_desc {
 	__le64 buffer_addr; /* Address of the descriptor's data buffer */
@@ -495,7 +510,6 @@ struct e1000_mac_operations {
 	s32  (*setup_physical_interface)(struct e1000_hw *);
 	s32  (*setup_led)(struct e1000_hw *);
 	void (*write_vfta)(struct e1000_hw *, u32, u32);
-	void (*mta_set)(struct e1000_hw *, u32);
 	void (*config_collision_dist)(struct e1000_hw *);
 	void (*rar_set)(struct e1000_hw *, u8*, u32);
 	s32  (*read_mac_addr)(struct e1000_hw *);
@@ -572,8 +586,8 @@ struct e1000_mac_info {
 	u8  forced_speed_duplex;
 
 	bool adaptive_ifs;
+	bool has_fwsm;
 	bool arc_subsystem_valid;
-	bool asf_firmware_present;
 	bool autoneg;
 	bool autoneg_failed;
 	bool get_link_status;
@@ -612,7 +626,6 @@ struct e1000_phy_info {
 	bool disable_polarity_correction;
 	bool is_mdix;
 	bool polarity_correction;
-	bool reset_disable;
 	bool speed_downgraded;
 	bool autoneg_wait_to_complete;
 };
@@ -645,6 +658,7 @@ struct e1000_fc_info {
 	u32 high_water;          /* Flow control high-water mark */
 	u32 low_water;           /* Flow control low-water mark */
 	u16 pause_time;          /* Flow control pause timer */
+	u16 refresh_time;        /* Flow control refresh timer */
 	bool send_xon;           /* Flow control send XON */
 	bool strict_ieee;        /* Strict IEEE mode */
 	enum e1000_fc_mode current_mode; /* FC mode in effect */
@@ -671,6 +685,7 @@ struct e1000_dev_spec_ich8lan {
 	bool kmrn_lock_loss_workaround_enabled;
 	struct e1000_shadow_ram shadow_ram[E1000_ICH8_SHADOW_RAM_WORDS];
 	bool nvm_k1_enabled;
+	bool eee_disable;
 };
 
 struct e1000_hw {
@@ -687,17 +702,10 @@ struct e1000_hw {
 	struct e1000_host_mng_dhcp_cookie mng_cookie;
 
 	union {
-		struct e1000_dev_spec_82571	_82571;
-		struct e1000_dev_spec_80003es2lan _80003es2lan;
+		struct e1000_dev_spec_82571	e82571;
+		struct e1000_dev_spec_80003es2lan e80003es2lan;
 		struct e1000_dev_spec_ich8lan	ich8lan;
 	} dev_spec;
-
-	u16 device_id;
-	u16 subsystem_vendor_id;
-	u16 subsystem_device_id;
-	u16 vendor_id;
-
-	u8  revision_id;
 };
 
 #include "e1000_82571.h"

@@ -43,6 +43,8 @@
 #define E1000_WUC_LSCWO      0x00000020 /* Link Status wake up override */
 #define E1000_WUC_SPM        0x80000000 /* Enable SPM */
 #define E1000_WUC_PHY_WAKE   0x00000100 /* if PHY supports wakeup */
+#define E1000_WUC_FLX6_PHY  0x4000 /* Flexible Filter 6 Enable */
+#define E1000_WUC_FLX7_PHY  0x8000 /* Flexible Filter 7 Enable */
 
 /* Wake Up Filter Control */
 #define E1000_WUFC_LNKC 0x00000001 /* Link Status Change Wakeup Enable */
@@ -67,6 +69,8 @@
 #define E1000_WUFC_FLX3 0x00080000 /* Flexible Filter 3 Enable */
 #define E1000_WUFC_FLX4 0x00100000 /* Flexible Filter 4 Enable */
 #define E1000_WUFC_FLX5 0x00200000 /* Flexible Filter 5 Enable */
+#define E1000_WUFC_FLX6  0x00400000 /* Flexible Filter 6 Enable */
+#define E1000_WUFC_FLX7  0x00800000 /* Flexible Filter 7 Enable */
 #define E1000_WUFC_ALL_FILTERS_PHY_4 0x0000F0FF /*Mask for all wakeup filters*/
 #define E1000_WUFC_FLX_OFFSET_PHY 12 /* Offset to the Flexible Filters bits */
 #define E1000_WUFC_FLX_FILTERS_PHY_4 0x0000F000 /*Mask for 4 flexible filters*/
@@ -74,9 +78,11 @@
 #define E1000_WUFC_FLX_FILTERS_PHY_6 0x0000F600 /*Mask for 6 flexible filters*/
 #define E1000_WUFC_ALL_FILTERS  0x000F00FF /* Mask for all wakeup filters */
 #define E1000_WUFC_ALL_FILTERS_6  0x003F00FF /* Mask for all 6 wakeup filters*/
+#define E1000_WUFC_ALL_FILTERS_8  0x00FF00FF /* Mask for all 8 wakeup filters*/
 #define E1000_WUFC_FLX_OFFSET   16 /* Offset to the Flexible Filters bits */
 #define E1000_WUFC_FLX_FILTERS  0x000F0000 /*Mask for the 4 flexible filters */
 #define E1000_WUFC_FLX_FILTERS_6  0x003F0000 /* Mask for 6 flexible filters */
+#define E1000_WUFC_FLX_FILTERS_8  0x00FF0000 /* Mask for 8 flexible filters */
 
 /* Wake Up Status */
 #define E1000_WUS_LNKC         E1000_WUFC_LNKC
@@ -98,10 +104,15 @@
 #define E1000_WUS_FLX3         E1000_WUFC_FLX3
 #define E1000_WUS_FLX4         E1000_WUFC_FLX4
 #define E1000_WUS_FLX5         E1000_WUFC_FLX5
+#define E1000_WUS_FLX6         E1000_WUFC_FLX6
+#define E1000_WUS_FLX7         E1000_WUFC_FLX7
 #define E1000_WUS_FLX4_PHY         E1000_WUFC_FLX4_PHY
 #define E1000_WUS_FLX5_PHY         E1000_WUFC_FLX5_PHY
+#define E1000_WUS_FLX6_PHY         0x0400
+#define E1000_WUS_FLX7_PHY         0x0800
 #define E1000_WUS_FLX_FILTERS  E1000_WUFC_FLX_FILTERS
 #define E1000_WUS_FLX_FILTERS_6  E1000_WUFC_FLX_FILTERS_6
+#define E1000_WUS_FLX_FILTERS_8  E1000_WUFC_FLX_FILTERS_8
 #define E1000_WUS_FLX_FILTERS_PHY_6  E1000_WUFC_FLX_FILTERS_PHY_6
 
 /* Wake Up Packet Length */
@@ -111,12 +122,15 @@
 #define E1000_FLEXIBLE_FILTER_COUNT_MAX 4
 /* Six Flexible Filters are supported */
 #define E1000_FLEXIBLE_FILTER_COUNT_MAX_6   6
+/* Eight Flexible Filters are supported */
+#define E1000_FLEXIBLE_FILTER_COUNT_MAX_8   8
 
 /* Each Flexible Filter is at most 128 (0x80) bytes in length */
 #define E1000_FLEXIBLE_FILTER_SIZE_MAX  128
 
 #define E1000_FFLT_SIZE E1000_FLEXIBLE_FILTER_COUNT_MAX
 #define E1000_FFLT_SIZE_6 E1000_FLEXIBLE_FILTER_COUNT_MAX_6
+#define E1000_FFLT_SIZE_8 E1000_FLEXIBLE_FILTER_COUNT_MAX_8
 #define E1000_FFMT_SIZE E1000_FLEXIBLE_FILTER_SIZE_MAX
 #define E1000_FFVT_SIZE E1000_FLEXIBLE_FILTER_SIZE_MAX
 
@@ -290,6 +304,11 @@
 #define E1000_MANC_SMB_DATA_OUT_SHIFT  28 /* SMBus Data Out Shift */
 #define E1000_MANC_SMB_CLK_OUT_SHIFT   29 /* SMBus Clock Out Shift */
 
+#define E1000_MANC2H_PORT_623    0x00000020 /* Port 0x26f */
+#define E1000_MANC2H_PORT_664    0x00000040 /* Port 0x298 */
+#define E1000_MDEF_PORT_623      0x00000800 /* Port 0x26f */
+#define E1000_MDEF_PORT_664      0x00000400 /* Port 0x298 */
+
 /* Receive Control */
 #define E1000_RCTL_RST            0x00000001    /* Software reset */
 #define E1000_RCTL_EN             0x00000002    /* enable */
@@ -392,6 +411,8 @@
                                                * PHYRST_N pin */
 #define E1000_CTRL_EXT_LINK_EN 0x00010000 /* enable link status from external
                                            * LINK_0 and LINK_1 pins */
+#define E1000_CTRL_LANPHYPC_OVERRIDE 0x00010000 /* SW control of LANPHYPC */
+#define E1000_CTRL_LANPHYPC_VALUE    0x00020000 /* SW value of LANPHYPC */
 #define E1000_CTRL_SWDPIN0  0x00040000  /* SWDPIN 0 value */
 #define E1000_CTRL_SWDPIN1  0x00080000  /* SWDPIN 1 value */
 #define E1000_CTRL_SWDPIN2  0x00100000  /* SWDPIN 2 value */
@@ -673,6 +694,7 @@
 #define E1000_EXTCNF_CTRL_LCD_WRITE_ENABLE       0x00000001
 #define E1000_EXTCNF_CTRL_OEM_WRITE_ENABLE       0x00000008
 #define E1000_EXTCNF_CTRL_SWFLAG                 0x00000020
+#define E1000_EXTCNF_CTRL_GATE_PHY_CFG           0x00000080
 #define E1000_EXTCNF_SIZE_EXT_PCIE_LENGTH_MASK   0x00FF0000
 #define E1000_EXTCNF_SIZE_EXT_PCIE_LENGTH_SHIFT          16
 #define E1000_EXTCNF_CTRL_EXT_CNF_POINTER_MASK   0x0FFF0000
@@ -926,6 +948,9 @@
 #define E1000_ERR_SWFW_SYNC 13
 #define E1000_NOT_IMPLEMENTED 14
 #define E1000_ERR_MBX      15
+#define E1000_ERR_INVALID_ARGUMENT  16
+#define E1000_ERR_NO_SPACE          17
+#define E1000_ERR_NVM_PBA_SECTION   18
 
 /* Loop limit on how long we wait for auto-negotiation to complete */
 #define FIBER_LINK_UP_LIMIT               50
@@ -1169,12 +1194,19 @@
 /* Mask bits for fields in Word 0x1a of the NVM */
 #define NVM_WORD1A_ASPM_MASK  0x000C
 
+/* Mask bits for fields in Word 0x03 of the EEPROM */
+#define NVM_COMPAT_LOM    0x0800
+
+/* length of string needed to store PBA number */
+#define E1000_PBANUM_LENGTH             11
+
 /* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
 #define NVM_SUM                    0xBABA
 
 #define NVM_MAC_ADDR_OFFSET        0
 #define NVM_PBA_OFFSET_0           8
 #define NVM_PBA_OFFSET_1           9
+#define NVM_PBA_PTR_GUARD          0xFAFA
 #define NVM_RESERVED_WORD          0xFFFF
 #define NVM_PHY_CLASS_A            0x8000
 #define NVM_SERDES_AMPLITUDE_MASK  0x000F
@@ -1229,10 +1261,13 @@
 #define PCI_HEADER_TYPE_MULTIFUNC    0x80
 #define PCIE_LINK_WIDTH_MASK         0x3F0
 #define PCIE_LINK_WIDTH_SHIFT        4
+#define PCIE_LINK_SPEED_MASK         0x0F
+#define PCIE_LINK_SPEED_2500         0x01
+#define PCIE_LINK_SPEED_5000         0x02
 #define PCIE_DEVICE_CONTROL2_16ms    0x0005
 
-#ifndef ETH_ADDR_LEN
-#define ETH_ADDR_LEN                 6
+#ifndef ETH_ALEN
+#define ETH_ALEN                 6
 #endif
 
 #define PHY_REVISION_MASK      0xFFFFFFF0
@@ -1259,6 +1294,7 @@
 #define BME1000_E_PHY_ID_R2  0x01410CB1
 #define I82577_E_PHY_ID 0x01540050
 #define I82578_E_PHY_ID 0x004DD040
+#define I82579_E_PHY_ID    0x01540090
 #define M88_VENDOR           0x0141
 
 /* M88E1000 Specific Registers */
@@ -1353,6 +1389,7 @@
 #define M88E1000_EPSCR_TX_CLK_2_5     0x0060 /* 2.5 MHz TX_CLK */
 #define M88E1000_EPSCR_TX_CLK_25      0x0070 /* 25  MHz TX_CLK */
 #define M88E1000_EPSCR_TX_CLK_0       0x0000 /* NO  TX_CLK */
+
 
 /* M88EC018 Rev 2 specific DownShift settings */
 #define M88EC018_EPSCR_DOWNSHIFT_COUNTER_MASK  0x0E00
@@ -1456,11 +1493,13 @@
 #define E1000_MDIC_READY     0x10000000
 #define E1000_MDIC_INT_EN    0x20000000
 #define E1000_MDIC_ERROR     0x40000000
+#define E1000_MDIC_DEST      0x80000000
 
 /* SerDes Control */
 #define E1000_GEN_CTL_READY             0x80000000
 #define E1000_GEN_CTL_ADDRESS_SHIFT     8
 #define E1000_GEN_POLL_TIMEOUT          640
+
 
 
 

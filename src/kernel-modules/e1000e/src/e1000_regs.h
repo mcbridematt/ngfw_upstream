@@ -41,6 +41,7 @@
 #define E1000_FCAL     0x00028  /* Flow Control Address Low - RW */
 #define E1000_FCAH     0x0002C  /* Flow Control Address High -RW */
 #define E1000_FEXT     0x0002C  /* Future Extended - RW */
+#define E1000_FEXTNVM4 0x00024  /* Future Extended NVM 4 - RW */
 #define E1000_FEXTNVM  0x00028  /* Future Extended NVM - RW */
 #define E1000_FCT      0x00030  /* Flow Control Type - RW */
 #define E1000_CONNSW   0x00034  /* Copper/Fiber switch control - RW */
@@ -53,7 +54,7 @@
 #define E1000_IAM      0x000E0  /* Interrupt Acknowledge Auto Mask */
 #define E1000_IVAR     0x000E4  /* Interrupt Vector Allocation Register - RW */
 #define E1000_SVCR     0x000F0
-#define E1000_SVT       0x000F4
+#define E1000_SVT      0x000F4
 #define E1000_RCTL     0x00100  /* Rx Control - RW */
 #define E1000_FCTTV    0x00170  /* Flow Control Transmit Timer Value - RW */
 #define E1000_TXCW     0x00178  /* Tx Configuration Word - RW */
@@ -154,6 +155,8 @@
                                        (0x054E0 + ((_i - 16) * 8)))
 #define E1000_RAH(_i)  (((_i) <= 15) ? (0x05404 + ((_i) * 8)) : \
                                        (0x054E4 + ((_i - 16) * 8)))
+#define E1000_SHRAL(_i)         (0x05438 + ((_i) * 8))
+#define E1000_SHRAH(_i)         (0x0543C + ((_i) * 8))
 #define E1000_IP4AT_REG(_i)     (0x05840 + ((_i) * 8))
 #define E1000_IP6AT_REG(_i)     (0x05880 + ((_i) * 4))
 #define E1000_WUPM_REG(_i)      (0x05A00 + ((_i) * 4))
@@ -292,6 +295,7 @@
 #define E1000_KMRNCTRLSTA 0x00034 /* MAC-PHY interface - RW */
 #define E1000_MDPHYA      0x0003C /* PHY address - RW */
 #define E1000_MANC2H      0x05860 /* Management Control To Host - RW */
+#define E1000_MDEF(_n)    (0x05890 + (4 * (_n))) /* Mngmt Decision Filters */
 #define E1000_SW_FW_SYNC  0x05B5C /* Software-Firmware Synchronization - RW */
 #define E1000_CCMCTL      0x05B48 /* CCM Control Register */
 #define E1000_GIOCTL      0x05B44 /* GIO Analog Control Register */
@@ -334,5 +338,7 @@
 #define E1000_RSSIR     0x05868 /* RSS Interrupt Request */
 #define E1000_RXMTRL     0x0B634 /* Time sync Rx EtherType and Msg Type - RW */
 #define E1000_RXUDP      0x0B638 /* Time Sync Rx UDP Port - RW */
+
+
 
 #endif
