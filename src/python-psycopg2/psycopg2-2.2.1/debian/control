@@ -1,0 +1,48 @@
+Source: psycopg2
+Section: python
+Priority: optional
+Build-Depends: debhelper (>= 5.0.37.2), python-all-dev, python-all-dbg, python-central (>= 0.5.0), python (>= 2.3.5-7), python-egenix-mx-base-dev, autoconf, libpq-dev
+Maintainer: Fabio Tranchitella <kobold@debian.org>
+Standards-Version: 3.9.0
+XS-Python-Version: all
+Vcs-Svn: svn://svn.debian.org/python-modules/packages/psycopg2/trunk/
+Vcs-Browser: http://svn.debian.org/viewsvn/python-modules/packages/psycopg2/trunk/
+Homepage: http://initd.org/projects/psycopg
+
+Package: python-psycopg2
+Architecture: any
+Section: python
+Depends: python-egenix-mxdatetime, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Provides: ${python:Provides}
+XB-Python-Version: ${python:Versions}
+Description: Python module for PostgreSQL
+ psycopg is a PostgreSQL database adapter for the Python programming language
+ (just like pygresql and popy.) This is version 2, a complete rewrite of the
+ original code to provide new-style classes for connection and cursor objects
+ and other sweet candies. Like the original, psycopg 2 was written with the
+ aim of being very small and fast, and stable as a rock.
+ .
+ psycopg is different from the other database adapter because it was designed
+ for heavily multi-threaded applications that create and destroy lots of
+ cursors and make a conspicuous number of concurrent INSERTs or UPDATEs.
+ psycopg 2 also provides full asycronous operations for the really brave
+ programmer.
+ .
+ The main advantages of psycopg2 are that it supports the full Python DBAPI-2.0
+ and being thread safe at level 2. It also includes some extensions to the
+ standard DBAPI-2.0 to allow for better thread performance.
+
+Package: python-psycopg2-dbg
+Priority: extra
+Architecture: any
+Section: debug
+Depends: python-psycopg2 (= ${binary:Version}), python-dbg, ${shlibs:Depends}, ${misc:Depends}
+XB-Python-Version: ${python:Versions}
+Description: Python module for PostgreSQL (debug extension)
+ psycopg is a PostgreSQL database adapter for the Python programming language
+ (just like pygresql and popy.) This is version 2, a complete rewrite of the
+ original code to provide new-style classes for connection and cursor objects
+ and other sweet candies. Like the original, psycopg 2 was written with the
+ aim of being very small and fast, and stable as a rock.
+ .
+ This package contains the extensions built for the Python debug interpreter.
