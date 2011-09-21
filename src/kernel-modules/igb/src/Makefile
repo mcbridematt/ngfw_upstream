@@ -1,7 +1,7 @@
 ################################################################################
 #
 # Intel(R) Gigabit Ethernet Linux driver
-# Copyright(c) 2007-2009 Intel Corporation.
+# Copyright(c) 2007-2010 Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms and conditions of the GNU General Public License,
@@ -33,15 +33,16 @@ FAMILYH = e1000_82575.h
 # core driver files
 CFILES = igb_main.c $(FAMILYC) e1000_mac.c e1000_nvm.c e1000_phy.c \
 	 e1000_manage.c igb_param.c igb_ethtool.c kcompat.c e1000_api.c \
-	 e1000_mbx.c
+	 e1000_mbx.c igb_vmdq.c
 HFILES = igb.h e1000_hw.h e1000_osdep.h e1000_defines.h e1000_mac.h \
 	 e1000_nvm.h e1000_manage.h $(FAMILYH) kcompat.h e1000_regs.h \
-	 e1000_api.h igb_regtest.h e1000_mbx.h
+	 e1000_api.h igb_regtest.h e1000_mbx.h igb_vmdq.h
 ifeq (,$(BUILD_KERNEL))
 BUILD_KERNEL=$(shell uname -r)
 endif
 
 DRIVER_NAME=igb
+
 ###########################################################################
 # Environment tests
 
@@ -67,50 +68,43 @@ ifeq (,$(KSRC))
 endif
 
 ifeq (,$(KSRC))
-  $(warning *** Linux kernel source not found in any of these locations:)
-  $(warning $(KSP))
+  $(warning *** Kernel header files not in any of the expected locations.)
   $(warning *** Install the appropriate kernel development package, e.g.)
   $(error kernel-devel, for building kernel modules and try again)
 else
-ifeq (/lib/modules/$(shell uname -r)/source, $(KSRC))
-  KOBJ :=  /lib/modules/$(shell uname -r)/build
+ifeq (/lib/modules/$(BUILD_KERNEL)/source, $(KSRC))
+  KOBJ :=  /lib/modules/$(BUILD_KERNEL)/build
 else
   KOBJ :=  $(KSRC)
 endif
 endif
 
-# check for version.h and autoconf.h for running kernel in /boot (SUSE)
-ifneq (,$(wildcard /boot/vmlinuz.version.h))
-  VERSION_FILE := /boot/vmlinuz.version.h
-  CONFIG_FILE  := /boot/vmlinuz.autoconf.h
-  KVER := $(shell $(CC) $(EXTRA_CFLAGS) -E -dM $(VERSION_FILE) | \
-          grep UTS_RELEASE | awk '{ print $$3 }' | sed 's/\"//g')
-  ifeq ($(KVER),$(shell uname -r))
-    # set up include path to override headers from kernel source
-    x:=$(shell rm -rf include)
-    x:=$(shell mkdir -p include/linux)
-    x:=$(shell cp /boot/vmlinuz.version.h include/linux/version.h)
-    x:=$(shell cp /boot/vmlinuz.autoconf.h include/linux/autoconf.h)
-    EXTRA_CFLAGS += -I./include
-  else
-    ifneq (,$(wildcard $(KOBJ)/include/linux/utsrelease.h))
-      VERSION_FILE := $(KOBJ)/include/linux/utsrelease.h
-    else
-      VERSION_FILE := $(KOBJ)/include/linux/version.h
-    endif
-    CONFIG_FILE  := $(KSRC)/include/linux/autoconf.h
-  endif
-else
-  ifneq (,$(wildcard $(KOBJ)/include/linux/utsrelease.h))
-    VERSION_FILE := $(KOBJ)/include/linux/utsrelease.h
-  else
-    VERSION_FILE := $(KOBJ)/include/linux/version.h
-  endif
-  CONFIG_FILE  := $(KSRC)/include/linux/autoconf.h
+# Version file Search Path
+VSP :=  $(KOBJ)/include/generated/utsrelease.h \
+        $(KOBJ)/include/linux/utsrelease.h \
+        $(KOBJ)/include/linux/version.h \
+        /boot/vmlinuz.version.h
+
+# Config file Search Path
+CSP :=  $(KSRC)/include/generated/autoconf.h \
+        $(KSRC)/include/linux/autoconf.h \
+        /boot/vmlinuz.autoconf.h
+
+# prune the lists down to only files that exist
+test_file = $(shell [ -f $(file) ] && echo $(file))
+VSP := $(foreach file, $(VSP), $(test_file))
+CSP := $(foreach file, $(CSP), $(test_file))
+
+# and use the first valid entry in the Search Paths
+ifeq (,$(VERSION_FILE))
+  VERSION_FILE := $(firstword $(VSP))
+endif
+ifeq (,$(CONFIG_FILE))
+  CONFIG_FILE := $(firstword $(CSP))
 endif
 
 ifeq (,$(wildcard $(VERSION_FILE)))
-  $(error Linux kernel source not configured - missing version.h)
+  $(error Linux kernel source not configured - missing version header file)
 endif
 
 ifeq (,$(wildcard $(CONFIG_FILE)))
@@ -146,9 +140,6 @@ ifeq ($(ARCH),ppc64)
   EXTRA_CFLAGS += -m64 -msoft-float
   LDFLAGS += -melf64ppc
 endif
-ifneq (,$(findstring NO_82542_SUPPORT, $(CFLAGS_EXTRA)))
-  CFILES := $(filter-out e1000_82542.c, $(CFILES))
-endif
 
 # extra flags for module builds
 EXTRA_CFLAGS += -DDRIVER_$(shell echo $(DRIVER_NAME) | tr '[a-z]' '[A-Z]')
@@ -182,11 +173,14 @@ ifneq ($(KSRC),$(shell readlink /lib/modules/$(KVER)/build))
 endif
 endif
 
-KKVER := $(shell echo $(KVER) | \
-         awk '{ if ($$0 ~ /2\.[4-9]\./) print "1"; else print "0"}')
-ifeq ($(KKVER), 0)
+KVER_CODE := $(shell $(CC) $(EXTRA_CFLAGS) -E -dM $(VSP) 2>/dev/null |\
+	grep -m 1 LINUX_VERSION_CODE | awk '{ print $$3 }' | sed 's/\"//g')
+
+# abort the build on kernels older than 2.4.21
+ifneq (1,$(shell [ $(KVER_CODE) -ge 132117 ] && echo 1 || echo 0))
   $(error *** Aborting the build. \
-          *** This driver is not supported on kernel versions older than 2.4.0)
+          *** This driver is not supported on kernel versions older than 2.4.21, \
+              because this driver requires NAPI support.)
 endif
 
 # look for PCI in config.h
@@ -226,13 +220,11 @@ ifeq ($(SMP),1)
 endif
 
 ###########################################################################
-# 2.4.x & 2.6.x Specific rules
+# Kernel Version Specific rules
 
-K_VERSION:=$(shell uname -r | cut -c1-3 | sed 's/2\.[56]/2\.6/')
+ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
-ifeq ($(K_VERSION), 2.6)
-
-# Makefile for 2.6.x kernel
+# Makefile for 2.5.x and newer kernel
 TARGET = $(DRIVER_NAME).ko
 
 # man page
@@ -252,7 +244,7 @@ else
 endif
 endif
 
-else # ifeq ($(K_VERSION),2.6)
+else # ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
 # Makefile for 2.4.x kernel
 TARGET = $(DRIVER_NAME).o
@@ -270,7 +262,6 @@ endif
 ifneq (,$(wildcard /etc/fedora-release))
   EXTRA_CFLAGS += -fno-strict-aliasing
 endif
-
 CFLAGS += $(EXTRA_CFLAGS)
 
 .SILENT: $(TARGET)
@@ -289,7 +280,7 @@ $(CFILES:.c=.o): $(HFILES) Makefile
 default:
 	$(MAKE)
 
-endif # ifeq ($(K_VERSION),2.6)
+endif # ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
 ifeq (,$(MANDIR))
   # find the best place to install the man page
@@ -352,4 +343,4 @@ uninstall:
 
 clean:
 	rm -rf $(TARGET) $(TARGET:.ko=.o) $(TARGET:.ko=.mod.c) $(TARGET:.ko=.mod.o) $(CFILES:.c=.o) \
-	$(MANFILE).gz .*cmd .tmp_versions Module.* modules.order
+	$(MANFILE).gz .*cmd .tmp_versions Module.markers Module.symvers modules.order

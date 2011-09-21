@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2009 Intel Corporation.
+  Copyright(c) 2007-2010 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -42,9 +42,10 @@
  * For 82576, there are an additional set of RARs that begin at an offset
  * separate from the first set of RARs.
  */
-#define E1000_RAR_ENTRIES_82575   16
-#define E1000_RAR_ENTRIES_82576   24
+#define E1000_RAR_ENTRIES_82575        16
+#define E1000_RAR_ENTRIES_82576        24
 #define E1000_RAR_ENTRIES_82580        24
+#define E1000_RAR_ENTRIES_I350         32
 #define E1000_SW_SYNCH_MB              0x00000100
 #define E1000_STAT_DEV_RST_SET         0x00100000
 #define E1000_CTRL_DEV_RST             0x20000000
@@ -191,8 +192,8 @@ union e1000_adv_rx_desc {
 				__le32 data;
 				struct {
 					__le16 pkt_info; /*RSS type, Pkt type*/
-					__le16 hdr_info; /* Split Header,
-				        	          * header buffer len*/
+					/* Split Header, header buffer len */
+					__le16 hdr_info;
 				} hs_rss;
 			} lo_dword;
 			union {
@@ -386,7 +387,7 @@ struct e1000_adv_tx_context_desc {
 #define E1000_FTQF_MASK_SOURCE_PORT_BP 0x80000000
 
 #define E1000_NVM_APME_82575          0x0400
-#define MAX_NUM_VFS                   8
+#define MAX_NUM_VFS                   7
 
 #define E1000_DTXSWC_MAC_SPOOF_MASK   0x000000FF /* Per VF MAC spoof control */
 #define E1000_DTXSWC_VLAN_SPOOF_MASK  0x0000FF00 /* Per VF VLAN spoof control */
@@ -416,6 +417,15 @@ struct e1000_adv_tx_context_desc {
 #define E1000_VMOLR_STRVLAN    0x40000000 /* Vlan stripping enable */
 #define E1000_VMOLR_STRCRC     0x80000000 /* CRC stripping enable */
 
+#define E1000_VMOLR_VPE        0x00800000 /* VLAN promiscuous enable */
+#define E1000_VMOLR_UPE        0x20000000 /* Unicast promisuous enable */
+#define E1000_DVMOLR_HIDVLAN   0x20000000 /* Vlan hiding enable */
+#define E1000_DVMOLR_STRVLAN   0x40000000 /* Vlan stripping enable */
+#define E1000_DVMOLR_STRCRC    0x80000000 /* CRC stripping enable */
+
+#define E1000_PBRWAC_WALPB     0x00000007 /* Wrap around event on LAN Rx PB */
+#define E1000_PBRWAC_PBE       0x00000008 /* Rx packet buffer empty */
+
 #define E1000_VLVF_ARRAY_SIZE     32
 #define E1000_VLVF_VLANID_MASK    0x00000FFF
 #define E1000_VLVF_POOLSEL_SHIFT  12
@@ -434,17 +444,26 @@ struct e1000_adv_tx_context_desc {
 #define E1000_RPLOLR_STRVLAN   0x40000000
 #define E1000_RPLOLR_STRCRC    0x80000000
 
+#define E1000_TCTL_EXT_COLD       0x000FFC00
+#define E1000_TCTL_EXT_COLD_SHIFT 10
+
 #define E1000_DTXCTL_8023LL     0x0004
 #define E1000_DTXCTL_VLAN_ADDED 0x0008
 #define E1000_DTXCTL_OOS_ENABLE 0x0010
 #define E1000_DTXCTL_MDP_EN     0x0020
 #define E1000_DTXCTL_SPOOF_INT  0x0040
 
+#define E1000_EEPROM_PCS_AUTONEG_DISABLE_BIT    1 << 14
+
 #define ALL_QUEUES   0xFFFF
 
-/* RX packet buffer size defines */
+/* Rx packet buffer size defines */
 #define E1000_RXPBS_SIZE_MASK_82576  0x0000007F
 void e1000_vmdq_set_loopback_pf(struct e1000_hw *hw, bool enable);
+void e1000_vmdq_set_anti_spoofing_pf(struct e1000_hw *hw, bool enable, int pf);
 void e1000_vmdq_set_replication_pf(struct e1000_hw *hw, bool enable);
+s32 e1000_init_nvm_params_82575(struct e1000_hw *hw);
+
 u16 e1000_rxpbs_adjust_82580(u32 data);
+s32 e1000_set_eee_i350(struct e1000_hw *);
 #endif /* _E1000_82575_H_ */

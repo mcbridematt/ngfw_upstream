@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel PRO/1000 Linux driver
-  Copyright(c) 1999 - 2008 Intel Corporation.
+  Copyright(c) 1999 - 2010 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -370,8 +370,10 @@ static int e1000_set_tx_csum(struct net_device *netdev, u32 data)
 static int e1000_set_tso(struct net_device *netdev, u32 data)
 {
 	struct e1000_adapter *adapter = netdev_priv(netdev);
+#ifndef HAVE_NETDEV_VLAN_FEATURES
 	int i;
 	struct net_device *v_netdev;
+#endif
 	if (!(adapter->flags & E1000_FLAG_HAS_TSO))
 		return data ? -EINVAL : 0;
 
@@ -379,6 +381,7 @@ static int e1000_set_tso(struct net_device *netdev, u32 data)
 		netdev->features |= NETIF_F_TSO;
 	} else {
 		netdev->features &= ~NETIF_F_TSO;
+#ifndef HAVE_NETDEV_VLAN_FEATURES
 #ifdef NETIF_F_HW_VLAN_TX
 		/* disable TSO on all VLANs if they're present */
 		if (!adapter->vlgrp)
@@ -392,9 +395,13 @@ static int e1000_set_tso(struct net_device *netdev, u32 data)
 			vlan_group_set_device(adapter->vlgrp, i, v_netdev);
 		}
 #endif
+#endif
 	}
-
+#ifndef HAVE_NETDEV_VLAN_FEATURES
+#ifdef NETIF_F_HW_VLAN_TX
 tso_out:
+#endif
+#endif
 	DPRINTK(PROBE, INFO, "TSO is %s\n", data ? "Enabled" : "Disabled");
 	adapter->flags |= E1000_FLAG_TSO_FORCE;
 	return 0;
@@ -1004,9 +1011,10 @@ static void e1000_free_desc_rings(struct e1000_adapter *adapter)
 	if (tx_ring->desc && tx_ring->buffer_info) {
 		for (i = 0; i < tx_ring->count; i++) {
 			if (tx_ring->buffer_info[i].dma)
-				pci_unmap_single(pdev, tx_ring->buffer_info[i].dma,
+				dma_unmap_single(pci_dev_to_dev(pdev),
+						 tx_ring->buffer_info[i].dma,
 						 tx_ring->buffer_info[i].length,
-						 PCI_DMA_TODEVICE);
+						 DMA_TO_DEVICE);
 			if (tx_ring->buffer_info[i].skb)
 				dev_kfree_skb(tx_ring->buffer_info[i].skb);
 		}
@@ -1015,20 +1023,23 @@ static void e1000_free_desc_rings(struct e1000_adapter *adapter)
 	if (rx_ring->desc && rx_ring->buffer_info) {
 		for (i = 0; i < rx_ring->count; i++) {
 			if (rx_ring->buffer_info[i].dma)
-				pci_unmap_single(pdev, rx_ring->buffer_info[i].dma,
+				dma_unmap_single(pci_dev_to_dev(pdev),
+						 rx_ring->buffer_info[i].dma,
 						 E1000_RXBUFFER_2048,
-						 PCI_DMA_FROMDEVICE);
+						 DMA_FROM_DEVICE);
 			if (rx_ring->buffer_info[i].skb)
 				dev_kfree_skb(rx_ring->buffer_info[i].skb);
 		}
 	}
 
 	if (tx_ring->desc) {
-		pci_free_consistent(pdev, tx_ring->size, tx_ring->desc, tx_ring->dma);
+		dma_free_coherent(pci_dev_to_dev(pdev), tx_ring->size,
+				  tx_ring->desc, tx_ring->dma);
 		tx_ring->desc = NULL;
 	}
 	if (rx_ring->desc) {
-		pci_free_consistent(pdev, rx_ring->size, rx_ring->desc, rx_ring->dma);
+		dma_free_coherent(pci_dev_to_dev(pdev), rx_ring->size,
+				  rx_ring->desc, rx_ring->dma);
 		rx_ring->desc = NULL;
 	}
 
@@ -1062,8 +1073,9 @@ static int e1000_setup_desc_rings(struct e1000_adapter *adapter)
 
 	tx_ring->size = tx_ring->count * sizeof(struct e1000_tx_desc);
 	tx_ring->size = ALIGN(tx_ring->size, 4096);
-	if (!(tx_ring->desc = pci_alloc_consistent(pdev, tx_ring->size,
-	                                           &tx_ring->dma))) {
+	if (!(tx_ring->desc = dma_alloc_coherent(pci_dev_to_dev(pdev),
+						 tx_ring->size, &tx_ring->dma,
+						 GFP_KERNEL))) {
 		ret_val = 2;
 		goto err_nomem;
 	}
@@ -1095,8 +1107,8 @@ static int e1000_setup_desc_rings(struct e1000_adapter *adapter)
 		tx_ring->buffer_info[i].skb = skb;
 		tx_ring->buffer_info[i].length = skb->len;
 		tx_ring->buffer_info[i].dma =
-			pci_map_single(pdev, skb->data, skb->len,
-				       PCI_DMA_TODEVICE);
+			dma_map_single(pci_dev_to_dev(pdev), skb->data,
+				       skb->len, DMA_TO_DEVICE);
 		tx_desc->buffer_addr = cpu_to_le64(tx_ring->buffer_info[i].dma);
 		tx_desc->lower.data = cpu_to_le32(skb->len);
 		tx_desc->lower.data |= cpu_to_le32(E1000_TXD_CMD_EOP |
@@ -1122,8 +1134,9 @@ static int e1000_setup_desc_rings(struct e1000_adapter *adapter)
 	}
 
 	rx_ring->size = rx_ring->count * sizeof(struct e1000_rx_desc);
-	if (!(rx_ring->desc = pci_alloc_consistent(pdev, rx_ring->size,
-	                                           &rx_ring->dma))) {
+	if (!(rx_ring->desc = dma_alloc_coherent(pci_dev_to_dev(pdev),
+						 rx_ring->size, &rx_ring->dma,
+						 GFP_KERNEL))) {
 		ret_val = 5;
 		goto err_nomem;
 	}
@@ -1154,8 +1167,8 @@ static int e1000_setup_desc_rings(struct e1000_adapter *adapter)
 		skb_reserve(skb, NET_IP_ALIGN);
 		rx_ring->buffer_info[i].skb = skb;
 		rx_ring->buffer_info[i].dma =
-			pci_map_single(pdev, skb->data, E1000_RXBUFFER_2048,
-				       PCI_DMA_FROMDEVICE);
+			dma_map_single(pci_dev_to_dev(pdev), skb->data,
+				       E1000_RXBUFFER_2048, DMA_FROM_DEVICE);
 		rx_desc->buffer_addr = cpu_to_le64(rx_ring->buffer_info[i].dma);
 		memset(skb->data, 0x00, skb->len);
 	}
@@ -1474,10 +1487,10 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 		for (i = 0; i < 64; i++) { /* send the packets */
 			e1000_create_lbtest_frame(tx_ring->buffer_info[k].skb,
 					1024);
-			pci_dma_sync_single_for_device(pdev,
+			dma_sync_single_for_device(pci_dev_to_dev(pdev),
 					tx_ring->buffer_info[k].dma,
 				    	tx_ring->buffer_info[k].length,
-				    	PCI_DMA_TODEVICE);
+				    	DMA_TO_DEVICE);
 			if (unlikely(++k == tx_ring->count)) k = 0;
 		}
 		E1000_WRITE_REG(&adapter->hw, E1000_TDT(0), k);
@@ -1485,10 +1498,10 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 		time = jiffies; /* set the start time for the receive */
 		good_cnt = 0;
 		do { /* receive the sent packets */
-			pci_dma_sync_single_for_cpu(pdev,
+			dma_sync_single_for_cpu(pci_dev_to_dev(pdev),
 			                rx_ring->buffer_info[l].dma,
 			                E1000_RXBUFFER_2048,
-			                PCI_DMA_FROMDEVICE);
+			                DMA_FROM_DEVICE);
 
 			ret_val = e1000_check_lbtest_frame(
 					rx_ring->buffer_info[l].skb,
@@ -1709,7 +1722,8 @@ static void e1000_get_wol(struct net_device *netdev,
 
 	/* this function will set ->supported = 0 and return 1 if wol is not
 	 * supported by this hardware */
-	if (e1000_wol_exclusion(adapter, wol))
+	if (e1000_wol_exclusion(adapter, wol) ||
+	    !device_can_wakeup(&adapter->pdev->dev))
 		return;
 
 	/* apply any specific unsupported masks here */
@@ -1824,7 +1838,7 @@ static int e1000_get_coalesce(struct net_device *netdev,
 {
 	struct e1000_adapter *adapter = netdev_priv(netdev);
 
-	if (adapter->itr_setting <= 3)
+	if (adapter->itr_setting <= 4)
 		ec->rx_coalesce_usecs = adapter->itr_setting;
 	else
 		ec->rx_coalesce_usecs = 1000000 / adapter->itr_setting;
@@ -1838,7 +1852,7 @@ static int e1000_set_coalesce(struct net_device *netdev,
 	struct e1000_adapter *adapter = netdev_priv(netdev);
 
 	if ((ec->rx_coalesce_usecs > E1000_MAX_ITR_USECS) ||
-	    ((ec->rx_coalesce_usecs > 3) &&
+	    ((ec->rx_coalesce_usecs > 4) &&
 	     (ec->rx_coalesce_usecs < E1000_MIN_ITR_USECS)) ||
 	    (ec->rx_coalesce_usecs == 2))
 		return -EINVAL;
@@ -1846,7 +1860,9 @@ static int e1000_set_coalesce(struct net_device *netdev,
 	if (!(adapter->flags & E1000_FLAG_HAS_INTR_MODERATION))
 		return -ENOTSUPP;
 
-	if (ec->rx_coalesce_usecs <= 3) {
+	if (ec->rx_coalesce_usecs == 4) {
+		adapter->itr = adapter->itr_setting = 4;
+	} else if (ec->rx_coalesce_usecs <= 3) {
 		adapter->itr = 20000;
 		adapter->itr_setting = ec->rx_coalesce_usecs;
 	} else {
@@ -1971,7 +1987,7 @@ static struct ethtool_ops e1000_ethtool_ops = {
 	.get_strings            = e1000_get_strings,
 	.phys_id                = e1000_phys_id,
 	.get_ethtool_stats      = e1000_get_ethtool_stats,
-#ifdef ETHTOOL_GPERMADDR
+#ifdef HAVE_ETHTOOL_GET_PERM_ADDR
 	.get_perm_addr          = ethtool_op_get_perm_addr,
 #endif
 	.get_coalesce           = e1000_get_coalesce,

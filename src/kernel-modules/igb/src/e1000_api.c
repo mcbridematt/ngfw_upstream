@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2009 Intel Corporation.
+  Copyright(c) 2007-2010 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -157,6 +157,7 @@ s32 e1000_set_mac_type(struct e1000_hw *hw)
 	case E1000_DEV_ID_82576_FIBER:
 	case E1000_DEV_ID_82576_SERDES:
 	case E1000_DEV_ID_82576_QUAD_COPPER:
+	case E1000_DEV_ID_82576_QUAD_COPPER_ET2:
 	case E1000_DEV_ID_82576_NS:
 	case E1000_DEV_ID_82576_NS_SERDES:
 	case E1000_DEV_ID_82576_SERDES_QUAD:
@@ -167,7 +168,19 @@ s32 e1000_set_mac_type(struct e1000_hw *hw)
 	case E1000_DEV_ID_82580_SERDES:
 	case E1000_DEV_ID_82580_SGMII:
 	case E1000_DEV_ID_82580_COPPER_DUAL:
+	case E1000_DEV_ID_82580_QUAD_FIBER:
+	case E1000_DEV_ID_DH89XXCC_SGMII:
+	case E1000_DEV_ID_DH89XXCC_SERDES:
+	case E1000_DEV_ID_DH89XXCC_BACKPLANE:
+	case E1000_DEV_ID_DH89XXCC_SFP:
 		mac->type = e1000_82580;
+		break;
+	case E1000_DEV_ID_I350_COPPER:
+	case E1000_DEV_ID_I350_FIBER:
+	case E1000_DEV_ID_I350_SERDES:
+	case E1000_DEV_ID_I350_SGMII:
+	case E1000_DEV_ID_I350_DA4:
+		mac->type = e1000_i350;
 		break;
 	default:
 		/* Should never have loaded on this device */
@@ -224,6 +237,7 @@ s32 e1000_setup_init_funcs(struct e1000_hw *hw, bool init_device)
 	case e1000_82575:
 	case e1000_82576:
 	case e1000_82580:
+	case e1000_i350:
 		e1000_init_function_pointers_82575(hw);
 		break;
 	default:
@@ -611,20 +625,6 @@ s32 e1000_validate_mdi_setting(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_mta_set - Sets multicast table bit
- *  @hw: pointer to the HW structure
- *  @hash_value: Multicast hash value.
- *
- *  This sets the bit in the multicast table corresponding to the
- *  hash value.  This is a function pointer entry point called by drivers.
- **/
-void e1000_mta_set(struct e1000_hw *hw, u32 hash_value)
-{
-	if (hw->mac.ops.mta_set)
-		hw->mac.ops.mta_set(hw, hash_value);
-}
-
-/**
  *  e1000_hash_mc_addr - Determines address location in multicast table
  *  @hw: pointer to the HW structure
  *  @mc_addr: Multicast address to hash.
@@ -953,18 +953,34 @@ s32 e1000_read_mac_addr(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_read_pba_num - Read device part number
+ *  e1000_read_pba_string - Read device part number string
  *  @hw: pointer to the HW structure
  *  @pba_num: pointer to device part number
+ *  @pba_num_size: size of part number buffer
  *
  *  Reads the product board assembly (PBA) number from the EEPROM and stores
  *  the value in pba_num.
  *  Currently no func pointer exists and all implementations are handled in the
  *  generic version of this function.
  **/
-s32 e1000_read_pba_num(struct e1000_hw *hw, u32 *pba_num)
+s32 e1000_read_pba_string(struct e1000_hw *hw, u8 *pba_num, u32 pba_num_size)
 {
-	return e1000_read_pba_num_generic(hw, pba_num);
+	return e1000_read_pba_string_generic(hw, pba_num, pba_num_size);
+}
+
+/**
+ *  e1000_read_pba_length - Read device part number string length
+ *  @hw: pointer to the HW structure
+ *  @pba_num_size: size of part number buffer
+ *
+ *  Reads the product board assembly (PBA) number length from the EEPROM and
+ *  stores the value in pba_num.
+ *  Currently no func pointer exists and all implementations are handled in the
+ *  generic version of this function.
+ **/
+s32 e1000_read_pba_length(struct e1000_hw *hw, u32 *pba_num_size)
+{
+	return e1000_read_pba_length_generic(hw, pba_num_size);
 }
 
 /**
@@ -1088,6 +1104,18 @@ void e1000_power_down_phy(struct e1000_hw *hw)
 {
 	if (hw->phy.ops.power_down)
 		hw->phy.ops.power_down(hw);
+}
+
+/**
+ *  e1000_power_up_fiber_serdes_link - Power up serdes link
+ *  @hw: pointer to the HW structure
+ *
+ *  Power on the optics and PCS.
+ **/
+void e1000_power_up_fiber_serdes_link(struct e1000_hw *hw)
+{
+	if (hw->mac.ops.power_up_serdes)
+		hw->mac.ops.power_up_serdes(hw);
 }
 
 /**

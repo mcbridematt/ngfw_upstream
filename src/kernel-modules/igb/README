@@ -1,7 +1,7 @@
-Linux* Base Driver for Intel(R) Network Connection
-==================================================
+Linux* Base Driver for Intel(R) Ethernet Network Connection
+===========================================================
 
-November 11, 2009
+April 14, 2011
 
 Contents
 ========
@@ -17,18 +17,14 @@ Contents
 In This Release
 ===============
 
-This file describes the igb Linux* Base Driver for Intel Network Connection.  
-This driver supports kernel versions 2.4.x and 2.6.x. 
+This file describes the igb Linux* Base Driver for Intel Ethernet Network 
+Connection.  This driver supports kernel versions 2.4.x and 2.6.x. 
 
 This driver is only supported as a loadable module at this time.  Intel is
 not supplying patches against the kernel source to allow for static linking
 of the driver.  For questions related to hardware requirements, refer to the
 documentation supplied with your Intel Gigabit adapter.  All hardware
 requirements listed apply to use with Linux.
-
-This release includes support for Intel(R) I/O Acceleration Technology,
-Intel(R) I/OAT.  You can find additional information on Intel I/OAT at 
-http://www.intel.com/technology/ioacceleration/index.htm.
 
 The following features are now available in supported kernels:
  - Native VLANs
@@ -39,8 +35,6 @@ Channel Bonding documentation can be found in the Linux kernel source:
 /Documentation/networking/bonding.txt
 
 The igb driver supports IEEE 1588 time stamping for kernels 2.6.30 and above.  
-A basic tutorial for the technology can be found at:
-http://ieee1588.nist.gov/tutorial-basic.pdf
 
 The driver information previously displayed in the /proc filesystem is not
 supported in this release.  Alternatively, you can use ethtool (version 1.6
@@ -58,8 +52,7 @@ Driver ID Guide at:
     http://support.intel.com/support/go/network/adapter/idguide.htm
 
 For the latest Intel network drivers for Linux, refer to the following
-website.  In the search field, enter your adapter name or type, or use the
-networking link on the left to search for your adapter:
+website.  Select the link for your adapter.
 
     http://support.intel.com/support/go/network/adapter/home.htm
 
@@ -138,23 +131,7 @@ for the ethX igb device, then this workaround may be necessary.
 To build igb driver with DCA:
 ------------------------------
  
-This example assumes the ioatdma and igb sources are in /usr/src
- 
-1. # unpack the ioatdma source, build and install
-
-     cd /usr/src
-     tar zxf ioatdma-<ioat version>.tar.gz
-     cd ioatdma-<ioat version>
-     make
-     make install
- 
-2. # unpack with igb driver, build with DCA support and install
-     
-     cd /usr/src
-     tar zxf igb-<igb version>.tar.gz
-     cd igb-<igb-version>/src
-     make CFLAGS_EXTRA="-DIGB_DCA -I/usr/src/ioatdma-<ioat version>/include"
-     make install
+If your kernel supports DCA, the driver will build by default with DCA enabled.
 
 Command Line Parameters
 =======================
@@ -358,7 +335,70 @@ separate vectors.
 
 This option can be overridden to 1 if there are not sufficient interrupts
 available.  This can occur if any combination of RSS, VMDQ, and max_vfs 
-results in more than 4 queues being used. 
+results in more than 4 queues being used.
+
+Node
+----
+Valid Range:   0-n
+Default Value: -1 (off)
+
+  0 - n: where n is the number of the NUMA node that should be used to 
+         allocate memory for this adapter port. 
+  -1: uses the driver default of allocating memory on whichever processor is
+      running insmod/modprobe. 
+
+  The Node parameter will allow you to pick which NUMA node you want to have 
+  the adapter allocate memory from.  All driver structures, in-memory queues, 
+  and receive buffers will be allocated on the node specified.  This parameter
+  is only useful when interrupt affinity is specified, otherwise some portion 
+  of the time the interrupt could run on a different core than the memory is 
+  allocated on, causing slower memory access and impacting throughput, CPU, or
+  both.
+
+EEE
+---
+Valid Range:  0-1
+Default Value: 1 (enabled)
+
+  A link between two EEE-compliant devices will result in periodic bursts of 
+  data followed by periods where the link is in an idle state. This Low
+  Power Idle (LPI) state is supported in both 1Gbps and 100Mbps link speeds. 
+  NOTE: EEE support requires autonegotiation.
+
+DMAC
+----
+Valid Range: 0, 250, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 
+9000, 10000.
+Default Value: 0 (disabled)
+  Enables or disables DMA Coalescing feature. Values are in usec’s and increase
+  the internal DMA Coalescing feature’s internal timer.  DMA (Direct Memory 
+  Access) allows the network device to move packet data directly to the 
+  system's memory, reducing CPU utilization. However, the frequency and random
+  intervals at which packets arrive do not allow the system to enter a lower 
+  power state. DMA Coalescing allows the adapter to collect packets before it 
+  initiates a DMA event. This may increase network latency but also increases
+  the chances that the system will enter a lower power state. 
+
+  Turning on DMA Coalescing may save energy with kernel 2.6.32 and later. This
+  will impart the greatest chance for your system to consume less power. DMA 
+  Coalescing is effective in helping potentially saving the platform power only
+  when it is enabled across all active ports.
+
+  InterruptThrottleRate (ITR) should be set to dynamic. When ITR=0, DMA 
+  Coalescing is automatically disabled. 
+ 
+  A whitepaper containing information on how to best configure your platform 
+  is available on the Intel website.
+
+MDD (Malicious Driver Detection)
+--------------------------------
+Valid Range: 0, 1; 0 = Disable, 1 = Enable
+Default Value: 1
+
+This parameter is only relevant for I350 devices operating in SR-IOV mode. When
+this parameter is set, the driver detects malicious VF driver and disables its
+TX/RX queues until a VF driver reset occurs.
+ 
 
 Additional Configurations
 =========================
@@ -418,26 +458,26 @@ Additional Configurations
   - The maximum MTU setting for Jumbo Frames is 9216.  This value coincides
     with the maximum Jumbo Frames size of 9234 bytes.
 
-  - Using Jumbo Frames at 10 or 100 Mbps may result in poor performance or
-    loss of link.
+  - Using Jumbo frames at 10 or 100 Mbps is not supported and may result in
+    poor performance or loss of link.
 
-  Ethtool
+  ethtool
   -------
   The driver utilizes the ethtool interface for driver configuration and
-  diagnostics, as well as displaying statistical information.  Ethtool
+  diagnostics, as well as displaying statistical information.  ethtool
   version 3.0 or later is required for this functionality, although we 
   strongly recommend downloading the latest version at:
 
-  http://sourceforge.net/projects/gkernel.
+  http://ftp.kernel.org/pub/software/network/ethtool/.
 
   Enabling Wake on LAN* (WoL)
   ---------------------------
-  WoL is configured through the Ethtool* utility.  Ethtool is included with
+  WoL is configured through the ethtool* utility.  ethtool is included with
   all versions of Red Hat after Red Hat 7.2.  For other Linux distributions,
-  download and install Ethtool from the following website:
+  download and install ethtool from the following website:
   http://sourceforge.net/projects/gkernel.
 
-  For instructions on enabling WoL with Ethtool, refer to the website listed
+  For instructions on enabling WoL with ethtool, refer to the website listed
   above.
 
   WoL will be enabled on the system during the next shut down or reboot.
@@ -483,7 +523,7 @@ Additional Configurations
      make CFLAGS_EXTRA="-DIGB_LRO" install
 
   You can verify that the driver is using LRO by looking at these counters in 
-  Ethtool:
+  ethtool:
 
   lro_aggregated - count of total packets that were combined
   lro_flushed - counts the number of packets flushed out of LRO
@@ -491,13 +531,42 @@ Additional Configurations
   recycling
 
   NOTE: IPv6 and UDP are not supported by LRO.
+
+  MAC and VLAN anti-spoofing feature
+  ----------------------------------
+  When a malicious driver attempts to send a spoofed packet, it is dropped by 
+  the hardware and not transmitted.  An interrupt is sent to the PF driver 
+  notifying it of the spoof attempt.
+
+  When a spoofed packet is detected the PF driver will send the following 
+  message to the system log (displayed by  the "dmesg" command):
+
+  Spoof event(s) detected on VF(n)
+
+  Where n=the VF that attempted to do the spoofing.
+
+  Setting MAC Address, VLAN and Rate Limit Using IProute2 Tool
+  ------------------------------------------------------------
+  You can set a MAC address of a Virtual Function (VF), a default VLAN and the
+  rate limit using the IProute2 tool. Download the latest version of the 
+  iproute2 tool from Sourceforge if your version does not have all the
+  features you require.
+
   
 Known Issues/Troubleshooting
 ============================
 
-  NOTE: After installing the driver, if your Intel Network Connection is not 
-  working, verify in the "In This Release" section of the readme that you have 
-  installed the correct driver.
+For known hardware and troubleshooting issues, refer to the following website.
+
+    http://support.intel.com/support/go/network/adapter/home.htm
+
+Either select the link for your adapter or perform a search for the adapter 
+number. The adapter's page lists many issues. For a complete list of hardware
+issues download your adapter's user guide and read the Release Notes.  
+
+  NOTE: After installing the driver, if your Intel Ethernet Network Connection
+  is not working, verify in the "In This Release" section of the readme that 
+  you have installed the correct driver.
 
   Using the igb driver on 2.4 or older 2.6 based kernels
   ------------------------------------------------------
@@ -628,6 +697,39 @@ Known Issues/Troubleshooting
   hot-plug the VF device out of the VM it is assigned to or else shut down the
   VM.
 
+  SLES10 SP3 random system panic when reloading driver
+  ---------------------------------------------------
+  This is a known SLES-10 SP3 issue. After requesting interrupts for MSI-X 
+  vectors, system may panic. 
+
+  Currently the only known workaround is to build the drivers with 
+  CFLAGS_EXTRA=-DDISABLE_PCI_MSI if the driver need to be loaded/unloaded.
+  Otherwise the driver can be loaded once and will be safe, but unloading it 
+  will lead to the issue.
+
+  Enabling SR-IOV in a 32-bit Microsoft* Windows* Server 2008 Guest OS using
+  Intel (R) 82576-based GbE or Intel (R) 82599-based 10GbE controller under KVM
+  -----------------------------------------------------------------------------
+  KVM Hypervisor/VMM supports direct assignment of a PCIe device to a VM.  This 
+  includes traditional PCIe devices, as well as SR-IOV-capable devices using
+  Intel 82576-based and 82599-based controllers.
+
+  While direct assignment of a PCIe device or an SR-IOV Virtual Function (VF)
+  to a Linux-based VM running 2.6.32 or later kernel works fine, there is a
+  known issue with Microsoft Windows Server 2008 VM that results in a "yellow 
+  bang" error. This problem is within the KVM VMM itself, not the Intel driver,
+  or the SR-IOV logic of the VMM, but rather that KVM emulates an older CPU 
+  model for the guests, and this older CPU model does not support MSI-X
+  interrupts, which is a requirement for Intel SR-IOV.  
+
+  If you wish to use the Intel 82576 or 82599-based controllers in SR-IOV mode
+  with KVM and a Microsoft Windows Server 2008 guest try the following 
+  workaround. The workaround is to tell KVM to emulate a different model of CPU
+  when using qemu to create the KVM guest: 
+
+       "-cpu qemu64,model=13"
+
+
 Support
 =======
 
@@ -641,13 +743,13 @@ or the Intel Wired Networking project hosted by Sourceforge at:
 
 If an issue is identified with the released source code on the supported
 kernel with a supported adapter, email the specific information related
-to the issue to igb-devel@lists.sf.net
+to the issue to e1000-devel@lists.sf.net
 
 License
 =======
 
 Intel Gigabit Linux driver.
-Copyright(c) 1999 - 2008 Intel Corporation.
+Copyright(c) 1999 - 2011 Intel Corporation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms and conditions of the GNU General Public License,

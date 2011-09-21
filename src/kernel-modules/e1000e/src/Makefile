@@ -1,7 +1,7 @@
 ################################################################################
 #
 # Intel PRO/1000 Linux driver
-# Copyright(c) 1999 - 2010 Intel Corporation.
+# Copyright(c) 1999 - 2011 Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms and conditions of the GNU General Public License,
@@ -28,14 +28,14 @@
 
 ###########################################################################
 # Driver files
-FAMILYC = e1000_82571.c e1000_ich8lan.c e1000_80003es2lan.c
-FAMILYH = e1000_82571.h e1000_ich8lan.h e1000_80003es2lan.h
+FAMILYC = 82571.c ich8lan.c 80003es2lan.c
+FAMILYH = 82571.h ich8lan.h 80003es2lan.h
 
 # core driver files
 CFILES = netdev.c ethtool.c param.c $(FAMILYC) \
-         e1000_mac.c e1000_nvm.c e1000_phy.c e1000_manage.c kcompat.c
-HFILES = e1000.h hw.h e1000_regs.h e1000_defines.h \
-         e1000_mac.h e1000_nvm.h e1000_phy.h e1000_manage.h $(FAMILYH) kcompat.h
+         mac.c nvm.c phy.c manage.c kcompat.c
+HFILES = e1000.h hw.h regs.h defines.h \
+         mac.h nvm.h phy.h manage.h $(FAMILYH) kcompat.h
 ifeq (,$(BUILD_KERNEL))
 BUILD_KERNEL=$(shell uname -r)
 endif
@@ -49,13 +49,13 @@ DRIVER_NAME = e1000e
 # All the places we look for kernel source
 KSP :=  /lib/modules/$(BUILD_KERNEL)/build \
         /lib/modules/$(BUILD_KERNEL)/source \
+        /lib/modules/$(BUILD_KERNEL)-default/build \
         /usr/src/linux-$(BUILD_KERNEL) \
         /usr/src/linux-$($(BUILD_KERNEL) | sed 's/-.*//') \
         /usr/src/kernel-headers-$(BUILD_KERNEL) \
         /usr/src/kernel-source-$(BUILD_KERNEL) \
         /usr/src/linux-$($(BUILD_KERNEL) | sed 's/\([0-9]*\.[0-9]*\)\..*/\1/') \
-        /usr/src/linux \
-	$(BUILD_KERNEL)
+        /usr/src/linux
 
 # prune the list down to only values that exist
 # and have an include/linux sub-directory
@@ -72,8 +72,8 @@ ifeq (,$(KSRC))
   $(warning *** Install the appropriate kernel development package, e.g.)
   $(error kernel-devel, for building kernel modules and try again)
 else
-ifeq (/lib/modules/$(shell uname -r)/source, $(KSRC))
-  KOBJ :=  /lib/modules/$(shell uname -r)/build
+ifeq (/lib/modules/$(BUILD_KERNEL)/source, $(KSRC))
+  KOBJ :=  /lib/modules/$(BUILD_KERNEL)/build
 else
   KOBJ :=  $(KSRC)
 endif
@@ -140,9 +140,6 @@ ifeq ($(ARCH),ppc64)
   EXTRA_CFLAGS += -m64 -msoft-float
   LDFLAGS += -melf64ppc
 endif
-ifneq (,$(findstring NO_82542_SUPPORT, $(CFLAGS_EXTRA)))
-  CFILES := $(filter-out e1000_82542.c, $(CFILES))
-endif
 
 # extra flags for module builds
 EXTRA_CFLAGS += -DDRIVER_$(shell echo $(DRIVER_NAME) | tr '[a-z]' '[A-Z]')
@@ -176,9 +173,11 @@ ifneq ($(KSRC),$(shell cd /lib/modules/$(KVER)/build ; pwd -P))
 endif
 endif
 
-KKVER := $(shell echo $(KVER) | \
-         awk '{ if ($$0 ~ /2\.[4-9]\./) print "1"; else print "0"}')
-ifeq ($(KKVER), 0)
+KVER_CODE := $(shell $(CC) $(EXTRA_CFLAGS) -E -dM $(VSP) 2>/dev/null |\
+	grep -m 1 LINUX_VERSION_CODE | awk '{ print $$3 }' | sed 's/\"//g')
+
+# abort the build on kernels older than 2.4.0
+ifneq (1,$(shell [ $(KVER_CODE) -ge 132096 ] && echo 1 || echo 0))
   $(error *** Aborting the build. \
           *** This driver is not supported on kernel versions older than 2.4.0)
 endif
@@ -212,13 +211,11 @@ ifeq ($(SMP),1)
 endif
 
 ###########################################################################
-# 2.4.x & 2.6.x Specific rules
+# Kernel Version Specific rules
 
-K_VERSION:=$(shell uname -r | cut -c1-3 | sed 's/2\.[56]/2\.6/')
+ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
-ifeq ($(K_VERSION), 2.6)
-
-# Makefile for 2.6.x kernel
+# Makefile for 2.5.x and newer kernel
 TARGET = $(DRIVER_NAME).ko
 
 # man page
@@ -238,7 +235,7 @@ else
 endif
 endif
 
-else # ifeq ($(K_VERSION),2.6)
+else # ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
 # Makefile for 2.4.x kernel
 TARGET = $(DRIVER_NAME).o
@@ -274,7 +271,7 @@ $(CFILES:.c=.o): $(HFILES) Makefile
 default:
 	$(MAKE)
 
-endif # ifeq ($(K_VERSION),2.6)
+endif # ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
 ifeq (,$(MANDIR))
   # find the best place to install the man page
@@ -334,6 +331,9 @@ uninstall:
 	fi
 
 .PHONY: clean install
+
+ksrc:
+	@echo $(KSRC)
 
 clean:
 ifeq ($(KOBJ),$(KSRC))

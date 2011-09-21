@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2009 Intel Corporation.
+  Copyright(c) 2007-2010 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -38,6 +38,8 @@ s32  e1000_mng_write_cmd_header_generic(struct e1000_hw *hw,
 s32  e1000_mng_write_dhcp_info_generic(struct e1000_hw *hw,
                                        u8 *buffer, u16 length);
 bool e1000_enable_mng_pass_thru(struct e1000_hw *hw);
+u8 e1000_calculate_checksum(u8 *buffer, u32 length);
+s32 e1000_host_interface_command(struct e1000_hw *hw, u8 *buffer, u32 length);
 
 enum e1000_mng_mode {
 	e1000_mng_mode_none = 0,
@@ -67,7 +69,6 @@ enum e1000_mng_mode {
 #define E1000_HI_MAX_BLOCK_BYTE_LENGTH       1792 /* Num of bytes in range */
 #define E1000_HI_MAX_BLOCK_DWORD_LENGTH      448 /* Num of dwords in range */
 #define E1000_HI_COMMAND_TIMEOUT             500 /* Process HI command limit */
-
 #define E1000_HICR_EN              0x01  /* Enable bit - RO */
 /* Driver sets this bit when done to put command in RAM */
 #define E1000_HICR_C               0x02

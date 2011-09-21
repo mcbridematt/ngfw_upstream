@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel PRO/1000 Linux driver
-  Copyright(c) 1999 - 2010 Intel Corporation.
+  Copyright(c) 1999 - 2011 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -31,10 +31,12 @@
 #ifndef _E1000_H_
 #define _E1000_H_
 
+#include <linux/bitops.h>
 #include <linux/types.h>
 #include <asm/io.h>
 #include <linux/netdevice.h>
 #include <linux/pci.h>
+#include <linux/if_vlan.h>
 
 #include "kcompat.h"
 #include "hw.h"
@@ -98,6 +100,33 @@ struct e1000_info;
 /* Time to wait before putting the device into D3 if there's no link (in ms). */
 #define LINK_TIMEOUT		100
 
+#define DEFAULT_RDTR			0
+#define DEFAULT_RADV			8
+#define BURST_RDTR			0x20
+#define BURST_RADV			0x20
+
+/*
+ * in the case of WTHRESH, it appears at least the 82571/2 hardware
+ * writes back 4 descriptors when WTHRESH=5, and 3 descriptors when
+ * WTHRESH=4, and since we want 64 bytes at a time written back, set
+ * it to 5
+ */
+#define E1000_TXDCTL_DMA_BURST_ENABLE                          \
+	(E1000_TXDCTL_GRAN | /* set descriptor granularity */  \
+	 E1000_TXDCTL_COUNT_DESC |                             \
+	 (5 << 16) | /* wthresh must be +1 more than desired */\
+	 (1 << 8)  | /* hthresh */                             \
+	 0x1f)       /* pthresh */
+
+#define E1000_RXDCTL_DMA_BURST_ENABLE                          \
+	(0x01000000 | /* set descriptor granularity */         \
+	 (4 << 16)  | /* set writeback threshold    */         \
+	 (4 << 8)   | /* set prefetch threshold     */         \
+	 0x20)        /* set hthresh                */
+
+#define E1000_TIDV_FPD (1 << 31)
+#define E1000_RDTR_FPD (1 << 31)
+
 enum e1000_boards {
 	board_82571,
 	board_82572,
@@ -110,11 +139,6 @@ enum e1000_boards {
 	board_ich10lan,
 	board_pchlan,
 	board_pch2lan,
-};
-
-struct e1000_queue_stats {
-	u64 packets;
-	u64 bytes;
 };
 
 struct e1000_ps_page {
@@ -172,8 +196,6 @@ struct e1000_ring {
 
 #endif /* CONFIG_E1000E_MSIX */
 	struct sk_buff *rx_skb_top;
-
-	struct e1000_queue_stats stats;
 };
 
 #ifdef SIOCGMIIPHY
@@ -201,7 +223,11 @@ struct e1000_adapter {
 
 	const struct e1000_info *ei;
 
+#ifdef HAVE_VLAN_RX_REGISTER
 	struct vlan_group *vlgrp;
+#else
+	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+#endif
 	u32 bd_number;
 	u32 rx_buffer_len;
 	u16 mng_vlan_id;
@@ -265,7 +291,7 @@ struct e1000_adapter {
 						____cacheline_aligned_in_smp;
 #endif
 	void (*alloc_rx_buf) (struct e1000_adapter *adapter,
-			      int cleaned_count);
+			      int cleaned_count, gfp_t gfp);
 	struct e1000_ring *rx_ring;
 
 	u32 rx_int_delay;
@@ -326,17 +352,22 @@ struct e1000_adapter {
 
 	bool fc_autoneg;
 
+#ifndef HAVE_ETHTOOL_SET_PHYS_ID
 	unsigned long led_status;
 
+#endif
 	unsigned int flags;
 	unsigned int flags2;
 	struct work_struct downshift_task;
 	struct work_struct update_phy_task;
+#ifndef HAVE_ETHTOOL_SET_PHYS_ID
 	struct work_struct led_blink_task;
+#endif
 	struct work_struct print_hang_task;
 	u32 *config_space;
 
 	bool idle_check;
+	int node; /* store the node to allocate memory on */
 	int phy_hang_count;
 };
 
@@ -392,13 +423,18 @@ struct e1000_info {
 #define FLAG2_DISABLE_ASPM_L1             (1 << 3)
 #define FLAG2_HAS_PHY_STATS               (1 << 4)
 #define FLAG2_HAS_EEE                     (1 << 5)
-#define FLAG2_CHECK_PHY_HANG              (1 << 7)
+#define FLAG2_DMA_BURST                   (1 << 6)
+#define FLAG2_DISABLE_ASPM_L0S            (1 << 7)
 #define FLAG2_DISABLE_AIM                 (1 << 8)
+#define FLAG2_CHECK_PHY_HANG              (1 << 9)
+#define FLAG2_NO_DISABLE_RX               (1 << 10)
+#define FLAG2_PCIM2PCI_ARBITER_WA         (1 << 11)
 
 #define E1000_RX_DESC_PS(R, i)	    \
 	(&(((union e1000_rx_desc_packet_split *)((R).desc))[i]))
+#define E1000_RX_DESC_EXT(R, i)	    \
+	(&(((union e1000_rx_desc_extended *)((R).desc))[i]))
 #define E1000_GET_DESC(R, i, type)	(&(((struct type *)((R).desc))[i]))
-#define E1000_RX_DESC(R, i)		E1000_GET_DESC(R, i, e1000_rx_desc)
 #define E1000_TX_DESC(R, i)		E1000_GET_DESC(R, i, e1000_tx_desc)
 #define E1000_CONTEXT_DESC(R, i)	E1000_GET_DESC(R, i, e1000_context_desc)
 
@@ -420,6 +456,9 @@ extern const char e1000e_driver_version[];
 
 extern void e1000e_check_options(struct e1000_adapter *adapter);
 extern void e1000e_set_ethtool_ops(struct net_device *netdev);
+#ifndef HAVE_ETHTOOL_SET_PHYS_ID
+extern void e1000e_led_blink_task(struct work_struct *work);
+#endif
 #ifdef ETHTOOL_OPS_COMPAT
 extern int ethtool_ioctl(struct ifreq *ifr);
 #endif
@@ -438,6 +477,8 @@ extern void e1000e_update_stats(struct e1000_adapter *adapter);
 extern void e1000e_set_interrupt_capability(struct e1000_adapter *adapter);
 extern void e1000e_reset_interrupt_capability(struct e1000_adapter *adapter);
 #endif
+extern void e1000e_get_hw_control(struct e1000_adapter *adapter);
+extern void e1000e_release_hw_control(struct e1000_adapter *adapter);
 
 extern unsigned int copybreak;
 
@@ -494,7 +535,7 @@ extern s32 e1000e_valid_led_default(struct e1000_hw *hw, u16 *data);
 extern void e1000e_config_collision_dist(struct e1000_hw *hw);
 extern s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw);
 extern s32 e1000e_force_mac_fc(struct e1000_hw *hw);
-extern s32 e1000e_blink_led(struct e1000_hw *hw);
+extern s32 e1000e_blink_led_generic(struct e1000_hw *hw);
 extern void e1000_write_vfta_generic(struct e1000_hw *hw, u32 offset, u32 value);
 extern void e1000e_reset_adaptive(struct e1000_hw *hw);
 extern void e1000e_update_adaptive(struct e1000_hw *hw);

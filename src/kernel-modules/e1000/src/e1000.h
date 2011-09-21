@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel PRO/1000 Linux driver
-  Copyright(c) 1999 - 2008 Intel Corporation.
+  Copyright(c) 1999 - 2010 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -60,7 +60,7 @@ struct e1000_adapter;
 /* TX/RX descriptor defines */
 #define E1000_DEFAULT_TXD                  256
 #define E1000_MAX_TXD                      256
-#define E1000_MIN_TXD                       80
+#define E1000_MIN_TXD                       48
 #define E1000_MAX_82544_TXD               4096
 
 #define E1000_DEFAULT_TXD_PWR               12
@@ -70,7 +70,7 @@ struct e1000_adapter;
 #define E1000_DEFAULT_RXD                  256
 #define E1000_MAX_RXD                      256
 
-#define E1000_MIN_RXD                       80
+#define E1000_MIN_RXD                       48
 #define E1000_MAX_82544_RXD               4096
 
 #define E1000_MIN_ITR_USECS                 10 /* 100000 irq/sec */
@@ -266,7 +266,6 @@ struct e1000_adapter {
 	/* TX */
 	struct e1000_tx_ring *tx_ring;
 	unsigned int restart_queue;
-	unsigned long tx_queue_len;
 	u32 txd_cmd;
 	u32 tx_int_delay;
 	u32 tx_abs_int_delay;
@@ -344,6 +343,9 @@ struct e1000_adapter {
 
 	/* upper limit parameter for tx desc size */
 	u32 tx_desc_pwr;
+
+	struct work_struct fifo_stall_task;
+	struct work_struct phy_info_task;
 };
 
 #define E1000_FLAG_HAS_SMBUS                (1 << 0)
