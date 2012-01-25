@@ -8,14 +8,14 @@ Standards-Version: 3.8.0
 
 Package: libjson0
 Architecture: any
-Depends: libc6 (>= 2.3.2.ds1-21), ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: C JSON Library
  libjson is a small C library for parsing and serializing JSON.
 
 Package: libjson-dev
 Section: upstream/libdevel
 Architecture: any
-Depends: libc6 (>= 2.3.2.ds1-21), pkg-config
+Depends: libjson0 (= ${binary:Version}), ${misc:Depends}
 Description: C JSON Library header files.
  libjson is a small C library for parsing and serializing JSON.
  This package contains the development files.
