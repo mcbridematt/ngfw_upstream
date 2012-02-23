@@ -12,7 +12,7 @@ Homepage: http://initd.org/projects/psycopg
 Package: python-psycopg2
 Architecture: any
 Section: python
-Depends: python-egenix-mxdatetime, ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Depends: python-egenix-mxdatetime, python, python-central (>= 0.6.7), ${shlibs:Depends}, ${misc:Depends}
 Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
 Description: Python module for PostgreSQL
