@@ -4,5 +4,5 @@ e1000e                                                  lenny,squeeze
 e1000                                                   lenny,squeeze
 igb                                                     lenny,squeeze
 bnx2                                                    lenny,squeeze
-tg3                                                     lenny,squeeze
+tg3                                                     lenny
 ipset/ipset-2.5.0                                       lenny,squeeze
