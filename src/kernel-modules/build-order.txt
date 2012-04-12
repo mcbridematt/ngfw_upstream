@@ -1,8 +1,8 @@
-niagara22xxed                                           lenny,sid
-virtualbox-ose-guest                                    lenny,sid
-e1000e                                                  lenny,sid
-e1000                                                   lenny,sid
-igb                                                     lenny,sid
-bnx2                                                    lenny,sid
-tg3                                                     lenny,sid
-ipset/ipset-2.5.0                                       lenny,sid
+niagara22xxed                                           lenny,squeeze
+virtualbox-ose-guest                                    lenny,squeeze
+e1000e                                                  lenny,squeeze
+e1000                                                   lenny,squeeze
+igb                                                     lenny,squeeze
+bnx2                                                    lenny,squeeze
+tg3                                                     lenny,squeeze
+ipset/ipset-2.5.0                                       lenny,squeeze
