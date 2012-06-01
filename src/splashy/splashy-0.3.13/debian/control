@@ -27,7 +27,7 @@ XS-Vcs-Browser: http://git.debian.org/?p=splashy/debian/splashy.git;a=summary
 # console-common is needed to not run keymap.sh on Debian earlier than Sid
 Package: splashy
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libdirectfb-1.0-0 (>= 1.0.1-9),
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdirectfb-1.2-9
  lsb-base, initramfs-tools
 Provides: bootsplash
 Replaces: debsplash-utils, bootsplash, usplash
