@@ -1,5 +1,5 @@
 Source: niagara22xxed-source
-Section: upstream/kernel
+Section: main/kernel
 Priority: extra
 Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 5.0.37), dpatch

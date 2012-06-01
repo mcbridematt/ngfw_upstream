@@ -1,5 +1,5 @@
 Source: libmicrohttpd
-Section: upstream/libs
+Section: main/libs
 Priority: optional
 Maintainer: Daniel Baumann <daniel@debian.org>
 Uploaders: Arnaud Kyheng <Arnaud.Kyheng@free.fr>
@@ -10,7 +10,7 @@ Vcs-Browser: http://git.debian.net/?p=libmicrohttpd.git
 Vcs-Git: git://git.debian.net/git/libmicrohttpd.git
 
 Package: libmicrohttpd4
-Section: upstream/libs
+Section: main/libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: library embedding HTTP server functionality
@@ -20,7 +20,7 @@ Description: library embedding HTTP server functionality
  It will be used in future GNUnet versions as part of the HTTP transport.
 
 Package: libmicrohttpd-dbg
-Section: upstream/devel
+Section: main/devel
 Priority: extra
 Architecture: any
 Depends: libmicrohttpd4 (= ${binary:Version}), libmicrohttpd-dev (= ${binary:Version})
@@ -31,7 +31,7 @@ Description: library embedding HTTP server functionality (debug)
  This package contains the debugging symbols.
 
 Package: libmicrohttpd-dev
-Section: upstream/libdevel
+Section: main/libdevel
 Architecture: any
 Depends: libmicrohttpd4 (= ${binary:Version})
 Description: library embedding HTTP server functionality (development)

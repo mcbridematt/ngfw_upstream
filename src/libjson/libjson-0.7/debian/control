@@ -1,5 +1,5 @@
 Source: libjson
-Section: upstream/libs
+Section: main/libs
 Priority: optional
 Maintainer: Robert Scott <rbscott@untangle.com>
 Uploaders: Untangle Buildbot <buildbot@untangle.com>
@@ -13,7 +13,7 @@ Description: C JSON Library
  libjson is a small C library for parsing and serializing JSON.
 
 Package: libjson-dev
-Section: upstream/libdevel
+Section: main/libdevel
 Architecture: any
 Depends: libjson0 (= ${binary:Version}), ${misc:Depends}
 Description: C JSON Library header files.
