@@ -1,4 +1,4 @@
-psycopg2 (2.2.1-2) unstable; urgency=low
+psycopg2 (2.2.1+untangle-1) unstable; urgency=low
 
   * Bump up version to ease upgrade path
 
