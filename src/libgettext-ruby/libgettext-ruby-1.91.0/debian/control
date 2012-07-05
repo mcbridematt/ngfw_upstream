@@ -3,7 +3,7 @@ Section: interpreters
 Priority: optional
 Maintainer: Tatsuki Sugiura <sugi@nemui.org>
 Build-Depends: debhelper (>> 4.0.0), cdbs (>= 0.4.26-2), dpatch
-Build-Depends-Indep: ruby1.8 (>= 1.8.2), ruby1.8-dev, racc (>= 1.4.3), libracc-runtime-ruby1.8 | libruby1.8 (>= 1.4.3), rake, irb1.8
+Build-Depends-Indep: ruby1.8 (>= 1.8.2), ruby1.8-dev, racc (>= 1.4.3), libracc-runtime-ruby1.8 | libruby1.8 (>= 1.4.3), rake, irb1.8, rsync
 Standards-Version: 3.7.3.0
 Uploaders: Taku YASUI <tach@debian.or.jp>
 
