@@ -1,0 +1,70 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 10_dup_strings_of_gettext_returns.dpatch by  <sugi@nemui.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: duplicate string object for return values from gettext.
+## DP: This patch fixes bug#473193 ( http:/bugs.debian.org/473193 )
+
+@DPATCH@
+diff -urNad libgettext-ruby~/lib/gettext/textdomain.rb libgettext-ruby/lib/gettext/textdomain.rb
+--- libgettext-ruby~/lib/gettext/textdomain.rb	2008-03-20 21:51:32.000000000 +0900
++++ libgettext-ruby/lib/gettext/textdomain.rb	2008-03-31 03:14:30.961169374 +0900
+@@ -118,7 +118,7 @@
+       return "" if msgid == "" or msgid.nil?
+       return nil unless @current_mo
+       if @current_mo[msgid] and (@current_mo[msgid].size > 0)
+-        @current_mo[msgid]
++        @current_mo[msgid].dup
+       elsif msgid.include?("\000")
+         ret = nil
+         msgid_single = msgid.split("\000")[0]
+@@ -126,7 +126,7 @@
+           if key =~ /^#{Regexp.quote(msgid_single)}\000/
+               # Usually, this is not caused to make po-files from rgettext.
+               warn %Q[Warning: n_("#{msgid_single}", "#{msgid.split("\000")[1]}") and n_("#{key.gsub(/\000/, '", "')}") are duplicated.] if $DEBUG
+-            ret = val
++            ret = val.dup
+             break
+           end
+         }
+diff -urNad libgettext-ruby~/lib/gettext.rb libgettext-ruby/lib/gettext.rb
+--- libgettext-ruby~/lib/gettext.rb	2008-03-20 21:51:32.000000000 +0900
++++ libgettext-ruby/lib/gettext.rb	2008-03-31 03:14:36.047836063 +0900
+@@ -260,7 +260,7 @@
+     cached_key = [bound_target, Locale.current, msgid]
+     if cached?
+       if @@__cache_msgids[cached_key]
+-        return @@__cache_msgids[cached_key]
++        return @@__cache_msgids[cached_key].dup
+       end
+     end
+     msg = nil
+@@ -282,6 +282,7 @@
+       end
+     end
+     @@__cache_msgids[cached_key] = msg
++    msg.dup
+   end
+ 
+   @@__cache_nmsgids = {}
+diff -urNad libgettext-ruby~/test/test_gettext.rb libgettext-ruby/test/test_gettext.rb
+--- libgettext-ruby~/test/test_gettext.rb	2008-03-20 21:51:28.000000000 +0900
++++ libgettext-ruby/test/test_gettext.rb	2008-03-31 03:16:10.715325749 +0900
+@@ -379,4 +379,17 @@
+     assert_equal("japanese", @@anon::I.new.test2)
+     
+   end   
++
++  def test_anti_modify
++    GetText.locale = nil
++    return if /linux/ !~ RUBY_PLATFORM
++
++    GetText.bindtextdomain("libc")
++    GetText.clear_cache
++    2.times {
++      original = GetText._("Terminated").dup
++      GetText._("Terminated") << " modified."
++      assert_equal(original, GetText._("Terminated"))
++    }
++  end
+ end

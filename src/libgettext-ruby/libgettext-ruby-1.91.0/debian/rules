@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/dpatch.mk
+include /usr/share/cdbs/1/class/langcore.mk
+
+DEB_INSTALL_MANPAGES_libgettext-ruby-util = debian/rgettext.1 debian/rmsgfmt.1 debian/rmsgmerge.1
+
+CUR_RUBYVER=$(if $(subst libgettext-ruby-data,,$(subst libgettext-ruby-util,,$(cdbs_curpkg))),$(subst libgettext-ruby,,$(cdbs_curpkg)),1.8)
+RUBY_CONFIG=ruby$(CUR_RUBYVER) -rrbconfig -e 'print RbConfig::CONFIG[ARGV[0]]'
+RUBY_ARCH=`$(RUBY_CONFIG) arch`
+CUR_PKGDIR=$(CURDIR)/debian/$(cdbs_curpkg)
+RUBY_VERSIONED_LIBS=$(filter %-ruby%.%, $(DEB_ALL_PACKAGES))
+SETUP_FILE=setup.rb
+
+clean::
+	rm -rf build-*
+
+$(patsubst %,makebuilddir/%,$(DEB_ALL_PACKAGES))::
+	mkdir -p build-$(cdbs_curpkg)
+	cp -a *.rb Rakefile bin data lib po src test build-$(cdbs_curpkg)
+
+$(patsubst %,configure/%,$(DEB_ALL_PACKAGES))::
+	cd build-$(cdbs_curpkg) && \
+		ruby$(CUR_RUBYVER) $(SETUP_FILE) config --installdirs=std
+
+configure/libgettext-ruby1.8 configure/libgettext-ruby1.9::
+	# don't need to build *.mo files...
+	cd build-$(cdbs_curpkg) && rm post-setup.rb
+
+$(patsubst %,build/%,$(DEB_ALL_PACKAGES))::
+	cd build-$(cdbs_curpkg) && \
+		ruby$(CUR_RUBYVER) -Ku $(SETUP_FILE) setup
+
+
+$(patsubst %,install/%,$(DEB_ALL_PACKAGES))::
+	cd build-$(cdbs_curpkg) && \
+		ruby$(CUR_RUBYVER) $(SETUP_FILE) install --prefix="$(CURDIR)/debian/$(cdbs_curpkg)"
+	if [ -f $(CURDIR)/debian/$(cdbs_curpkg).lintian-override ]; then \
+		mkdir -p $(CUR_PKGDIR)/usr/share/lintian/overrides; \
+		install -m 644 $(CURDIR)/debian/$(cdbs_curpkg).lintian-override \
+			$(CUR_PKGDIR)/usr/share/lintian/overrides/$(cdbs_curpkg); \
+	fi || true
+
+install/libgettext-ruby1.8 install/libgettext-ruby1.9::
+	rm -r $(CUR_PKGDIR)/usr/bin
+	rm -r $(CUR_PKGDIR)/usr/share/locale
+
+install/libgettext-ruby-util::
+	rm -r $(CUR_PKGDIR)/usr/lib
+	rm $(CUR_PKGDIR)/usr/share/locale/*/*/rails.mo
+	cd $(CUR_PKGDIR)/usr/share/locale && rmdir -p --ignore-fail-on-non-empty */*
+	for f in $(CURDIR)/debian/$(cdbs_curpkg)/usr/bin/*; do \
+	  ruby1.8 -i -npe '$$. == 1 && /^#!/ and $$_="#!/usr/bin/ruby1.8\n"' $$f; \
+	done
+
+
+binary-fixup/libgettext-ruby-data::
+	find $(CUR_PKGDIR)/usr/share/doc/$(cdbs_curpkg)/examples -type f | xargs chmod a-x
+	rm -r $(CUR_PKGDIR)/usr/bin
+	rm -r $(CUR_PKGDIR)/usr/lib
+	rm $(CUR_PKGDIR)/usr/share/locale/*/*/rgettext.mo
+	cd $(CUR_PKGDIR)/usr/share/locale && rmdir -p --ignore-fail-on-non-empty */*

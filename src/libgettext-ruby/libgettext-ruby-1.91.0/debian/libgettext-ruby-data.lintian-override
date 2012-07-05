@@ -1,0 +1,2 @@
+libgettext-ruby-data: zero-byte-file-in-doc-directory usr/share/doc/libgettext-ruby-data/examples/rails/public/favicon.ico
+libgettext-ruby-data: package-contains-empty-directory usr/share/doc/libgettext-ruby-data/examples/rails/log/
