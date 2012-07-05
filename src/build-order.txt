@@ -1,3 +1,4 @@
+rails/rails-2.1.0                                       squeeze
 python-psycopg2/psycopg2-2.2.1                          lenny,squeeze
 conntrack/conntrack-0.9.7                               lenny
 iptables/iptables-1.4.2                                 lenny
