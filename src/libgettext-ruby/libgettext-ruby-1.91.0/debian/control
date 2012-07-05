@@ -3,7 +3,7 @@ Section: interpreters
 Priority: optional
 Maintainer: Tatsuki Sugiura <sugi@nemui.org>
 Build-Depends: debhelper (>> 4.0.0), cdbs (>= 0.4.26-2), dpatch
-Build-Depends-Indep: ruby1.8 (>= 1.8.2), ruby1.8-dev, ruby1.9, ruby1.9-dev, racc (>= 1.4.3), libracc-runtime-ruby1.8 | libruby1.8 (>= 1.4.3), libruby1.9, rake, irb1.8, irb1.9
+Build-Depends-Indep: ruby1.8 (>= 1.8.2), ruby1.8-dev, racc (>= 1.4.3), libracc-runtime-ruby1.8 | libruby1.8 (>= 1.4.3), rake, irb1.8
 Standards-Version: 3.7.3.0
 Uploaders: Taku YASUI <tach@debian.or.jp>
 
@@ -15,23 +15,6 @@ Conflicts: libgettext-ruby (<= 0.8.1-2), apt-listbugs (<= 0.0.86)
 Replaces: libgettext-ruby (<= 0.8.1-2)
 Suggests: libgettext-ruby-util, libgettext-ruby-data
 Description: Gettext for ruby1.8
- Ruby GetText Package is Native Language Support Library and Tools 
- which modeled after GNU gettext package.
- .
- Features:
-   * Simple APIs(similar GNU gettext)
-   * rgettext creates po-files from ruby scripts.
-     The po-file is compatible to GNU gettext.
-   * rmsgfmt creates a mo-file from a po-file.
-
-Package: libgettext-ruby1.9
-Provides: libgettext-ruby
-Architecture: all
-Depends: irb1.9, ${shlibs:Depends}
-Conflicts: libgettext-ruby (<= 0.8.1-2)
-Replaces: libgettext-ruby (<= 0.8.1-2)
-Suggests: libgettext-ruby-util, libgettext-ruby-data
-Description: Gettext for ruby1.9
  Ruby GetText Package is Native Language Support Library and Tools 
  which modeled after GNU gettext package.
  .
