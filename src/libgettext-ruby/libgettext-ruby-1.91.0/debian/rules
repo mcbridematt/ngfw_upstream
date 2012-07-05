@@ -18,7 +18,7 @@ clean::
 
 $(patsubst %,makebuilddir/%,$(DEB_ALL_PACKAGES))::
 	mkdir -p build-$(cdbs_curpkg)
-	cp -a *.rb Rakefile bin data lib po src test build-$(cdbs_curpkg)
+	rsync --exclude='.svn' -a *.rb Rakefile bin data lib po src test build-$(cdbs_curpkg)/
 
 $(patsubst %,configure/%,$(DEB_ALL_PACKAGES))::
 	cd build-$(cdbs_curpkg) && \
