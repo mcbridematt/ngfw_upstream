@@ -3,7 +3,7 @@ Section: web
 Priority: optional
 Maintainer: Debian Ruby Extras Maintainers <pkg-ruby-extras-maintainers@lists.alioth.debian.org>
 Uploaders: Ondřej Surý <ondrej@debian.org>
-Build-Depends: debhelper (>= 4.0.0), rake (>>0.7.0), liberb-ruby, libxml-simple-ruby (>>1.0.11), libbuilder-ruby1.8 (>>2.1.2)
+Build-Depends: debhelper (>= 4.0.0), rake (>>0.7.0), libruby, libxml-simple-ruby (>>1.0.11), libbuilder-ruby1.8 (>>2.1.2)
 Standards-Version: 3.8.0
 Vcs-Browser: http://git.debian.org/?p=collab-maint/rails.git;a=summary
 Vcs-Git: git://git.debian.org/git/collab-maint/rails.git
@@ -12,7 +12,7 @@ Homepage: http://rubyonrails.com
 Package: rails
 Architecture: all
 Pre-Depends: dpkg (>= 1.10.24)
-Depends: ${misc:Depends}, ruby, ruby1.8 (>=1.8.2-3), rake (>>0.7.0), libsqlite3-ruby1.8 | libpgsql-ruby1.8 | libmysql-ruby1.8 | libdbi-ruby1.8, libredcloth-ruby1.8, liberb-ruby, libruby1.8-extras, libjs-prototype, libxml-simple-ruby (>>1.0.11), libbuilder-ruby1.8 (>>2.1.2)
+Depends: ${misc:Depends}, ruby, ruby1.8 (>=1.8.2-3), rake (>>0.7.0), libsqlite3-ruby1.8 | libpgsql-ruby1.8 | libmysql-ruby1.8 | libdbi-ruby1.8, libredcloth-ruby1.8, libruby, libruby1.8-extras, libjs-prototype, libxml-simple-ruby (>>1.0.11), libbuilder-ruby1.8 (>>2.1.2)
 Recommends: irb (>>1.8), libmocha-ruby1.8
 Conflicts: libdevel-logger-ruby1.8
 Suggests: libapache2-mod-ruby | libapache-mod-ruby | libapache2-mod-fcgid, libfcgi-ruby1.8
