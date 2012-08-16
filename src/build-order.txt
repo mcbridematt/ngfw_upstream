@@ -9,7 +9,7 @@ jslint/jslint-0.1.0					lenny,squeeze
 monit/monit-5.0.3					lenny
 libjson/libjson-0.7					lenny,squeeze
 libmicrohttpd/libmicrohttpd-0.3.1			squeeze
-splashy/splashy-0.3.13					lenny,squeeze
+splashy/splashy-0.3.13					lenny
 
 kernel-modules/virtualbox-ose-guest                     lenny,squeeze
 kernel-modules/bnx2                                     lenny,squeeze
