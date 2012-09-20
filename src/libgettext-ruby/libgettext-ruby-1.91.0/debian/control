@@ -10,10 +10,9 @@ Uploaders: Taku YASUI <tach@debian.or.jp>
 Package: libgettext-ruby1.8
 Provides: libgettext-ruby
 Architecture: all
-Depends: irb1.8, ${shlibs:Depends}
+Depends: irb1.8, ${shlibs:Depends}, libgettext-ruby-util, libgettext-ruby-data
 Conflicts: libgettext-ruby (<= 0.8.1-2), apt-listbugs (<= 0.0.86)
 Replaces: libgettext-ruby (<= 0.8.1-2)
-Suggests: libgettext-ruby-util, libgettext-ruby-data
 Description: Gettext for ruby1.8
  Ruby GetText Package is Native Language Support Library and Tools 
  which modeled after GNU gettext package.
