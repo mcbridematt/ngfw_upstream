@@ -1,0 +1,12 @@
+xdialog for Debian
+------------------
+
+The example scripts are EXTREMLY INSECURE and BUGGY ones. I take less
+than ZERO RESPONSILITY about them! You've been warned.
+
+ -- Lenart Janos <ocsi@debian.org>, Sun, 10 Jun 2001 22:05:46 +0200
+
+The fix for Bug#194790 is a Debian specific hack. Can be removed at any
+time, without any warning. You've been warned.
+
+ -- Lenart Janos <ocsi@debian.org>, Mon, 22 Dec 2003 10:50:52 +0100

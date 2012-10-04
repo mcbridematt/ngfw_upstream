@@ -1,0 +1,35 @@
+This package was debianized by Lenart Janos <ocsi@debian.org> on
+Sun, 10 Jun 2001 20:14:16 +0200.
+
+Stan Vasilyev <stan.vasilyev@csun.edu> took over this package on Sun, 29 Jan
+2006 16:35:42 -0800.
+
+Alexander Schmehl <tolimar@debian.org> took over this package on Sun, 11 Feb
+2007 20:02:03 +0100.
+
+It was downloaded from http://xdialog.dyns.net/
+
+Upstream Authors: Thierry Godefroy <xdialog@free.fr>
+                  Cyberone Internet Inc. <alfred@cyberone.com.au>
+
+This software is Copyright (C) 2000-2004, Thierry Godefroy <xdialog@free.fr>.
+Xdialog 1.0 is Copyright (C) 1999-2000, Cyberone Internet Inc. <alfred@cyberone.com.au>.
+
+Copyright:
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
