@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Daniel Baumann <daniel.baumann@progress-technologies.net>
 Build-Depends:
  debhelper (>= 8), autotools-dev, libdrm-dev, libgtk2.0-dev, libpango1.0-dev,
- libpng-dev, pkg-config, dpkg-dev (>= 1.15.0)
+ libpng-dev, pkg-config, dpkg-dev (>= 1.15.0), libkms1
 Standards-Version: 3.9.3
 Homepage: http://www.freedesktop.org/wiki/Software/Plymouth
 
