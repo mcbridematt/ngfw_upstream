@@ -10,7 +10,6 @@ Homepage: http://www.freedesktop.org/wiki/Software/Plymouth
 
 Package: plymouth
 Architecture: linux-any
-Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends}, ${shlibs:Depends}, initramfs-tools
 Conflicts: console-tools
 Suggests: desktop-base, plymouth-drm
@@ -21,7 +20,6 @@ Description: Graphical Boot Animation and Logger
 
 Package: plymouth-drm
 Architecture: linux-any
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends}, ${shlibs:Depends}, plymouth (= ${binary:Version}),
  fontconfig-config, ttf-dejavu-core

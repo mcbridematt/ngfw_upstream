@@ -2,10 +2,10 @@
 
 set -e
 
-DEB_HOST_MULTIARCH="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
+#DEB_HOST_MULTIARCH="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
 
 cat << EOF
 usr/bin/plymouth-log-viewer
-usr/lib/${DEB_HOST_MULTIARCH}/plymouth/renderers/x11.so
+usr/lib/plymouth/renderers/x11.so
 usr/share/gdm
 EOF
