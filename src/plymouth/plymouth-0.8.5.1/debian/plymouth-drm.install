@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+DEB_HOST_MULTIARCH="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
+
+cat << EOF
+usr/lib/${DEB_HOST_MULTIARCH}/libply-splash-graphics.so.*
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/fade-throbber.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/label.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/script.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/space-flares.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/throbgress.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/two-step.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/renderers/drm.so
+usr/lib/${DEB_HOST_MULTIARCH}/plymouth/renderers/frame-buffer.so
+EOF
