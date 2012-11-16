@@ -1,3 +1,9 @@
+niagara22xxed-source (0.2+untangle7-2) unstable; urgency=low
+
+  * Bump version
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 16 Nov 2012 00:54:35 -0800
+
 niagara22xxed-source (0.2+untangle6-1) unstable; urgency=low
 
   * Fix squeeze
