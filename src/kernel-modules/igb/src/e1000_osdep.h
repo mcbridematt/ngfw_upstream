@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2010 Intel Corporation.
+  Copyright(c) 2007-2012 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -67,10 +67,19 @@
 #endif
 
 
+#ifdef DEBUG
+#define DEBUGOUT(S) printk(KERN_DEBUG S)
+#define DEBUGOUT1(S, A...) printk(KERN_DEBUG S, ## A)
+#else
 #define DEBUGOUT(S)
 #define DEBUGOUT1(S, A...)
+#endif
 
+#ifdef DEBUG_FUNC
+#define DEBUGFUNC(F) DEBUGOUT(F "\n")
+#else
 #define DEBUGFUNC(F)
+#endif
 #define DEBUGOUT2 DEBUGOUT1
 #define DEBUGOUT3 DEBUGOUT2
 #define DEBUGOUT7 DEBUGOUT3

@@ -1,7 +1,7 @@
 /*******************************************************************************
 
   Intel(R) Gigabit Ethernet Linux driver
-  Copyright(c) 2007-2010 Intel Corporation.
+  Copyright(c) 2007-2012 Intel Corporation.
 
   This program is free software; you can redistribute it and/or modify it
   under the terms and conditions of the GNU General Public License,
@@ -485,10 +485,9 @@ _kc_alloc_etherdev(int sizeof_priv)
 	int alloc_size;
 
 	alloc_size = sizeof(*dev) + sizeof_priv + IFNAMSIZ + 31;
-	dev = kmalloc(alloc_size, GFP_KERNEL);
+	dev = kzalloc(alloc_size, GFP_KERNEL);
 	if (!dev)
 		return NULL;
-	memset(dev, 0, alloc_size);
 
 	if (sizeof_priv)
 		dev->priv = (void *) (((unsigned long)(dev + 1) + 31) & ~31);
@@ -590,6 +589,54 @@ found_middle:
 	return result + ffs(tmp);
 }
 
+size_t _kc_strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t ret = strlen(src);
+
+	if (size) {
+		size_t len = (ret >= size) ? size - 1 : ret;
+		memcpy(dest, src, len);
+		dest[len] = '\0';
+	}
+	return ret;
+}
+
+#ifndef do_div
+#if BITS_PER_LONG == 32
+uint32_t __attribute__((weak)) _kc__div64_32(uint64_t *n, uint32_t base)
+{
+	uint64_t rem = *n;
+	uint64_t b = base;
+	uint64_t res, d = 1;
+	uint32_t high = rem >> 32;
+
+	/* Reduce the thing a bit first */
+	res = 0;
+	if (high >= base) {
+		high /= base;
+		res = (uint64_t) high << 32;
+		rem -= (uint64_t) (high*base) << 32;
+	}
+
+	while ((int64_t)b > 0 && b < rem) {
+		b = b+b;
+		d = d+d;
+	}
+
+	do {
+		if (rem >= b) {
+			rem -= b;
+			res += d;
+		}
+		b >>= 1;
+		d >>= 1;
+	} while (d);
+
+	*n = res;
+	return rem;
+}
+#endif /* BITS_PER_LONG == 32 */
+#endif /* do_div */
 #endif /* 2.6.0 => 2.4.6 */
 
 /*****************************************************************************/
@@ -961,6 +1008,21 @@ void _kc_netif_tx_start_all_queues(struct net_device *netdev)
 			netif_start_subqueue(netdev, i);
 }
 #endif /* HAVE_TX_MQ */
+
+#ifndef __WARN_printf
+void __kc_warn_slowpath(const char *file, int line, const char *fmt, ...)
+{
+	va_list args;
+
+	printk(KERN_WARNING "------------[ cut here ]------------\n");
+	printk(KERN_WARNING "WARNING: at %s:%d %s()\n", file, line);
+	va_start(args, fmt);
+	vprintk(fmt, args);
+	va_end(args);
+
+	dump_stack();
+}
+#endif /* __WARN_printf */
 #endif /* < 2.6.27 */
 
 /*****************************************************************************/
@@ -1000,70 +1062,32 @@ out:
 }
 #endif /* < 2.6.28 */
 
-/*****************************************************************************/
-#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,30) )
-#ifdef HAVE_NETDEV_SELECT_QUEUE
-#include <net/ip.h>
-static u32 _kc_simple_tx_hashrnd;
-static u32 _kc_simple_tx_hashrnd_initialized;
-
-u16 _kc_skb_tx_hash(struct net_device *dev, struct sk_buff *skb)
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,34) )
+#if (RHEL_RELEASE_CODE < RHEL_RELEASE_VERSION(6,0))
+int _kc_pci_num_vf(struct pci_dev *dev)
 {
-	u32 addr1, addr2, ports;
-	u32 hash, ihl;
-	u8 ip_proto = 0;
+	int num_vf = 0;
+#ifdef CONFIG_PCI_IOV
+	struct pci_dev *vfdev;
 
-	if (unlikely(!_kc_simple_tx_hashrnd_initialized)) {
-		get_random_bytes(&_kc_simple_tx_hashrnd, 4);
-		_kc_simple_tx_hashrnd_initialized = 1;
+	/* loop through all ethernet devices starting at PF dev */
+	vfdev = pci_get_class(PCI_CLASS_NETWORK_ETHERNET << 8, NULL);
+	while (vfdev) {
+		if (vfdev->is_virtfn && vfdev->physfn == dev)
+			num_vf++;
+
+		vfdev = pci_get_class(PCI_CLASS_NETWORK_ETHERNET << 8, vfdev);
 	}
 
-	switch (skb->protocol) {
-	case htons(ETH_P_IP):
-		if (!(ip_hdr(skb)->frag_off & htons(IP_MF | IP_OFFSET)))
-			ip_proto = ip_hdr(skb)->protocol;
-		addr1 = ip_hdr(skb)->saddr;
-		addr2 = ip_hdr(skb)->daddr;
-		ihl = ip_hdr(skb)->ihl;
-		break;
-#if defined(CONFIG_IPV6) || defined(CONFIG_IPV6_MODULE)
-	case htons(ETH_P_IPV6):
-		ip_proto = ipv6_hdr(skb)->nexthdr;
-		addr1 = ipv6_hdr(skb)->saddr.s6_addr32[3];
-		addr2 = ipv6_hdr(skb)->daddr.s6_addr32[3];
-		ihl = (40 >> 2);
-		break;
 #endif
-	default:
-		return 0;
-	}
-
-
-	switch (ip_proto) {
-	case IPPROTO_TCP:
-	case IPPROTO_UDP:
-	case IPPROTO_DCCP:
-	case IPPROTO_ESP:
-	case IPPROTO_AH:
-	case IPPROTO_SCTP:
-	case IPPROTO_UDPLITE:
-		ports = *((u32 *) (skb_network_header(skb) + (ihl * 4)));
-		break;
-
-	default:
-		ports = 0;
-		break;
-	}
-
-	hash = jhash_3words(addr1, addr2, ports, _kc_simple_tx_hashrnd);
-
-	return (u16) (((u64) hash * dev->real_num_tx_queues) >> 32);
+	return num_vf;
 }
-#endif /* HAVE_NETDEV_SELECT_QUEUE */
-#endif /* < 2.6.30 */
+#endif /* RHEL_RELEASE_CODE */
+#endif /* < 2.6.34 */
 
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35) )
 #ifdef HAVE_TX_MQ
+#if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(6,0)))
 #ifndef CONFIG_NETDEVICES_MULTIQUEUE
 void _kc_netif_set_real_num_tx_queues(struct net_device *dev, unsigned int txq)
 {
@@ -1088,6 +1112,7 @@ void _kc_netif_set_real_num_tx_queues(struct net_device *dev, unsigned int txq)
 	}
 }
 #endif /* CONFIG_NETDEVICES_MULTIQUEUE */
+#endif /* !(RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(6,0)) */
 #endif /* HAVE_TX_MQ */
 #endif /* < 2.6.35 */
 
@@ -1112,8 +1137,54 @@ int _kc_ethtool_op_set_flags(struct net_device *dev, u32 data, u32 supported)
 }
 #endif /* < 2.6.36 */
 
+/*****************************************************************************/
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38) )
+#ifdef HAVE_NETDEV_SELECT_QUEUE
+#include <net/ip.h>
+static u32 _kc_simple_tx_hashrnd;
+static u32 _kc_simple_tx_hashrnd_initialized;
+
+u16 ___kc_skb_tx_hash(struct net_device *dev, const struct sk_buff *skb,
+		      u16 num_tx_queues)
+{
+	u32 hash;
+
+	if (skb_rx_queue_recorded(skb)) {
+		hash = skb_get_rx_queue(skb);
+		while (unlikely(hash >= num_tx_queues))
+			hash -= num_tx_queues;
+		return hash;
+	}
+
+	if (unlikely(!_kc_simple_tx_hashrnd_initialized)) {
+		get_random_bytes(&_kc_simple_tx_hashrnd, 4);
+		_kc_simple_tx_hashrnd_initialized = 1;
+	}
+
+	if (skb->sk && skb->sk->sk_hash)
+		hash = skb->sk->sk_hash;
+	else
+#ifdef NETIF_F_RXHASH
+		hash = (__force u16) skb->protocol ^ skb->rxhash;
+#else
+		hash = skb->protocol;
+#endif
+
+	hash = jhash_1word(hash, _kc_simple_tx_hashrnd);
+
+	return (u16) (((u64) hash * num_tx_queues) >> 32);
+}
+#endif /* HAVE_NETDEV_SELECT_QUEUE */
+#endif /* < 2.6.38 */
+
 /******************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39) )
-#if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(6,1)))
+#if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(6,0)))
+
+
 #endif /* !(RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(6,0)) */
 #endif /* < 2.6.39 */
+
+/******************************************************************************/
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0) )
+#endif /* < 3.4.0 */
