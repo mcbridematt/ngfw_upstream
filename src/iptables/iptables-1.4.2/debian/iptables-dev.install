@@ -1,6 +1,0 @@
-usr/include
-usr/share/man/man3
-lib/libxtables.so
-lib/*.a usr/lib
-lib/pkgconfig usr/lib
-
