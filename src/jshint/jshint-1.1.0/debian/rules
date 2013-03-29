@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-DESTDIR=$(CURDIR)/debian/jslint
+DESTDIR=$(CURDIR)/debian/jshint
 
 build:
 	dh_testdir

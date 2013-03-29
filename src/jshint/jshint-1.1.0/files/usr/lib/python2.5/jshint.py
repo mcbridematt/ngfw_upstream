@@ -31,7 +31,7 @@ class Problem:
 
 class Problems:
   SEA_MONKEY = "/usr/bin/smjs"
-  JS_LINT = "/usr/share/javascript/jslint.js"
+  JS_LINT = "/usr/share/javascript/jshint.js"
 
   TAG_RE = re.compile(r'<.*?>')
   PARAGRAPH_RE = re.compile(r'(?<!^)<(p|div).*?>')
