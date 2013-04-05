@@ -1,7 +1,3 @@
-#! /usr/bin/python
+#! /bin/sh
 
-import jshint, sys
-
-for file in sys.argv[1:]:
-  print jshint.Problems(file)
-
+/usr/bin/rhino /usr/share/javascript/jshint.js $@
