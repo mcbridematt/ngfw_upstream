@@ -1,5 +1,4 @@
 niagara22xxed                                           lenny,squeeze
-virtualbox-ose-guest                                    lenny,squeeze
 e1000e                                                  lenny,squeeze
 e1000                                                   lenny,squeeze
 igb                                                     lenny,squeeze
