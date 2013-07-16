@@ -4,4 +4,4 @@ e1000e                                                  lenny
 e1000                                                   lenny,squeeze
 igb                                                     lenny,squeeze
 bnx2                                                    lenny,squeeze
-tg3                                                     lenny
+tg3                                                     lenny,squeeze
