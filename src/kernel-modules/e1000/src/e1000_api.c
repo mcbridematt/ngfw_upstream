@@ -106,7 +106,6 @@ out:
 	return ret_val;
 }
 
-
 /**
  *  e1000_set_mac_type - Sets MAC type
  *  @hw: pointer to the HW structure

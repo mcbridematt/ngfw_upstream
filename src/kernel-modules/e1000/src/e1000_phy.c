@@ -69,16 +69,29 @@ void e1000_init_phy_ops_generic(struct e1000_hw *hw)
 	phy->ops.get_cfg_done = e1000_null_ops_generic;
 	phy->ops.get_cable_length = e1000_null_ops_generic;
 	phy->ops.get_info = e1000_null_ops_generic;
+	phy->ops.set_page = e1000_null_set_page;
 	phy->ops.read_reg = e1000_null_read_reg;
 	phy->ops.read_reg_locked = e1000_null_read_reg;
+	phy->ops.read_reg_page = e1000_null_read_reg;
 	phy->ops.release = e1000_null_phy_generic;
 	phy->ops.reset = e1000_null_ops_generic;
 	phy->ops.set_d0_lplu_state = e1000_null_lplu_state;
 	phy->ops.set_d3_lplu_state = e1000_null_lplu_state;
 	phy->ops.write_reg = e1000_null_write_reg;
 	phy->ops.write_reg_locked = e1000_null_write_reg;
+	phy->ops.write_reg_page = e1000_null_write_reg;
 	phy->ops.power_up = e1000_null_phy_generic;
 	phy->ops.power_down = e1000_null_phy_generic;
+}
+
+/**
+ *  e1000_null_set_page - No-op function, return 0
+ *  @hw: pointer to the HW structure
+ **/
+s32 e1000_null_set_page(struct e1000_hw *hw, u16 data)
+{
+	DEBUGFUNC("e1000_null_set_page");
+	return E1000_SUCCESS;
 }
 
 /**
@@ -159,18 +172,18 @@ s32 e1000_get_phy_id(struct e1000_hw *hw)
 	if (!(phy->ops.read_reg))
 		goto out;
 
-		ret_val = phy->ops.read_reg(hw, PHY_ID1, &phy_id);
-		if (ret_val)
-			goto out;
+	ret_val = phy->ops.read_reg(hw, PHY_ID1, &phy_id);
+	if (ret_val)
+		goto out;
 
-		phy->id = (u32)(phy_id << 16);
-		usec_delay(20);
-		ret_val = phy->ops.read_reg(hw, PHY_ID2, &phy_id);
-		if (ret_val)
-			goto out;
+	phy->id = (u32)(phy_id << 16);
+	usec_delay(20);
+	ret_val = phy->ops.read_reg(hw, PHY_ID2, &phy_id);
+	if (ret_val)
+		goto out;
 
-		phy->id |= (u32)(phy_id & PHY_REVISION_MASK);
-		phy->revision = (u32)(phy_id & ~PHY_REVISION_MASK);
+	phy->id |= (u32)(phy_id & PHY_REVISION_MASK);
+	phy->revision = (u32)(phy_id & ~PHY_REVISION_MASK);
 
 out:
 	return ret_val;
@@ -384,6 +397,26 @@ out:
 }
 
 /**
+ *  e1000_set_page_igp - Set page as on IGP-like PHY(s)
+ *  @hw: pointer to the HW structure
+ *  @page: page to set (shifted left when necessary)
+ *
+ *  Sets PHY page required for PHY register access.  Assumes semaphore is
+ *  already acquired.  Note, this function sets phy.addr to 1 so the caller
+ *  must set it appropriately (if necessary) after this function returns.
+ **/
+s32 e1000_set_page_igp(struct e1000_hw *hw, u16 page)
+{
+	DEBUGFUNC("e1000_set_page_igp");
+
+	DEBUGOUT1("Setting page 0x%x\n", page);
+
+	hw->phy.addr = 1;
+
+	return e1000_write_phy_reg_mdic(hw, IGP01E1000_PHY_PAGE_SELECT, page);
+}
+
+/**
  *  __e1000_read_phy_reg_igp - Read igp PHY register
  *  @hw: pointer to the HW structure
  *  @offset: register offset to be read
@@ -561,6 +594,7 @@ static s32 __e1000_read_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 *data,
 	kmrnctrlsta = ((offset << E1000_KMRNCTRLSTA_OFFSET_SHIFT) &
 	               E1000_KMRNCTRLSTA_OFFSET) | E1000_KMRNCTRLSTA_REN;
 	E1000_WRITE_REG(hw, E1000_KMRNCTRLSTA, kmrnctrlsta);
+	E1000_WRITE_FLUSH(hw);
 
 	usec_delay(2);
 
@@ -635,6 +669,7 @@ static s32 __e1000_write_kmrn_reg(struct e1000_hw *hw, u32 offset, u16 data,
 	kmrnctrlsta = ((offset << E1000_KMRNCTRLSTA_OFFSET_SHIFT) &
 	               E1000_KMRNCTRLSTA_OFFSET) | data;
 	E1000_WRITE_REG(hw, E1000_KMRNCTRLSTA, kmrnctrlsta);
+	E1000_WRITE_FLUSH(hw);
 
 	usec_delay(2);
 
@@ -2438,7 +2473,7 @@ s32 e1000_determine_phy_address(struct e1000_hw *hw)
 			 * If phy_type is valid, break - we found our
 			 * PHY address
 			 */
-			if (phy_type  != e1000_phy_unknown) {
+			if (phy_type != e1000_phy_unknown) {
 				ret_val = E1000_SUCCESS;
 				goto out;
 			}

@@ -337,7 +337,7 @@ Jumbo Frames support is enabled by changing the MTU to a value larger than the d
 ifconfig ethx mtu 9000 up
 .LP
 .B NOTE: 
-Jumbo Frames are supported at 1000 Mbps only.  Using Jumbo Frames at 10 or 100 Mbps may result in poor performance or loss of link.
+Using Jumbo frames at 10 or 100 Mbps is not supported and may result in poor performance or loss of link.
 .LP
 Some Intel gigabit adapters that support Jumbo Frames have a frame size limit of 9238 bytes, with a corresponding MTU size limit of 9216 bytes.  Adapters with this limitation are based on the Intel(R) 82571EB, 82573L and 80003ES2LAN controller.
 .LP
@@ -346,13 +346,13 @@ Adapters based on the Intel(R) 82542 and 82573V/E controllers do not support Jum
 See the section "Jumbo Frames" in Readme.
 
 
-.SH Ethtool
+.SH ethtool
 .LP
-The driver utilizes the ethtool interface for driver configuration and diagnostics, as well as displaying statistical information.  Ethtool version 1.8.1 or later is required for this functionality.
+The driver utilizes the ethtool interface for driver configuration and diagnostics, as well as displaying statistical information.  ethtool version 1.8.1 or later is required for this functionality.
 .LP
-The latest release of ethtool can be found from http://sf.net/projects/gkernel.  The driver then must be recompiled in order to take advantage of the latest ethtool features.
+The latest release of ethtool can be found from http://ftp.kernel.org/pub/software/network/ethtool/.  The driver then must be recompiled in order to take advantage of the latest ethtool features.
 .LP
-Ethtool 1.6 only supports a limited set of ethtool options.  Support for a more complete ethtool feature set can be enabled by upgrading ethtool to ethtool-1.8.1.  
+ethtool 1.6 only supports a limited set of ethtool options.  Support for a more complete ethtool feature set can be enabled by upgrading ethtool to ethtool-1.8.1.  
 
 .SH NAPI
 .LP

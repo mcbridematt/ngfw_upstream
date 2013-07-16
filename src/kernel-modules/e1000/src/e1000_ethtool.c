@@ -928,6 +928,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 
 	/* Disable all the interrupts */
 	E1000_WRITE_REG(&adapter->hw, E1000_IMC, 0xFFFFFFFF);
+	E1000_WRITE_FLUSH(&adapter->hw);
 	msleep(10);
 
 	/* Test each interrupt */
@@ -946,6 +947,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 			adapter->test_icr = 0;
 			E1000_WRITE_REG(&adapter->hw, E1000_IMC, mask);
 			E1000_WRITE_REG(&adapter->hw, E1000_ICS, mask);
+			E1000_WRITE_FLUSH(&adapter->hw);
 			msleep(10);
 
 			if (adapter->test_icr & mask) {
@@ -963,6 +965,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		adapter->test_icr = 0;
 		E1000_WRITE_REG(&adapter->hw, E1000_IMS, mask);
 		E1000_WRITE_REG(&adapter->hw, E1000_ICS, mask);
+		E1000_WRITE_FLUSH(&adapter->hw);
 		msleep(10);
 
 		if (!(adapter->test_icr & mask)) {
@@ -982,6 +985,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 			                ~mask & 0x00007FFF);
 			E1000_WRITE_REG(&adapter->hw, E1000_ICS,
 			                ~mask & 0x00007FFF);
+			E1000_WRITE_FLUSH(&adapter->hw);
 			msleep(10);
 
 			if (adapter->test_icr) {
@@ -993,6 +997,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 
 	/* Disable all the interrupts */
 	E1000_WRITE_REG(&adapter->hw, E1000_IMC, 0xFFFFFFFF);
+	E1000_WRITE_FLUSH(&adapter->hw);
 	msleep(10);
 
 	/* Unhook test interrupt handler */
@@ -1494,6 +1499,7 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 			if (unlikely(++k == tx_ring->count)) k = 0;
 		}
 		E1000_WRITE_REG(&adapter->hw, E1000_TDT(0), k);
+		E1000_WRITE_FLUSH(&adapter->hw);
 		msleep(200);
 		time = jiffies; /* set the start time for the receive */
 		good_cnt = 0;
@@ -1790,7 +1796,34 @@ static int e1000_set_wol(struct net_device *netdev,
 
 	return 0;
 }
+#ifdef HAVE_ETHTOOL_SET_PHYS_ID
+static int e1000_set_phys_id(struct net_device *netdev,
+			     enum ethtool_phys_id_state state)
+{
+	struct e1000_adapter *adapter = netdev_priv(netdev);
+	struct e1000_hw *hw = &adapter->hw;
 
+	switch (state) {
+	case ETHTOOL_ID_ACTIVE:
+		e1000_setup_led(hw);
+		return 2;
+
+	case ETHTOOL_ID_ON:
+		e1000_led_on(hw);
+		break;
+
+	case ETHTOOL_ID_OFF:
+		e1000_led_off(hw);
+		break;
+
+	case ETHTOOL_ID_INACTIVE:
+		e1000_cleanup_led(hw);
+	}
+
+	return 0;
+}
+
+#else
 /* toggle LED 4 times per second = 2 "blinks" per second */
 #define E1000_ID_INTERVAL	(HZ/4)
 
@@ -1832,6 +1865,7 @@ static int e1000_phys_id(struct net_device *netdev, u32 data)
 
 	return 0;
 }
+#endif /* HAVE_ETHTOOL_SET_PHYS_ID */
 
 static int e1000_get_coalesce(struct net_device *netdev,
 			      struct ethtool_coalesce *ec)
@@ -1985,7 +2019,11 @@ static struct ethtool_ops e1000_ethtool_ops = {
 #endif
 	.self_test              = e1000_diag_test,
 	.get_strings            = e1000_get_strings,
+#ifdef HAVE_ETHTOOL_SET_PHYS_ID
+	.set_phys_id		= e1000_set_phys_id,
+#else
 	.phys_id                = e1000_phys_id,
+#endif
 	.get_ethtool_stats      = e1000_get_ethtool_stats,
 #ifdef HAVE_ETHTOOL_GET_PERM_ADDR
 	.get_perm_addr          = ethtool_op_get_perm_addr,

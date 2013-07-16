@@ -65,7 +65,7 @@ static char e1000_driver_string[] = "Intel(R) PRO/1000 Network Driver";
 
 #define DRV_HW_PERF
 
-#define DRV_VERSION "8.0.30" DRV_NAPI DRV_DEBUG DRV_HW_PERF
+#define DRV_VERSION "8.0.35" DRV_NAPI DRV_DEBUG DRV_HW_PERF
 const char e1000_driver_version[] = DRV_VERSION;
 static const char e1000_copyright[] = "Copyright (c) 1999-2010 Intel Corporation.";
 
@@ -230,7 +230,7 @@ MODULE_PARM_DESC(copybreak,
 	"Maximum size of packet that is copied to a new buffer on receive");
 
 static int ignore_64bit_dma = 0;
-module_param(ignore_64bit_dma, int, 0644);
+module_param(ignore_64bit_dma, int, 0444);
 MODULE_PARM_DESC(ignore_64bit_dma, "Ignore 64-bit DMA (DAC) capability");
 
 #ifdef HAVE_PCI_ERS
@@ -2972,9 +2972,10 @@ static int e1000_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
 	 * Pad all 16 byte packets with an additional byte to work-around this
 	 * problem case.
 	 */
-	if (unlikely(skb->len == 16)) {
-	       skb_pad(skb,1);
-	       skb_put(skb,1);
+	if (skb->len < 17) {
+		if (skb_padto(skb, 17))
+			return NETDEV_TX_OK;
+		skb->len = 17;
 	}
 
 
@@ -3435,8 +3436,16 @@ static irqreturn_t e1000_intr(int irq, void *data)
 	struct e1000_hw *hw = &adapter->hw;
 	u32 icr = E1000_READ_REG(hw, E1000_ICR);
 
-	if (unlikely((!icr) || test_bit(__E1000_DOWN, &adapter->state)))
+	if (unlikely((!icr)))
 		return IRQ_NONE;  /* Not our interrupt */
+
+	/*
+	 * we might have caused the interrupt, but the above
+	 * read cleared it, and just in case the driver is
+	 * down there is nothing to do so return handled
+	 */
+	if (unlikely(test_bit(__E1000_DOWN, &adapter->state)))
+		return IRQ_HANDLED;
 
 	if (unlikely(icr & (E1000_ICR_RXSEQ | E1000_ICR_LSC))) {
 		hw->mac.get_link_status = 1;
@@ -3557,6 +3566,10 @@ static bool e1000_clean_tx_irq(struct e1000_adapter *adapter,
 	eop_desc = E1000_TX_DESC(*tx_ring, eop);
 
 	while (eop_desc->upper.data & cpu_to_le32(E1000_TXD_STAT_DD)) {
+		/* Value of eop could change between read and DD check */
+		if (unlikely(eop != tx_ring->buffer_info[i].next_to_watch))
+			goto cont_loop;
+
 		for (cleaned = false; !cleaned; ) {
 			tx_desc = E1000_TX_DESC(*tx_ring, i);
 			buffer_info = &tx_ring->buffer_info[i];
@@ -3582,6 +3595,7 @@ static bool e1000_clean_tx_irq(struct e1000_adapter *adapter,
 			E1000_TX_DESC_INC(tx_ring,i);
 		}
 
+cont_loop:
 		eop = tx_ring->buffer_info[i].next_to_watch;
 		eop_desc = E1000_TX_DESC(*tx_ring, eop);
 #ifdef CONFIG_E1000_NAPI
@@ -4572,9 +4586,13 @@ static void e1000_vlan_rx_add_vid(struct net_device *netdev, u16 vid)
 	/* Copy feature flags from netdev to the vlan netdev for this vid.
 	 * This allows things like TSO to bubble down to our vlan device.
 	 */
-	v_netdev = vlan_group_get_device(adapter->vlgrp, vid);
-	v_netdev->features |= adapter->netdev->features;
-	vlan_group_set_device(adapter->vlgrp, vid, v_netdev);
+	if (adapter->vlgrp) {
+		v_netdev = vlan_group_get_device(adapter->vlgrp, vid);
+		if (v_netdev) {
+			v_netdev->features |= adapter->netdev->features;
+			vlan_group_set_device(adapter->vlgrp, vid, v_netdev);
+		}
+	}
 #endif
 }
 

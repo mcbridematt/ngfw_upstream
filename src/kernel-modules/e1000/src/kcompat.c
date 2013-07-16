@@ -380,28 +380,6 @@ int _kc_snprintf(char * buf, size_t size, const char *fmt, ...)
 #endif /* < 2.4.8 */
 
 /*****************************************************************************/
-#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,4,21) )
-struct sk_buff *
-_kc_skb_pad(struct sk_buff *skb, int pad)
-{
-        struct sk_buff *nskb;
-        
-        /* If the skbuff is non linear tailroom is always zero.. */
-        if(skb_tailroom(skb) >= pad)
-        {
-                memset(skb->data+skb->len, 0, pad);
-                return skb;
-        }
-        
-        nskb = skb_copy_expand(skb, skb_headroom(skb), skb_tailroom(skb) + pad, GFP_ATOMIC);
-        kfree_skb(skb);
-        if(nskb)
-                memset(nskb->data+nskb->len, 0, pad);
-        return nskb;
-} 
-#endif /* < 2.4.21 */
-
-/*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,4,13) )
 
 /**************************************/
@@ -635,6 +613,24 @@ DECLARE_BITMAP(_kcompat_node_online_map, MAX_NUMNODES) = {1};
 #endif /* < 2.6.10 */
 
 /*****************************************************************************/
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,13) )
+char *_kc_kstrdup(const char *s, unsigned int gfp)
+{
+	size_t len;
+	char *buf;
+
+	if (!s)
+		return NULL;
+
+	len = strlen(s) + 1;
+	buf = kmalloc(len, gfp);
+	if (buf)
+		memcpy(buf, s, len);
+	return buf;
+}
+#endif /* < 2.6.13 */
+
+/*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,14) )
 void *_kc_kzalloc(size_t size, int flags)
 {
@@ -647,6 +643,37 @@ void *_kc_kzalloc(size_t size, int flags)
 
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,19) )
+int _kc_skb_pad(struct sk_buff *skb, int pad)
+{
+	int ntail;
+        
+        /* If the skbuff is non linear tailroom is always zero.. */
+        if(!skb_cloned(skb) && skb_tailroom(skb) >= pad) {
+		memset(skb->data+skb->len, 0, pad);
+		return 0;
+        }
+        
+	ntail = skb->data_len + pad - (skb->end - skb->tail);
+	if (likely(skb_cloned(skb) || ntail > 0)) {
+		if (pskb_expand_head(skb, 0, ntail, GFP_ATOMIC));
+			goto free_skb;
+	}
+
+#ifdef MAX_SKB_FRAGS
+	if (skb_is_nonlinear(skb) &&
+	    !__pskb_pull_tail(skb, skb->data_len))
+		goto free_skb;
+
+#endif
+	memset(skb->data + skb->len, 0, pad);
+        return 0;
+
+free_skb:
+	kfree_skb(skb);
+	return -ENOMEM;
+} 
+
+#if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(5,4)))
 int _kc_pci_save_state(struct pci_dev *pdev)
 {
 	struct net_device *netdev = pci_get_drvdata(pdev);
@@ -706,6 +733,7 @@ void _kc_pci_restore_state(struct pci_dev *pdev)
 #endif
 	}
 }
+#endif /* !(RHEL_RELEASE_CODE >= RHEL 5.4) */
 
 #ifdef HAVE_PCI_ERS
 void _kc_free_netdev(struct net_device *netdev)
@@ -737,7 +765,7 @@ void *_kc_kmemdup(const void *src, size_t len, unsigned gfp)
 		memcpy(p, src, len);
 	return p;
 }
-#endif /* <= 2.6.18 */
+#endif /* <= 2.6.19 */
 
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) )
@@ -975,4 +1003,27 @@ out:
 
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,36) )
+static const u32 _kc_flags_dup_features =
+	(ETH_FLAG_LRO | ETH_FLAG_NTUPLE | ETH_FLAG_RXHASH);
+
+u32 _kc_ethtool_op_get_flags(struct net_device *dev)
+{
+	return dev->features & _kc_flags_dup_features;
+}
+
+int _kc_ethtool_op_set_flags(struct net_device *dev, u32 data, u32 supported)
+{
+	if (data & ~supported)
+		return -EINVAL;
+
+	dev->features = ((dev->features & ~_kc_flags_dup_features) |
+			 (data & _kc_flags_dup_features));
+	return 0;
+}
 #endif /* < 2.6.36 */
+
+/******************************************************************************/
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,39) )
+#if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(6,1)))
+#endif /* !(RHEL_RELEASE_CODE > RHEL_RELEASE_VERSION(6,0)) */
+#endif /* < 2.6.39 */

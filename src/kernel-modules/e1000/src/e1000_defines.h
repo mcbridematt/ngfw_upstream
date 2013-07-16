@@ -114,6 +114,8 @@
 #define E1000_CTRL_EXT_RO_DIS    0x00020000 /* Relaxed Ordering disable */
 #define E1000_CTRL_EXT_DMA_DYN_CLK_EN 0x00080000 /* DMA Dynamic Clock Gating */
 #define E1000_CTRL_EXT_LINK_MODE_MASK 0x00C00000
+#define E1000_CTRL_EXT_LINK_MODE_OFFSET 22  /* Offset of the link mode field
+                                             * in Ctrl Ext register */
 #define E1000_CTRL_EXT_LINK_MODE_GMII 0x00000000
 #define E1000_CTRL_EXT_LINK_MODE_TBI  0x00C00000
 #define E1000_CTRL_EXT_LINK_MODE_KMRN    0x00000000
@@ -147,6 +149,8 @@
 #define E1000_I2CCMD_READY            0x20000000
 #define E1000_I2CCMD_INTERRUPT_ENA    0x40000000
 #define E1000_I2CCMD_ERROR            0x80000000
+#define E1000_I2CCMD_SFP_DATA_ADDR(a) (0x0000 + (a))
+#define E1000_I2CCMD_SFP_DIAG_ADDR(a) (0x0100 + (a))
 #define E1000_MAX_SGMII_PHY_REG_ADDR  255
 #define E1000_I2CCMD_PHY_TIMEOUT      200
 
@@ -177,6 +181,7 @@
 #define E1000_RXD_SPC_CFI_MASK  0x1000  /* CFI is bit 12 */
 #define E1000_RXD_SPC_CFI_SHIFT 12
 
+#define E1000_RXDEXT_STATERR_LB    0x00040000
 #define E1000_RXDEXT_STATERR_CE    0x01000000
 #define E1000_RXDEXT_STATERR_SE    0x02000000
 #define E1000_RXDEXT_STATERR_SEQ   0x04000000
@@ -670,6 +675,8 @@
 #define E1000_PBA_48K 0x0030    /* 48KB */
 #define E1000_PBA_64K 0x0040    /* 64KB */
 
+#define E1000_PBA_RXA_MASK  0xFFFF;
+
 #define E1000_PBS_16K E1000_PBA_16K
 #define E1000_PBS_24K E1000_PBA_24K
 
@@ -722,6 +729,10 @@
                                             * an interrupt */
 #define E1000_ICR_DOUTSYNC      0x10000000 /* NIC DMA out of sync */
 #define E1000_ICR_EPRST         0x00100000 /* ME hardware reset occurs */
+
+
+#define E1000_ITR_MASK          0x000FFFFF /* ITR value bitfield */
+#define E1000_ITR_MULT          256        /* ITR mulitplier in nsec */
 
 
 /*
@@ -919,6 +930,38 @@
 #define E1000_RXCW_SYNCH      0x40000000        /* Receive config synch */
 #define E1000_RXCW_ANC        0x80000000        /* Auto-neg complete */
 
+#define E1000_TSYNCTXCTL_VALID    0x00000001 /* Tx timestamp valid */
+#define E1000_TSYNCTXCTL_ENABLED  0x00000010 /* enable Tx timestamping */
+
+#define E1000_TSYNCRXCTL_VALID      0x00000001 /* Rx timestamp valid */
+#define E1000_TSYNCRXCTL_TYPE_MASK  0x0000000E /* Rx type mask */
+#define E1000_TSYNCRXCTL_TYPE_L2_V2       0x00
+#define E1000_TSYNCRXCTL_TYPE_L4_V1       0x02
+#define E1000_TSYNCRXCTL_TYPE_L2_L4_V2    0x04
+#define E1000_TSYNCRXCTL_TYPE_ALL         0x08
+#define E1000_TSYNCRXCTL_TYPE_EVENT_V2    0x0A
+#define E1000_TSYNCRXCTL_ENABLED    0x00000010 /* enable Rx timestamping */
+
+#define E1000_TSYNCRXCFG_PTP_V1_CTRLT_MASK   0x000000FF
+#define E1000_TSYNCRXCFG_PTP_V1_SYNC_MESSAGE       0x00
+#define E1000_TSYNCRXCFG_PTP_V1_DELAY_REQ_MESSAGE  0x01
+#define E1000_TSYNCRXCFG_PTP_V1_FOLLOWUP_MESSAGE   0x02
+#define E1000_TSYNCRXCFG_PTP_V1_DELAY_RESP_MESSAGE 0x03
+#define E1000_TSYNCRXCFG_PTP_V1_MANAGEMENT_MESSAGE 0x04
+
+#define E1000_TSYNCRXCFG_PTP_V2_MSGID_MASK               0x00000F00
+#define E1000_TSYNCRXCFG_PTP_V2_SYNC_MESSAGE                 0x0000
+#define E1000_TSYNCRXCFG_PTP_V2_DELAY_REQ_MESSAGE            0x0100
+#define E1000_TSYNCRXCFG_PTP_V2_PATH_DELAY_REQ_MESSAGE       0x0200
+#define E1000_TSYNCRXCFG_PTP_V2_PATH_DELAY_RESP_MESSAGE      0x0300
+#define E1000_TSYNCRXCFG_PTP_V2_FOLLOWUP_MESSAGE             0x0800
+#define E1000_TSYNCRXCFG_PTP_V2_DELAY_RESP_MESSAGE           0x0900
+#define E1000_TSYNCRXCFG_PTP_V2_PATH_DELAY_FOLLOWUP_MESSAGE  0x0A00
+#define E1000_TSYNCRXCFG_PTP_V2_ANNOUNCE_MESSAGE             0x0B00
+#define E1000_TSYNCRXCFG_PTP_V2_SIGNALLING_MESSAGE           0x0C00
+#define E1000_TSYNCRXCFG_PTP_V2_MANAGEMENT_MESSAGE           0x0D00
+
+#define E1000_TIMINCA_16NS_SHIFT 24
 
 /* PCI Express Control */
 #define E1000_GCR_RXD_NO_SNOOP          0x00000001
@@ -1061,6 +1104,10 @@
 #define E1000_EECD_GNT       0x00000080 /* NVM Access Grant */
 #define E1000_EECD_PRES      0x00000100 /* NVM Present */
 #define E1000_EECD_SIZE      0x00000200 /* NVM Size (0=64 word 1=256 word) */
+#define E1000_EECD_BLOCKED   0x00008000 /* Bit banging access blocked flag */
+#define E1000_EECD_ABORT     0x00010000 /* NVM operation aborted flag */
+#define E1000_EECD_TIMEOUT   0x00020000 /* NVM read operation timeout flag */
+#define E1000_EECD_ERROR_CLR 0x00040000 /* NVM error status clear bit */
 /* NVM Addressing bits based on type 0=small, 1=large */
 #define E1000_EECD_ADDR_BITS 0x00000400
 #define E1000_EECD_TYPE      0x00002000 /* NVM Type (1-SPI, 0-Microwire) */
@@ -1324,9 +1371,17 @@
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_1X    0x0100
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_2X    0x0200
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_3X    0x0300
-#define M88E1000_EPSCR_TX_CLK_2_5     0x0060 /* 2.5 MHz TX_CLK */
-#define M88E1000_EPSCR_TX_CLK_25      0x0070 /* 25  MHz TX_CLK */
-#define M88E1000_EPSCR_TX_CLK_0       0x0000 /* NO  TX_CLK */
+#define M88E1000_EPSCR_TX_CLK_2_5       0x0060 /* 2.5 MHz TX_CLK */
+#define M88E1000_EPSCR_TX_CLK_25        0x0070 /* 25  MHz TX_CLK */
+#define M88E1000_EPSCR_TX_CLK_0         0x0000 /* NO  TX_CLK */
+
+/* M88E1111 Specific Registers */
+#define M88E1111_PHY_PAGE_SELECT1       0x16  /* for registers 0-28 */
+#define M88E1111_PHY_PAGE_SELECT2       0x1D  /* for registers 30-31 */
+
+/* M88E1111 page select register mask */
+#define M88E1111_PHY_PAGE_SELECT_MASK1  0xFF
+#define M88E1111_PHY_PAGE_SELECT_MASK2  0x3F
 
 
 /* M88EC018 Rev 2 specific DownShift settings */
@@ -1431,8 +1486,6 @@
 #define E1000_GEN_CTL_READY             0x80000000
 #define E1000_GEN_CTL_ADDRESS_SHIFT     8
 #define E1000_GEN_POLL_TIMEOUT          640
-
-
 
 
 #endif /* _E1000_DEFINES_H_ */

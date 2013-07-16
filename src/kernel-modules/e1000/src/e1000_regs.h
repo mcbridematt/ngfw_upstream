@@ -270,6 +270,8 @@
 #define E1000_RA       0x05400  /* Receive Address - RW Array */
 #define E1000_VFTA     0x05600  /* VLAN Filter Table Array - RW Array */
 #define E1000_VT_CTL   0x0581C  /* VMDq Control - RW */
+#define E1000_CIAA     0x05B88  /* Config Indirect Access Address - RW */
+#define E1000_CIAD     0x05B8C  /* Config Indirect Access Data - RW */
 #define E1000_VFQA0    0x0B000  /* VLAN Filter Queue Array 0 - RW Array */
 #define E1000_VFQA1    0x0B200  /* VLAN Filter Queue Array 1 - RW Array */
 #define E1000_WUC      0x05800  /* Wakeup Control - RW */
@@ -331,6 +333,18 @@
 #define E1000_RSSRK(_i) (0x05C80 + ((_i) * 4)) /* RSS Random Key - RW */
 #define E1000_RSSIM     0x05864 /* RSS Interrupt Mask */
 #define E1000_RSSIR     0x05868 /* RSS Interrupt Request */
+#define E1000_TSYNCRXCTL 0x0B620 /* Rx Time Sync Control register - RW */
+#define E1000_TSYNCTXCTL 0x0B614 /* Tx Time Sync Control register - RW */
+#define E1000_TSYNCRXCFG 0x05F50 /* Time Sync Rx Configuration - RW */
+#define E1000_RXSTMPL    0x0B624 /* Rx timestamp Low - RO */
+#define E1000_RXSTMPH    0x0B628 /* Rx timestamp High - RO */
+#define E1000_RXSATRL    0x0B62C /* Rx timestamp attribute low - RO */
+#define E1000_RXSATRH    0x0B630 /* Rx timestamp attribute high - RO */
+#define E1000_TXSTMPL    0x0B618 /* Tx timestamp value Low - RO */
+#define E1000_TXSTMPH    0x0B61C /* Tx timestamp value High - RO */
+#define E1000_SYSTIML    0x0B600 /* System time register Low - RO */
+#define E1000_SYSTIMH    0x0B604 /* System time register High - RO */
+#define E1000_TIMINCA    0x0B608 /* Increment attributes register - RW */
 
 
 

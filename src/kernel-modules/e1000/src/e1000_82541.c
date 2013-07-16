@@ -313,6 +313,7 @@ static s32 e1000_reset_hw_82541(struct e1000_hw *hw)
 	/* Must reset the Phy before resetting the MAC */
 	if ((hw->mac.type == e1000_82541) || (hw->mac.type == e1000_82547)) {
 		E1000_WRITE_REG(hw, E1000_CTRL, (ctrl | E1000_CTRL_PHY_RST));
+		E1000_WRITE_FLUSH(hw);
 		msec_delay(5);
 	}
 
@@ -381,7 +382,7 @@ static s32 e1000_init_hw_82541(struct e1000_hw *hw)
 		DEBUGOUT("Error initializing identification LED\n");
 		/* This is not fatal and we should not stop init due to this */
 	}
-        
+
 	/* Storing the Speed Power Down  value for later use */
 	ret_val = hw->phy.ops.read_reg(hw,
 	                               IGP01E1000_GMII_FIFO,
