@@ -1,35 +1,60 @@
 #!/usr/bin/make
 #
 # Makefile for building Linux Broadcom Gigabit ethernet driver as a module.
+# Copyright (c) 2007-2012 Broadcom Corporation
 #
+
+# Uncomment the following line if you want EEE support completely removed.
+#TG3_EXTRA_DEFS += TG3_NO_EEE
 
 KVER=
 ifeq ($(KVER),)
 	KVER=$(shell uname -r)
 endif
 
+BCMPROC=
+ifeq ($(BCMPROC),)
+	BCMPROC=$(shell uname -m)
+endif
+
 BCMCFGDIR=
 BCMSRCDIR=
 
 ifeq ($(BCMCFGDIR),)
-	ifeq ($(shell ls /lib/modules/$(KVER)/build > /dev/null 2>&1 && echo build),)
-		ifneq ($(shell ls /usr/src/linux > /dev/null 2>&1 && echo linux),)
-			BCMCFGDIR=/usr/src/linux
-		endif
+	BCMCFGS := /lib/modules/$(KVER)/build \
+	           /usr/src/kernels/$(KVER)-$(BCMPROC) \
+	           /usr/src/linux-$(shell echo $(KVER) | sed "s|\(.*\)-\([a-z]*\)|\1-obj/$(shell uname -i)/\2|") \
+	           /usr/src/linux
+
+	# Delete any entries that do not exist.
+	BCMTSTDIR = $(shell if ls $(DIR) > /dev/null 2>&1; then echo $(DIR); fi)
+	BCMCFGS := $(foreach DIR, $(BCMCFGS), $(BCMTSTDIR))
+
+	ifeq ($(BCMCFGS),)
+		$(error Linux kernel config directory not found)
 	else
-		BCMCFGDIR=/lib/modules/$(KVER)/build
-		ifneq ($(shell ls /lib/modules/$(KVER)/source > /dev/null 2>&1 && echo source),)
-			BCMSRCDIR=/lib/modules/$(KVER)/source
-		endif
+		BCMCFGDIR := $(firstword $(BCMCFGS))
 	endif
 endif
 
 ifeq ($(BCMSRCDIR),)
-	BCMSRCDIR=$(BCMCFGDIR)
-endif
+	BCMSRCS := /lib/modules/$(KVER)/source \
+	           /lib/modules/$(KVER)/build  \
+	           /usr/src/kernels/$(KVER)-$(BCMPROC) \
+	           /usr/src/linux-$(shell echo $(KVER) | sed "s|\(.*\)-[a-z]*|\1|") \
+	           /usr/src/linux
 
-ifeq ($(BCMCFGDIR),)
-	$(error Linux kernel config directory not found)
+	# Delete any entries that do not exist.
+	BCMTSTDIR = $(shell if ls $(DIR)/include/linux > /dev/null 2>&1; then \
+	                        echo $(DIR); \
+	                    fi)
+	BCMSRCS := $(foreach DIR, $(BCMSRCS), $(BCMTSTDIR))
+
+	ifeq ($(BCMSRCS),)
+		$(error Linux kernel source directory not found)
+	else
+		BCMSRCDIR := $(firstword $(BCMSRCS))
+	endif
 endif
 
 # PREFIX may be set by the RPM build to set the effective root.
@@ -51,16 +76,10 @@ ifeq ($(BCMMODDIR),)
 	endif
 endif
 
-ifeq ($(shell [ -e /etc/SuSE-release ] && echo 1),1)
-	SUSEVERS = $(shell grep VERSION /etc/SuSE-release | sed -e 's/.*= //')
-else
-	SUSEVERS = 0
-endif
-
 # check if 2.4 kernel or 2.5+ kernel
-BCM_KVER := $(shell echo $(KVER) | cut -c1-3 | sed 's/2\.[56]/2\.6/')
+BCM_KVER := $(shell echo $(KVER) | cut -c1-3 | sed -e 's/2\.[56]/3\.0/' | cut -c1)
 
-ifeq ($(BCM_KVER), 2.6)
+ifeq ($(BCM_KVER), 3)
 # Makefile for 2.5+ kernel
 
 BCM_DRV = tg3.ko
@@ -71,12 +90,12 @@ obj-m += tg3.o
 
 else
 
-default: tg3_flags.h supported_file
+default: tg3_flags.h
 	make -C $(BCMCFGDIR) SUBDIRS=$(shell pwd) modules
 
 endif
 
-else # ifeq ($(BCM_KVER),2.6)
+else # ifeq ($(BCM_KVER),3)
 # Makefile for 2.4 kernel
 
 BCM_DRV = tg3.o
@@ -109,18 +128,18 @@ endif
 
 CFLAGS += -O2
 
-all: tg3_flags.h supported_file tg3.o
+all: tg3_flags.h tg3.o
 
 endif # ifeq ($(BCM_KVER),2.6)
 
 tg3_flags.h:
-	sh makeflags.sh $(BCMSRCDIR) > tg3_flags.h
+	sh makeflags.sh $(BCMSRCDIR) $(TG3_EXTRA_DEFS) > tg3_flags.h
 
 tg3.4.gz:
 	gzip -c tg3.4 > tg3.4.gz
 
 
-ifeq ($(BCM_KVER), 2.6)
+ifeq ($(BCM_KVER), 3)
 install: default tg3.4.gz
 else
 install: $(BCM_DRV) tg3.4.gz
@@ -132,14 +151,12 @@ endif
 	fi
 	install -m 444 tg3.4.gz $(PREFIX)/usr/share/man/man4;\
 
-.PHONEY: all supported_file clean install
-
-supported_file:
-	@if [ $(SUSEVERS) -ge 11 ]; then \
-		echo "tg3.ko external" > Module.supported; \
-	fi
+.PHONEY: all clean install
 
 clean:
-	-rm -f tg3.o tg3.ko tg3.mod.c tg3.mod.o tg3.4.gz tg3_flags.h .tg3* Module.symvers modules.order
-	-rm -rf .tmp_versions Module.supported Module.markers
+	-rm -f tg3.o tg3.mod.c tg3.mod.o .tg3*
+	-rm -f tg3.ko tg3.ko.unsigned
+	-rm -f tg3.4.gz tg3_flags.h
+	-rm -f Module.symvers Modules.symvers modules.order
+	-rm -rf .tmp_versions Module.markers
 

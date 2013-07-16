@@ -1,11 +1,11 @@
-.\" Copyright (c) 2006-2010 Broadcom Corporation
+.\" Copyright (c) 2006-2013 Broadcom Corporation
 .\" This is free documentation; you can redistribute it and/or
 .\" modify it under the terms of the GNU General Public License as
 .\" published by the Free Software Foundation.
 .\"
 .\" tg3.4,v 1.1 
 .\"
-.TH TG3 4 "08/04/06" "Broadcom Corporation"
+.TH TG3 4 "07/19/12" "Broadcom Corporation"
 .\"
 .\" NAME part
 .\"
@@ -28,9 +28,9 @@ tg3 \- Broadcom NetXtreme (Tigon3) series Gigabit Ethernet device driver
 is the network device driver for the Broadcom
 .B NetXtreme BCM57xx
 series PCI/PCI-X/PCI Express Gigabit Ethernet Network Interface Card (NIC).
-The latest driver is in the latest 2.6 Linux kernel. It can also be
+The latest driver is in the latest 3.x Linux kernel. It can also be
 downloaded from http://www.broadcom.com as a source package, but is
-generally not necessary to do so if you are using the latest 2.6
+generally not necessary to do so if you are using the latest 3.x
 upstream kernel from http://www.kernel.org or one of the latest
 vendor kernels from Red Hat, SuSE, or others.
 .PP
@@ -44,8 +44,9 @@ on how to configure network protocol and address.
 .\"
 .SH DRIVER SETTINGS
 Driver settings can be queried and changed using \fBethtool\fP. The latest
-ethtool can be downloaded from \fBhttp://sourceforge.net/projects/gkernel\fP
-if it is not already installed. 
+ethtool can be downloaded from
+\fBftp://ftp.kernel.org/pub/software/network/ethtool\fP if
+it is not already installed. 
 See the ethtool man page for more information. ethtool settings
 do not persist across reboot or module reload. The ethtool commands can be
 put in a startup script such as /etc/rc.local to preserve the settings
@@ -88,8 +89,19 @@ Tx Ring Size :
 511 (range (MAX_SKB_FRAGS+1) - 511)
 
 MAX_SKB_FRAGS varies on different kernels and
-different architectures. On a 2.6 kernel for
+different architectures. On a 2.6/3.x kernel for
 x86, MAX_SKB_FRAGS is 18.
+
+.TP
+Number of RSS channels:
+Varies depending on the number of CPUs on MSI-X
+capable devices.  (Range 1 - 4)
+
+.TP
+Number of TSS channels:
+Varies depending on the number of CPUs on MSI-X
+capable devices.  (Range 1 - 4)
+
 .TP
 Coalesce rx usecs :
 20 (range 0 - 1023)
@@ -122,15 +134,27 @@ Some coalescing parameters are not used or have
 different defaults on some chips
 
 .TP
-MSI :
+MSI/MSI-X :
 Enabled (if supported by the device and interrupt test passes)
 .TP
 TSO :
-Enabled on 2.6 kernels on newer devices
+Enabled on 2.6/3.x kernels on newer devices
 (Some devices do not support TSO)
 .TP
 WoL :
 Disabled
+.\"
+.\" SENSOR SUPPORT part
+.\"
+.SH SENSOR SUPPORT
+If your device and platform support sensors and you're running a
+kernel that supports CONFIG_HWMON, you can read the sensor data from:
+
+/sys/class/hwmon/hwmon#/device/
+
+Select the hwmon# device that matches the tg3 device.  Only
+\fBtemp1\fP sensor attributes are supported at this time.
+
 .\"
 .\" AUTHOR part
 .\"

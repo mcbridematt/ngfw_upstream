@@ -1,13 +1,13 @@
                            Installation Notes
-                        Broadcom tg3 Linux Driver
-                               Version 3.105h
-                                02/04/2009
+                         Broadcom tg3 Linux Driver
+                              Version 3.129c
+                                01/14/2013
 
                           Broadcom Corporation
                          5300 California Avenue
                         Irvine, California  92617
 
-  Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Broadcom Corporation
+               Copyright (c) 2004 - 2013 Broadcom Corporation
                            All rights reserved
 
 
@@ -17,10 +17,12 @@ Table of Contents
   Introduction
   Limitations
   Packaging
+  Driver Build Options
   Installing Source RPM Package
   Building Driver From TAR File
   Driver Settings
   Driver Defaults
+  Sensor Support
   Unloading and Removing Driver
   Driver Messages
   
@@ -30,14 +32,14 @@ Introduction
 
 This file describes the tg3 Linux driver for the Broadcom NetXtreme
 10/100/1000 Mbps PCI/PCI-X/PCI Express Ethernet Network Controllers.
-The latest driver is in the latest 2.6 Linux kernel. It can also be
+The latest driver is in the latest 3.x Linux kernel. It can also be
 downloaded from http://www.broadcom.com as a source package, but is
-generally not necessary to do so if you are using the latest 2.6
+generally not necessary to do so if you are using the latest 3.x
 upstream kernel from http://www.kernel.org or one of the latest
 vendor kernels from Red Hat, SuSE, or others.
 
 The tg3 driver from the Broadcom package is almost identical to the
-tg3 driver in the latest 2.6 upstream Linux kernel. It includes some
+tg3 driver in the latest 3.x upstream Linux kernel. It includes some
 additional kernel compatible code to allow it to compile on older 2.6
 and some 2.4 kernels. The version number is also similar but generally
 has a one letter suffix at the end, (e.g. 3.55b) to distinguish it from
@@ -51,7 +53,7 @@ Limitations
 ===========
 
 The current version of the driver has been tested on 2.4.x kernels starting
-from 2.4.24 and all 2.6.x kernels. The driver may not compile on kernels
+from 2.4.24 and all 2.6.x/3.x kernels. The driver may not compile on kernels
 older than 2.4.24. Testing is concentrated on i386 and x86_64 architectures.
 Only limited testing has been done on some other architectures such as
 powerpc and sparc64.
@@ -61,6 +63,17 @@ kernels.
 
 Forcing 1 Gigabit speed in a copper environment is not supported and may
 result in connection issues with certain switches.
+
+
+SLES 11 Considerations
+======================
+
+Starting with SLES 11, all modules not compiled by Novell will refuse to load
+through modprobe by default.  Externally compiled modules can be loaded if the
+"allow_unsupported_modules" flag is toggled in
+/etc/modprobe.d/unsupported-modules, however this will render your kernel and
+whole system unsupportable through Novell.  Please refer to the SLES 11 release
+notes for more details.
 
 
 Packaging
@@ -73,6 +86,14 @@ The driver package from http://www.broadcom.com is released in two packaging
 formats: source RPM and compressed tar formats. The file names for the two
 packages are tg3-<version>.src.rpm and tg3-<version>.tar.gz respectively.
 Identical source files to build the driver are included in both packages.
+
+
+Driver Build Options
+====================
+
+This version of the tg3 driver contains support for Energy Efficient Ethernet.
+The feature is on by default but can be disabled at compile time by adding
+"TG3_EXTRA_DEFS=TG3_NO_EEE" to the make command line.
 
 
 Installing Source RPM Package
@@ -122,7 +143,7 @@ The driver will be installed in the following path:
 
     /lib/modules/<kernel_version>/kernel/drivers/net/tg3.o
 
-2.6.x kernels:
+2.6.x/3.x kernels:
 
     /lib/modules/<kernel_version>/kernel/drivers/net/tg3.ko
 
@@ -130,7 +151,7 @@ The driver will be installed in the following path:
 
    insmod tg3.o
 or
-   insmod tg3.ko (on 2.6.x kernels)
+   insmod tg3.ko (on 2.6.x/3.x kernels)
 or
    modprobe tg3
 
@@ -166,7 +187,7 @@ kernel that is installed on the system.
 
    insmod tg3.o
 or
-   insmod tg3.ko (on 2.6.x kernels)
+   insmod tg3.ko (on 2.6.x/3.x kernels)
 or
    insmod tg3
 
@@ -183,14 +204,19 @@ documentations.
 Driver Settings
 ===============
 
-This and the rest of the sections below apply to both the in-kernel tg3
+This version of the tg3 driver supports one module parameter that is
+not available in the in-kernel driver.  The parameter is named tg3_disable_eee.
+To disable Energy Efficient Ethernet (EEE) support, set this module parameter
+to 1.
+
+The rest of the sections below apply to both the in-kernel tg3
 driver and the tg3 driver package from Broadcom.
 
 Driver settings can be queried and changed using ethtool. The latest ethtool
-can be downloaded from http://sourceforge.net/projects/gkernel if it is not
-already installed. The following are some common examples on how to use
-ethtool. See the ethtool man page for more information. ethtool settings do
-not persist across reboot or module reload. The ethtool commands can be put
+can be downloaded from ftp://ftp.kernel.org/pub/software/network/ethtool if
+it is not already installed. The following are some common examples on how to
+use ethtool. See the ethtool man page for more information. ethtool settings
+do not persist across reboot or module reload. The ethtool commands can be put
 in a startup script such as /etc/rc.local to preserve the settings across a
 reboot. On Red Hat distributions, "ethtool -s" parameters can be specified
 in the ifcfg-ethx scripts using the ETHTOOL_OPTS keyword. The specified
@@ -255,7 +281,27 @@ Example: Turn off TSO (TCP segmentation offload)
 
    Note that the interface (eth0) must be up to do all tests.
 
-9. See ethtool man page for more options.
+9. Show number of channels (rings):
+
+   ethtool -l eth0
+
+   Note that this is only supported on newer MSI-X capable devices (e.g.
+   57765, 57766, 5717, 5719, 5720) and available on 3.x kernels and 3.x
+   ethtool only.
+
+10. Set number of channels (rings):
+
+   ethtool -L eth0 rx N tx N
+
+   rx and tx channel numbers can be different.  0 means use default.  The
+   driver selects the best number of channels based on the number of CPU
+   cores.
+
+   Note that this is only supported on newer MSI-X capable devices (e.g.
+   57765, 57766, 5717, 5719, 5720) and available on 3.x kernels and 3.x
+   ethtool only.
+
+11. See ethtool man page for more options.
 
 
 Driver Defaults
@@ -283,8 +329,14 @@ Rx Jumbo Ring Size :        100 (range 0 - 255)
 Tx Ring Size :              511 (range (MAX_SKB_FRAGS+1) - 511)
 
                             MAX_SKB_FRAGS varies on different kernels and
-                            different architectures. On a 2.6 kernel for
+                            different architectures. On a 2.6/3.x kernel for
                             x86, MAX_SKB_FRAGS is 18.
+
+Number of RSS channels:    Varies depending on the number of CPUs on MSI-X
+                           capable devices.  (Range 1 - 4)
+
+Number of TSS channels:    Varies depending on the number of CPUs on MSI-X
+                           capable devices.  (Range 1 - 4)
 
 Coalesce rx usecs :          20 (range 0 - 1023)
 
@@ -307,13 +359,25 @@ Coalesce stats usecs   : 1000000 (aprox. 1 sec.)
                              Some coalescing parameters are not used or have
                              different defaults on some chips
 
-MSI :                      Enabled (if supported by the chip and passed
+MSI/MSI-X :                Enabled (if supported by the chip and passed
                                     the interrupt test)
 
 TSO :                      Enabled on newer chips that support TCP segmentation
                            offload in hardware
 
 WoL :                      Disabled
+
+
+Sensor Support
+==============
+
+If your device and platform support sensors and you're running a kernel
+that supports CONFIG_HWMON, you can read the sensor data from:
+
+/sys/class/hwmon/hwmon#/device/
+
+Select the hwmon# device that matches the tg3 device.  Only temp1 sensor
+attributes are supported at this time.
 
 
 Unloading and Removing Driver
@@ -324,7 +388,7 @@ by the driver, then do the following:
 
 rmmod tg3
 
-Note that on 2.6 kernels, it is not necessary to bring down the eth#
+Note that on 2.6/3.x kernels, it is not necessary to bring down the eth#
 interfaces before unloading the driver module.
 
 
@@ -350,7 +414,7 @@ all messages, set the level higher.
 Driver signon:
 -------------
 
-tg3.c:v3.105h (February 4, 2010)
+tg3.c:v3.123e (April 30, 2012)
 
 
 NIC detected:
