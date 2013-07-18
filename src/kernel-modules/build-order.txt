@@ -1,6 +1,6 @@
-niagara22xxed                                           lenny,squeeze
-e1000e                                                  lenny,squeeze
-e1000                                                   lenny,squeeze
-igb                                                     lenny,squeeze
-bnx2                                                    lenny,squeeze
-tg3                                                     lenny,squeeze
+niagara22xxed                                           squeeze
+e1000e                                                  squeeze
+e1000                                                   squeeze
+igb                                                     squeeze
+bnx2                                                    squeeze
+tg3                                                     squeeze
