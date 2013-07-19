@@ -44,7 +44,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs -p$(NAME) usr/sbin
-	cp util/$(UTIL) $(CURDIR)/debian/$(NAME)/usr/sbin
+	cp user_api/$(UTIL) $(CURDIR)/debian/$(NAME)/usr/sbin
 	dh_installdirs -p$(NAME)-source usr/src
 	cp $(NAME).tar.gz $(CURDIR)/debian/$(NAME)-source/usr/src
 	chmod 0644 $(CURDIR)/debian/$(NAME)-source/usr/src/$(NAME).tar.gz
