@@ -157,6 +157,7 @@ EXTRA_CFLAGS += -I$(KSRC)/include -I.
 EXTRA_CFLAGS += $(shell [ -f $(KSRC)/include/linux/modversions.h ] && \
             echo "-DMODVERSIONS -DEXPORT_SYMTAB \
                   -include $(KSRC)/include/linux/modversions.h")
+EXTRA_CFLAGS += -DDISABLE_PM
 
 EXTRA_CFLAGS += $(CFLAGS_EXTRA)
 
