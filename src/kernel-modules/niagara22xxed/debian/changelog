@@ -1,3 +1,9 @@
+niagara22xxed-source (0.5b1+untangle7-2) unstable; urgency=low
+
+  * And let's not forget to depend on some ancient, 2.4.x-style artefacts
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 05:39:48 -0700
+
 niagara22xxed-source (0.5b1+untangle6-1) unstable; urgency=low
 
   * Supporting the build against a different kernel version than the one
