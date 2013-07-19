@@ -1,3 +1,10 @@
+niagara22xxed-source (0.5b1+untangle6-1) unstable; urgency=low
+
+  * Supporting the build against a different kernel version than the one
+    currently running would have been too hard, eh ?
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 05:09:27 -0700
+
 niagara22xxed-source (0.5b1+untangle5-1) unstable; urgency=low
 
   * Include files
