@@ -1,3 +1,9 @@
+niagara22xxed-source (0.5b1+untangle4-1) unstable; urgency=low
+
+  * Put supported_cards.txt in the proper directory
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 04:38:25 -0700
+
 niagara22xxed-source (0.5b1+untangle3-2) unstable; urgency=low
 
   * Fix module path
