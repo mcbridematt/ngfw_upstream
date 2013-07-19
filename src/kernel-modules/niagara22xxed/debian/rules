@@ -37,7 +37,6 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	rm -rf $(NAME).tar.gz modules
-	make -C util clean
 	dh_clean
 
 install: build
