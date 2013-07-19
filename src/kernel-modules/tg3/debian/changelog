@@ -1,3 +1,9 @@
+tg3-source (3.129+untangle2-2) unstable; urgency=low
+
+  * JFC
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 06:22:40 -0700
+
 tg3-source (3.129+untangle2-1) unstable; urgency=low
 
   * And a missing build-dep

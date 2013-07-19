@@ -7,9 +7,8 @@
 # Uncomment the following line if you want EEE support completely removed.
 #TG3_EXTRA_DEFS += TG3_NO_EEE
 
-KVER=
-ifeq ($(KVER),)
-	KVER=$(shell uname -r)
+ifeq ($(KVERS),)
+	KVERS=$(shell uname -r)
 endif
 
 BCMPROC=
@@ -21,9 +20,9 @@ BCMCFGDIR=
 BCMSRCDIR=
 
 ifeq ($(BCMCFGDIR),)
-	BCMCFGS := /lib/modules/$(KVER)/build \
-	           /usr/src/kernels/$(KVER)-$(BCMPROC) \
-	           /usr/src/linux-$(shell echo $(KVER) | sed "s|\(.*\)-\([a-z]*\)|\1-obj/$(shell uname -i)/\2|") \
+	BCMCFGS := /lib/modules/$(KVERS)/build \
+	           /usr/src/kernels/$(KVERS)-$(BCMPROC) \
+	           /usr/src/linux-$(shell echo $(KVERS) | sed "s|\(.*\)-\([a-z]*\)|\1-obj/$(shell uname -i)/\2|") \
 	           /usr/src/linux
 
 	# Delete any entries that do not exist.
@@ -38,10 +37,10 @@ ifeq ($(BCMCFGDIR),)
 endif
 
 ifeq ($(BCMSRCDIR),)
-	BCMSRCS := /lib/modules/$(KVER)/source \
-	           /lib/modules/$(KVER)/build  \
-	           /usr/src/kernels/$(KVER)-$(BCMPROC) \
-	           /usr/src/linux-$(shell echo $(KVER) | sed "s|\(.*\)-[a-z]*|\1|") \
+	BCMSRCS := /lib/modules/$(KVERS)/source \
+	           /lib/modules/$(KVERS)/build  \
+	           /usr/src/kernels/$(KVERS)-$(BCMPROC) \
+	           /usr/src/linux-$(shell echo $(KVERS) | sed "s|\(.*\)-[a-z]*|\1|") \
 	           /usr/src/linux
 
 	# Delete any entries that do not exist.
@@ -61,25 +60,25 @@ endif
 PREFIX=
 
 ifeq ($(BCMMODDIR),)
-	ifeq ($(shell ls /lib/modules/$(KVER)/updates > /dev/null 2>&1 && echo 1),1)
-		BCMMODDIR=/lib/modules/$(KVER)/updates
+	ifeq ($(shell ls /lib/modules/$(KVERS)/updates > /dev/null 2>&1 && echo 1),1)
+		BCMMODDIR=/lib/modules/$(KVERS)/updates
 	else
 		ifeq ($(shell grep -q "search.*[[:space:]]updates" /etc/depmod.conf > /dev/null 2>&1 && echo 1),1)
-			BCMMODDIR=/lib/modules/$(KVER)/updates
+			BCMMODDIR=/lib/modules/$(KVERS)/updates
 		else
 			ifeq ($(shell grep -q "search.*[[:space:]]updates" /etc/depmod.d/* > /dev/null 2>&1 && echo 1),1)
-				BCMMODDIR=/lib/modules/$(KVER)/updates
+				BCMMODDIR=/lib/modules/$(KVERS)/updates
 			else
-				BCMMODDIR=/lib/modules/$(KVER)/kernel/drivers/net
+				BCMMODDIR=/lib/modules/$(KVERS)/kernel/drivers/net
 			endif
 		endif
 	endif
 endif
 
 # check if 2.4 kernel or 2.5+ kernel
-BCM_KVER := $(shell echo $(KVER) | cut -c1-3 | sed -e 's/2\.[56]/3\.0/' | cut -c1)
+BCM_KVERS := $(shell echo $(KVERS) | cut -c1-3 | sed -e 's/2\.[56]/3\.0/' | cut -c1)
 
-ifeq ($(BCM_KVER), 3)
+ifeq ($(BCM_KVERS), 3)
 # Makefile for 2.5+ kernel
 
 BCM_DRV = tg3.ko
@@ -95,7 +94,7 @@ default: tg3_flags.h
 
 endif
 
-else # ifeq ($(BCM_KVER),3)
+else # ifeq ($(BCM_KVERS),3)
 # Makefile for 2.4 kernel
 
 BCM_DRV = tg3.o
@@ -130,7 +129,7 @@ CFLAGS += -O2
 
 all: tg3_flags.h tg3.o
 
-endif # ifeq ($(BCM_KVER),2.6)
+endif # ifeq ($(BCM_KVERS),2.6)
 
 tg3_flags.h:
 	sh makeflags.sh $(BCMSRCDIR) $(TG3_EXTRA_DEFS) > tg3_flags.h
@@ -139,7 +138,7 @@ tg3.4.gz:
 	gzip -c tg3.4 > tg3.4.gz
 
 
-ifeq ($(BCM_KVER), 3)
+ifeq ($(BCM_KVERS), 3)
 install: default tg3.4.gz
 else
 install: $(BCM_DRV) tg3.4.gz
