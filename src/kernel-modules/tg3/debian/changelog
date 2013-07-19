@@ -1,3 +1,9 @@
+tg3-source (3.129+untangle1-1) unstable; urgency=low
+
+  * And let's not forget to depend on some ancient, 2.4.x-style artefacts
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 05:42:49 -0700
+
 tg3-source (3.129-2) unstable; urgency=low
 
   * Fix build error

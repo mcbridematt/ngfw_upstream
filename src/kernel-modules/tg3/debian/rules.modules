@@ -25,6 +25,8 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
+	ln -sf /usr/src/linux-headers-$(KVERS) /usr/src/linux
+
 	$(ROOT_CMD) $(MAKE) -C src
 
 	dh_installdirs lib/modules/$(KVERS)/extra
