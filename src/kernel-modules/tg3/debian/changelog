@@ -1,3 +1,9 @@
+tg3-source (3.129-2) unstable; urgency=low
+
+  * Fix build error
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 03:43:57 -0700
+
 tg3-source (3.129-1) unstable; urgency=low
 
   * New upstream version
