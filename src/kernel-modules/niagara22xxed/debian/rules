@@ -7,7 +7,7 @@
 
 NAME=niagara22xxed
 
-UTIL := n22xxed_util
+UTIL := util
 
 configure: configure-stamp
 configure-stamp:
