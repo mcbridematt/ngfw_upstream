@@ -21,6 +21,7 @@ build: build-stamp
 modules/$(NAME): $(wildcard kernel/*) $(wildcard debian/*)
 	mkdir -p modules/$(NAME)/debian
 	cp -dR module modules/$(NAME)/src
+	cp supported_cards.txt modules/$(NAME)/src
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
 	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
 	chmod -R ug=rwX,o=rX modules
