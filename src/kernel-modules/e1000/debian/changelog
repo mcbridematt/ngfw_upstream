@@ -1,3 +1,9 @@
+e1000-source (8.0.35+untangle1-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 03:19:09 -0700
+
 e1000-source (8.0.30+untangle1-1) unstable; urgency=low
 
   * New upstream version: 8.0.30
