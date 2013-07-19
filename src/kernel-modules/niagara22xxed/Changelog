@@ -1,0 +1,24 @@
+Version 0.5 b1 20130410
+	- verbose output while insmod
+	- prohibition of unloading Intel driver
+	- card binary attributes cpld_mem and cpu_mem
+
+Version 0.3.b1 20130303
+	- FLASH cards fully supported (N2282, N2261E)
+	- kick(): unneeded locking removed
+
+Version 0.2.b1 20130103
+	- sysfs implemented in full volume
+	- API changed (from structures to attributes)
+	- sysfs used as main wrapper
+	- ioctl access removed
+
+Version 0.1.b2 20121230
+	- README added
+	- versioning support, check the same driver/utility version
+	- /proc/niagara/version added
+	- utility: verbose output for CURRENT_MODE 0x70
+	- uncrustify sources
+	- api: TIMEOUT 00 prohibited
+	- /proc/niagara/supported_cards added
+	- niagara_util -l 

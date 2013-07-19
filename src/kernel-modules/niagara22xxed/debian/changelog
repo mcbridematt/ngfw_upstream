@@ -1,3 +1,9 @@
+niagara22xxed-source (0.5b1+untangle1-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Sebastien Delafond <seb@untangle.com>  Fri, 19 Jul 2013 03:28:06 -0700
+
 niagara22xxed-source (0.2+untangle7-2) unstable; urgency=low
 
   * Bump version

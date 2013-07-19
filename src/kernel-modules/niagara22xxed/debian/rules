@@ -16,11 +16,11 @@ configure-stamp:
 
 build: build-stamp
 	dh_testdir
-	$(MAKE) -C util
+	$(MAKE) -C user_api
 
 modules/$(NAME): $(wildcard kernel/*) $(wildcard debian/*)
 	mkdir -p modules/$(NAME)/debian
-	cp -dR kernel modules/$(NAME)/src
+	cp -dR module modules/$(NAME)/src
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
 	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
 	chmod -R ug=rwX,o=rX modules
