@@ -1,0 +1,22 @@
+Source: niagara-source
+Section: main/kernel
+Priority: extra
+Maintainer: Sebastien Delafond <seb@untangle.com>
+Build-Depends: debhelper (>= 5.0.37), dpatch
+Build-Depends-Indep: debconf-utils
+Standards-Version: 3.7.2
+
+Package: niagara
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: niagara utils
+ Niagara utils
+
+Package: niagara-source
+Architecture: all
+Depends: module-assistant
+Recommends:  dpkg-dev, kernel-package, debhelper (>= 5.0.37), debconf-utils
+Description: module source for niagara
+ This package provides the source code for the niagara module.. You
+ will need make-kpkg from kernel-package to be able to compile modules
+ usable with a Debian kernel.
