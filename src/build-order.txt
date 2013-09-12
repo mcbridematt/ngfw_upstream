@@ -11,4 +11,4 @@ kernel-modules/tg3                                      squeeze
 kernel-modules/e1000e                                   squeeze
 kernel-modules/e1000                                    squeeze
 kernel-modules/igb                                      squeeze
-kernel-modules/niagara22xxed                            squeeze
+kernel-modules/niagara                                  squeeze
