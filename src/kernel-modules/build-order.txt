@@ -1,4 +1,3 @@
-niagara22xxed                                           squeeze
 e1000e                                                  squeeze
 e1000                                                   squeeze
 igb                                                     squeeze
