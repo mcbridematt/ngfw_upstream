@@ -47,6 +47,8 @@ install: build
 	dh_clean -k
 	dh_installdirs -p$(NAME) usr/sbin
 	cp user_api/$(UTIL) $(CURDIR)/debian/$(NAME)/usr/sbin
+	dh_installdirs -p$(NAME) etc/network/if-up.d
+	cp -r debian/niagara_load $(CURDIR)/debian/$(NAME)/etc/network/if-up.d/
 	dh_installdirs -p$(NAME)-source usr/src
 	cp $(NAME).tar.gz $(CURDIR)/debian/$(NAME)-source/usr/src
 	chmod 0644 $(CURDIR)/debian/$(NAME)-source/usr/src/$(NAME).tar.gz
