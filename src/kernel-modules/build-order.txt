@@ -1,6 +1,6 @@
-universal-driver					squeeze			    
-e1000e                                                  squeeze
-e1000                                                   squeeze
-igb                                                     squeeze
-bnx2                                                    squeeze
-tg3                                                     squeeze
+niagara		squeeze
+e1000e          squeeze
+e1000           squeeze
+igb             squeeze
+bnx2            squeeze
+tg3             squeeze
