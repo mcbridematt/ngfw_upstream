@@ -1,0 +1,10 @@
+diff -ruN acpi-support.orig/hibernate.sh acpi-support/hibernate.sh
+--- acpi-support.orig/hibernate.sh	2009-11-22 12:25:44.000000000 +0100
++++ acpi-support/hibernate.sh	2009-11-22 12:26:19.000000000 +0100
+@@ -1,5 +1,4 @@
+-#!/bin/bash
+-# TODO:  Above should be /bin/sh
++#!/bin/sh
+ 
+ test -f /usr/share/acpi-support/state-funcs || exit 0
+ 

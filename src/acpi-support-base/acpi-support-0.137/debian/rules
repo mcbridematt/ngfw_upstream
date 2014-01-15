@@ -1,0 +1,57 @@
+#!/usr/bin/make -f
+
+include /usr/share/quilt/quilt.make
+
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ifeq ($(DEB_HOST_ARCH),i386)
+arch-depends := -V'arch:Suggests=toshset'
+endif
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+	make clean
+	-rm -f acpi_fakekeyd
+	dh_clean
+
+build: patch build-stamp
+build-stamp:
+	make
+
+dhclean: 
+	dh_testdir
+	dh_testroot
+	dh_prep
+
+install: dhclean
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	# work around buggy orig tarball, to be removed for the next upstream version
+	-rm -f debian/acpi-support.manpages debian/dirs debian/docs debian/init.d debian/postinst debian/preinst
+
+binary-indep:
+
+binary-arch: dhclean install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installchangelogs 
+	dh_installman
+	dh_installinit -pacpi-support --no-start -- start 99 2 3 4 5 . stop 20 1 . 
+	dh_installinit -pacpi-fakekey -- start 99 2 3 4 5 .  
+	dh_install
+	find debian/acpi-support/etc/acpi -name "*.sh" -exec chmod a+x {} \;
+	chmod a-x debian/acpi-support/usr/share/acpi-support/state-funcs
+	find debian/acpi-support-base/etc/acpi -name "*.sh" -exec chmod a+x {} \;
+	dh_strip
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps 
+	dh_gencontrol -- $(arch-depends)
+	dh_md5sums
+	dh_builddeb
+	
+binary: binary-arch binary-indep

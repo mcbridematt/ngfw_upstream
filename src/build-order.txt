@@ -1,3 +1,4 @@
+acpi-support-base/acpi-support-base                     squeeze
 ipvsadm/ipvsadm-1.25.clean                              squeeze
 plymouth/plymouth-0.8.5.1                               squeeze
 xdialog/xdialog-2.3.1                                   squeeze,wheezy

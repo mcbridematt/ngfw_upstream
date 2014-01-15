@@ -1,0 +1,6 @@
+--- acpi-support-0.137/events/asus-brightness-down	2010-06-23 04:27:29.000000000 +0200
++++ acpi-support-0.137/events/asus-brightness-down	2010-06-24 14:00:00.000000000 +0200
+@@ -1,2 +1,2 @@
+ event=hotkey (ATKD|HOTK) 0000002[0123456789abcdef]
+-action=/etc/acpi/asus-brn-down.sh
++action=/etc/acpi/if-asus-not-eee.sh asus-brn-down.sh

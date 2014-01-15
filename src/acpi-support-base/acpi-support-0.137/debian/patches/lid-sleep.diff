@@ -1,0 +1,15 @@
+Index: acpi-support-0.137/lid.sh
+===================================================================
+--- acpi-support-0.137.orig/lid.sh	2010-08-05 19:55:35.031725187 +0200
++++ acpi-support-0.137/lid.sh	2010-08-05 19:56:01.980727213 +0200
+@@ -13,6 +13,10 @@
+ grep -q closed /proc/acpi/button/lid/*/state
+ if [ $? = 0 ]
+ then
++    if [ x$LID_SLEEP = xtrue ]; then
++        [ -x /etc/acpi/sleep.sh ] && /etc/acpi/sleep.sh
++        exit
++    fi
+     for x in /tmp/.X11-unix/*; do
+ 	displaynum=`echo $x | sed s#/tmp/.X11-unix/X##`
+ 	getXuser;

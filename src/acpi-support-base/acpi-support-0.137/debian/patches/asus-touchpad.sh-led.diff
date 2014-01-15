@@ -1,0 +1,15 @@
+--- acpi-support-0.133.orig/asus-touchpad.sh
++++ acpi-support-0.133/asus-touchpad.sh
+@@ -25,6 +25,12 @@
+ 
+ if [ $TPSTATUS = 0 ]; then
+    xinput set-int-prop $XINPUTNUM "Synaptics Off" 8 1
++   if [ -e /sys/class/leds/asus::touchpad/brightness ]; then
++	echo 0 > /sys/class/leds/asus::touchpad/brightness
++   fi
+ else
+    xinput set-int-prop $XINPUTNUM "Synaptics Off" 8 0
++   if [ -e /sys/class/leds/asus::touchpad/brightness ]; then
++	echo 1 > /sys/class/leds/asus::touchpad/brightness
++   fi
+ fi

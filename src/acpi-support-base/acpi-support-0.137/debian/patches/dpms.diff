@@ -1,0 +1,51 @@
+--- acpi-support/lid.sh	2009-12-28 22:54:05.000000000 +0100
++++ acpi-support/lid.sh	2009-12-28 22:58:11.000000000 +0100
+@@ -42,7 +42,17 @@
+ 	    if [ `pidof xscreensaver` ]; then
+ 		su $user -s /bin/sh -c "xscreensaver-command -deactivate"
+ 	    fi
++	    case "$DISPLAY_DPMS" in
++		xset)
+ 	    su $user -s /bin/sh -c "xset dpms force on"
++			;;
++		xrandr)
++			su $user -s /bin/sh -c "xrandr --output LVDS --auto"
++			;;
++		vbetool)
++			/usr/sbin/vbetool dpms on
++			;;
++	    esac
+ 	else
+ 	    [ -x /usr/sbin/vbetool ] && /usr/sbin/vbetool dpms on
+ 	fi
+--- acpi-support/lib/screenblank	2009-12-28 22:54:08.000000000 +0100
++++ acpi-support/lib/screenblank	2009-12-28 22:59:06.000000000 +0100
+@@ -14,7 +14,18 @@
+ 	fi
+ fi
+ 
++case "$DISPLAY_DPMS" in
++  xset)
+ su $user -s /bin/sh -c "xset dpms force off"
++	;;
++  xrandr)
++	su $user -s /bin/sh -c "xrandr --output LVDS --off"
++	;;
++  vbetool)
++	/usr/sbin/vbetool dpms off
++	;;
++esac
++
+ if [ x$RADEON_LIGHT = xtrue ]; then
+     [ -x /usr/sbin/radeontool ] && radeontool light off
+ fi
+--- acpi-support/screenblank.sh	2009-12-28 23:04:58.000000000 +0100
++++ acpi-support/screenblank.sh	2009-12-28 23:05:59.000000000 +0100
+@@ -4,6 +4,7 @@
+ 
+ . /etc/default/acpi-support
+ . /usr/share/acpi-support/power-funcs
++. /etc/default/acpi-support
+ 
+ for x in /tmp/.X11-unix/*; do
+     displaynum=`echo $x | sed s#/tmp/.X11-unix/X##`

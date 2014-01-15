@@ -1,0 +1,20 @@
+--- acpi-support-0.131.orig/lid.sh
++++ acpi-support-0.131/lid.sh
+@@ -19,6 +19,8 @@
+ 	if [ x"$XAUTHORITY" != x"" ]; then
+ 	    export DISPLAY=":$displaynum"	    
+ 	    . /usr/share/acpi-support/screenblank
++	else
++	    [ -x /usr/sbin/vbetool ] && /usr/sbin/vbetool dpms off
+ 	fi
+     done
+ else
+@@ -41,6 +43,8 @@
+ 		su $user -s /bin/sh -c "xscreensaver-command -deactivate"
+ 	    fi
+ 	    su $user -s /bin/sh -c "xset dpms force on"
++	else
++	    [ -x /usr/sbin/vbetool ] && /usr/sbin/vbetool dpms on
+ 	fi
+     done
+ fi

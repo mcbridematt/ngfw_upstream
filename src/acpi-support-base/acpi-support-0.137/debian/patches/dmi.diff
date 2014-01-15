@@ -1,0 +1,32 @@
+--- acpi-support-0.133.orig/lib/device-funcs	2010-03-19 17:25:40.000000000 +0100
++++ acpi-support-0.133/lib/device-funcs	2010-03-19 17:36:09.000000000 +0100
+@@ -1,10 +1,7 @@
+ 
+ DeviceConfig() {
+-
+-    # Use a cached copy of the DMI data if it is available as we may
+-    # not be running with privileges necessary to access /dev/mem
+-    manufacturer=`cat /var/lib/acpi-support/system-manufacturer||dmidecode --string system-manufacturer|sed -e 's/ *$//'`
+-    model=`cat /var/lib/acpi-support/system-product-name||dmidecode --string system-product-name|sed -e 's/ *$//'`
+-    version=`cat /var/lib/acpi-support/system-version||dmidecode --string system-version|sed -e 's/ *$//'`
+-    bios_version=`cat /var/lib/acpi-support/bios-version||dmidecode --string bios-version|sed -e 's/ *$//'`
++    manufacturer=`cat /sys/class/dmi/id/sys_vendor|sed -e 's/ *$//'`
++    model=`cat /sys/class/dmi/id/product_name|sed -e 's/ *$//'`
++    version=`cat /sys/class/dmi/id/product_version|sed -e 's/ *$//'`
++    bios_version=`cat /sys/class/dmi/id/bios_version|sed -e 's/ *$//'`
+ }
+--- acpi-support-0.133.orig/thinkpad-stretchortouchpad.sh	2010-03-19 17:26:13.000000000 +0100
++++ acpi-support-0.133/thinkpad-stretchortouchpad.sh	2010-03-19 17:27:46.000000000 +0100
+@@ -17,10 +17,10 @@
+ 
+ toggle_touchpad=0
+ 
+-system_manufactuer=`dmidecode -s system-manufacturer`
++system_manufactuer=`cat /sys/class/dmi/id/sys_vendor`
+ case "$system_manufactuer" in
+     IBM*)
+-    system_version=`dmidecode -s system-version`
++    system_version=`cat /sys/class/dmi/id/product_version`
+     case "$system_version" in
+ 	ThinkPad\ [TXZ]60*)
+ 	toggle_touchpad=1

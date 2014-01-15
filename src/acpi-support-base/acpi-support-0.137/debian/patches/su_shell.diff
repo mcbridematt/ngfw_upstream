@@ -1,0 +1,48 @@
+diff -ruN acpi-support.orig/lib/policy-funcs acpi-support/lib/policy-funcs
+--- acpi-support.orig/lib/policy-funcs	2009-11-22 12:16:55.000000000 +0100
++++ acpi-support/lib/policy-funcs	2009-11-22 12:17:11.000000000 +0100
+@@ -28,7 +28,7 @@
+ 		test -r /proc/$p/environ || continue
+ 		local DBUS_SESS=$(cat /proc/$p/environ | grep -z "DBUS_SESSION_BUS_ADDRESS=")
+ 		test "$DBUS_SESS" != "" || continue
+-		(su - $(ps -o user= $p) -c "$DBUS_SESS dbus-send --print-reply --dest=org.kde.kded /kded org.kde.kded.loadedModules" | grep -q powerdevil) && return 0
++		(su $(ps -o user= $p) -s /bin/sh -c "$DBUS_SESS dbus-send --print-reply --dest=org.kde.kded /kded org.kde.kded.loadedModules" | grep -q powerdevil) && return 0
+ 	done
+ 	
+ 	return 1
+diff -ruN acpi-support.orig/lib/screenblank acpi-support/lib/screenblank
+--- acpi-support.orig/lib/screenblank	2009-11-22 12:17:22.000000000 +0100
++++ acpi-support/lib/screenblank	2009-11-22 12:17:40.000000000 +0100
+@@ -1,7 +1,7 @@
+ if [ `pidof xscreensaver` ]; then
+-	su $user -c "(xscreensaver-command -throttle)"
++	su $user -s /bin/sh -c "(xscreensaver-command -throttle)"
+ 		if [ x$LOCK_SCREEN = xtrue ]; then	
+-		su $user -c "(xscreensaver-command -lock)"
++		su $user -s /bin/sh -c "(xscreensaver-command -lock)"
+ 	fi
+ elif [ `pidof dcopserver` ]; then
+ 	if [ x$LOCK_SCREEN = xtrue ]; then
+diff -ruN acpi-support.orig/lid.sh acpi-support/lid.sh
+--- acpi-support.orig/lid.sh	2009-11-22 12:15:59.000000000 +0100
++++ acpi-support/lid.sh	2009-11-22 12:16:05.000000000 +0100
+@@ -31,16 +31,16 @@
+ 	    if [ $? = 1 ]
+ 		then
+ 		if pidof xscreensaver > /dev/null; then 
+-		    su $user -c "xscreensaver-command -unthrottle"
++		    su $user -s /bin/sh -c "xscreensaver-command -unthrottle"
+ 		fi
+ 	    fi
+ 	    if [ x$RADEON_LIGHT = xtrue ]; then
+ 		[ -x /usr/sbin/radeontool ] && radeontool light on
+ 	    fi
+ 	    if [ `pidof xscreensaver` ]; then
+-		su $user -c "xscreensaver-command -deactivate"
++		su $user -s /bin/sh -c "xscreensaver-command -deactivate"
+ 	    fi
+-	    su $user -c "xset dpms force on"
++	    su $user -s /bin/sh -c "xset dpms force on"
+ 	fi
+     done
+ fi
