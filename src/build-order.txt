@@ -1,7 +1,7 @@
 acpi-support-base/acpi-support-0.137                    squeeze
 ipvsadm/ipvsadm-1.25.clean                              squeeze
 plymouth/plymouth-0.8.5.1                               squeeze
-xdialog/xdialog-2.3.1                                   squeeze,wheezy
+xdialog/xdialog-2.3.1                                   squeeze
 libgettext-ruby/libgettext-ruby-1.91.0                  squeeze,wheezy
 python-psycopg2/psycopg2-2.2.1                          squeeze
 #iptables/iptables-1.4.8                                 squeeze
