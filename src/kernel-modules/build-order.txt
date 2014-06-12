@@ -2,5 +2,5 @@
 e1000e          squeeze,wheezy
 e1000           squeeze,wheezy
 igb             squeeze,wheezy
-bnx2            squeeze,wheezy
-tg3             squeeze,wheezy
+bnx2            squeeze
+tg3             squeeze
