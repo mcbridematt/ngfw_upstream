@@ -9,7 +9,7 @@ Uploaders: Paul Cager <paul-debian@home.paulcager.org>,
 Build-Depends: ant,
                cdbs,
                debhelper (>= 7),
-               default-jdk,
+               openjdk-7-jdk,
                javahelper,
                libxmlbeans-java,
                maven-repo-helper
