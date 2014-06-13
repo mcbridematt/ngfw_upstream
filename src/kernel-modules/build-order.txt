@@ -1,4 +1,3 @@
-#niagara		squeeze,wheezy
 e1000e          squeeze,wheezy
 e1000           squeeze,wheezy
 igb             squeeze,wheezy
