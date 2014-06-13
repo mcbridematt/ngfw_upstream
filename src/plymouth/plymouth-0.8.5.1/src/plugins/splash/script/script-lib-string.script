@@ -1,4 +1,0 @@
-String |= fun(text)
-{
-  return text | global.String;
-};

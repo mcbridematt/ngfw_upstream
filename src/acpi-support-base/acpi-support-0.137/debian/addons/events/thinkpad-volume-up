@@ -1,3 +1,0 @@
-# Volume Up
-event=ibm/hotkey HKEY 00000080 00001015
-action=/etc/acpi/volupbtn.sh

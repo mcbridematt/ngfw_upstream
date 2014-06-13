@@ -1,5 +1,7 @@
-e1000e          squeeze,wheezy
-e1000           squeeze,wheezy
-igb             squeeze,wheezy
-bnx2            squeeze
-tg3             squeeze
+#niagara		wheezy
+e1000e          wheezy
+#e1000           wheezy
+igb             wheezy
+#bnx2            squeeze
+#tg3             squeeze
+

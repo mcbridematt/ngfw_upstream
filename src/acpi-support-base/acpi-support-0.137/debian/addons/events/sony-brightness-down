@@ -1,4 +1,0 @@
-# /etc/acpi/events/sony-brightness-down
-
-event=sony/hotkey SPIC 00000001 00000010
-action=/etc/acpi/sonybright.sh down

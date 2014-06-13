@@ -1,9 +1,0 @@
---- acpi-support-0.114.orig/lid.sh
-+++ acpi-support-0.114/lid.sh
-@@ -1,5 +1,4 @@
--#!/bin/bash
--# TODO:  Change the above to /bin/sh
-+#!/bin/sh
- 
- test -f /usr/share/acpi-support/state-funcs || exit 0
- 

@@ -1,4 +1,0 @@
-This is a library of various acpi functionality that we're confident will work
-on most systems.
-Eventually, we'd like to be able to work out what we can do based on machine
-type.
