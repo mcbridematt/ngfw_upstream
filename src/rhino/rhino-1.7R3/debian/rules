@@ -4,7 +4,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/javahelper.mk
 include /usr/share/cdbs/1/class/ant.mk
 
-JAVA_HOME := /usr/lib/jvm/default-java
+JAVA_HOME := /usr/lib/jvm/java-7-openjdk-$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 DEB_ANT_BUILD_TARGET := jar javadoc 
 
 UVERSION	:= $(shell echo $(DEB_UPSTREAM_VERSION) | sed "s/~RC.//" | sed "s/~pre/pre/")
