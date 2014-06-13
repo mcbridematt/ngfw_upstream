@@ -112,6 +112,8 @@ struct igb_adapter;
 
 /* Transmit and receive queues */
 #define IGB_MAX_RX_QUEUES                 16
+#define IGB_MAX_RX_QUEUES_82575            4
+#define IGB_MAX_RX_QUEUES_I211             2
 #define IGB_MAX_TX_QUEUES                 16
 
 #define IGB_MAX_VF_MC_ENTRIES             30
@@ -142,7 +144,6 @@ struct vf_data_storage {
 	bool spoofchk_enabled;
 #endif
 #endif
-	struct pci_dev *vfdev;
 };
 
 #define IGB_VF_FLAG_CTS            0x00000001 /* VF is clear to send data */
@@ -161,9 +162,9 @@ struct vf_data_storage {
  *           descriptors until either it has this many to write back, or the
  *           ITR timer expires.
  */
-#define IGB_RX_PTHRESH	8
+#define IGB_RX_PTHRESH	((hw->mac.type == e1000_i354) ? 12 : 8)
 #define IGB_RX_HTHRESH	8
-#define IGB_TX_PTHRESH	8
+#define IGB_TX_PTHRESH	((hw->mac.type == e1000_i354) ? 20 : 8)
 #define IGB_TX_HTHRESH	1
 #define IGB_RX_WTHRESH	((hw->mac.type == e1000_82576 && \
 			  adapter->msix_entries) ? 1 : 4)
@@ -328,6 +329,18 @@ struct igb_rx_queue_stats {
 	u64 alloc_failed;
 };
 
+struct igb_rx_packet_stats {
+	u64 ipv4_packets;      /* IPv4 headers processed */
+	u64 ipv4e_packets;     /* IPv4E headers with extensions processed */
+	u64 ipv6_packets;      /* IPv6 headers processed */
+	u64 ipv6e_packets;     /* IPv6E headers with extensions processed */
+	u64 tcp_packets;       /* TCP headers processed */
+	u64 udp_packets;       /* UDP headers processed */
+	u64 sctp_packets;      /* SCTP headers processed */
+	u64 nfs_packets;       /* NFS headers processe */
+	u64 other_packets;
+};
+
 struct igb_ring_container {
 	struct igb_ring *ring;		/* pointer to linked list of rings */
 	unsigned int total_bytes;	/* total bytes processed this int */
@@ -371,6 +384,7 @@ struct igb_ring {
 		/* RX */
 		struct {
 			struct igb_rx_queue_stats rx_stats;
+			struct igb_rx_packet_stats pkt_stats;
 #ifdef CONFIG_IGB_DISABLE_PACKET_SPLIT
 			u16 rx_buffer_len;
 #else
@@ -399,6 +413,7 @@ struct igb_q_vector {
 #ifndef IGB_NO_LRO
 	struct igb_lro_list lrolist;   /* LRO list for queue vector*/
 #endif
+	struct rcu_head rcu;	/* to avoid race with update stats on free */
 	char name[IFNAMSIZ + 9];
 #ifndef HAVE_NETDEV_NAPI_LIST
 	struct net_device poll_dev;
@@ -480,13 +495,6 @@ struct igb_therm_proc_data
 //  #endif /* IGB_PROCFS */
 // #endif /* EXT_THERMAL_SENSOR_SUPPORT */
 
-#ifdef HAVE_I2C_SUPPORT
-struct igb_i2c_client_list {
-	struct i2c_client *client;
-	struct igb_i2c_client_list *next;
-};
-#endif /* HAVE_I2C_SUPPORT */
-
 #ifdef IGB_HWMON
 #define IGB_HWMON_TYPE_LOC	0
 #define IGB_HWMON_TYPE_TEMP	1
@@ -506,6 +514,9 @@ struct hwmon_buff {
 	unsigned int n_hwmon;
 	};
 #endif /* IGB_HWMON */
+#ifdef ETHTOOL_GRXFHINDIR
+#define IGB_RETA_SIZE	128
+#endif /* ETHTOOL_GRXFHINDIR */
 
 /* board specific private data structure */
 struct igb_adapter {
@@ -603,6 +614,7 @@ struct igb_adapter {
 	bool mdd;
 	int int_mode;
 	u32 rss_queues;
+	u32 tss_queues;
 	u32 vmdq_pools;
 	char fw_version[32];
 	u32 wvbr;
@@ -624,6 +636,7 @@ struct igb_adapter {
 	struct proc_dir_entry *info_dir;
 	struct proc_dir_entry *therm_dir[E1000_MAX_SENSORS];
 	struct igb_therm_proc_data therm_data[E1000_MAX_SENSORS];
+	bool old_lsc;
 #endif /* IGB_PROCFS */
 #endif /* IGB_HWMON */
 	u32 etrack_id;
@@ -646,9 +659,19 @@ struct igb_adapter {
 #ifdef HAVE_I2C_SUPPORT
 	struct i2c_algo_bit_data i2c_algo;
 	struct i2c_adapter i2c_adap;
-	struct igb_i2c_client_list *i2c_clients;
+	struct i2c_client *i2c_client;
 #endif /* HAVE_I2C_SUPPORT */
 	unsigned long link_check_timeout;
+
+
+	int devrc;
+
+	int copper_tries;
+	u16 eee_advert;
+#ifdef ETHTOOL_GRXFHINDIR
+	u32 rss_indir_tbl_init;
+	u8 rss_indir_tbl[IGB_RETA_SIZE];
+#endif
 };
 
 #ifdef CONFIG_IGB_VMDQ_NETDEV
@@ -680,6 +703,15 @@ struct igb_vmdq_adapter {
 #define IGB_FLAG_RSS_FIELD_IPV6_UDP	(1 << 10)
 #define IGB_FLAG_WOL_SUPPORTED		(1 << 11)
 #define IGB_FLAG_NEED_LINK_UPDATE	(1 << 12)
+#define IGB_FLAG_LOOPBACK_ENABLE	(1 << 13)
+#define IGB_FLAG_MEDIA_RESET		(1 << 14)
+#define IGB_FLAG_MAS_ENABLE		(1 << 15)
+
+/* Media Auto Sense */
+#define IGB_MAS_ENABLE_0		0X0001
+#define IGB_MAS_ENABLE_1		0X0002
+#define IGB_MAS_ENABLE_2		0X0004
+#define IGB_MAS_ENABLE_3		0X0008
 
 #define IGB_MIN_TXPBSIZE           20408
 #define IGB_TX_BUF_4096            4096
@@ -752,6 +784,9 @@ extern int igb_up(struct igb_adapter *);
 extern void igb_down(struct igb_adapter *);
 extern void igb_reinit_locked(struct igb_adapter *);
 extern void igb_reset(struct igb_adapter *);
+#ifdef ETHTOOL_SRXFHINDIR
+extern void igb_write_rss_indir_tbl(struct igb_adapter *);
+#endif
 extern int igb_set_spd_dplx(struct igb_adapter *, u16);
 extern int igb_setup_tx_resources(struct igb_ring *);
 extern int igb_setup_rx_resources(struct igb_ring *);
@@ -766,6 +801,7 @@ extern void igb_unmap_and_free_tx_resource(struct igb_ring *,
                                            struct igb_tx_buffer *);
 extern void igb_alloc_rx_buffers(struct igb_ring *, u16);
 extern void igb_clean_rx_ring(struct igb_ring *);
+extern int igb_setup_queues(struct igb_adapter *adapter);
 extern void igb_update_stats(struct igb_adapter *);
 extern bool igb_has_link(struct igb_adapter *adapter);
 extern void igb_set_ethtool_ops(struct net_device *);
@@ -783,20 +819,25 @@ extern void igb_ptp_rx_rgtstamp(struct igb_q_vector *q_vector,
 extern void igb_ptp_rx_pktstamp(struct igb_q_vector *q_vector,
 				unsigned char *va,
 				struct sk_buff *skb);
-static inline void igb_ptp_rx_hwtstamp(struct igb_q_vector *q_vector,
+static inline void igb_ptp_rx_hwtstamp(struct igb_ring *rx_ring,
 				       union e1000_adv_rx_desc *rx_desc,
 				       struct sk_buff *skb)
 {
 	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
 #ifdef CONFIG_IGB_DISABLE_PACKET_SPLIT
-		igb_ptp_rx_pktstamp(q_vector, skb->data, skb);
+		igb_ptp_rx_pktstamp(rx_ring->q_vector, skb->data, skb);
 		skb_pull(skb, IGB_TS_HDR_LEN);
 #endif
 		return;
 	}
 
 	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TS))
-		igb_ptp_rx_rgtstamp(q_vector, skb);
+		igb_ptp_rx_rgtstamp(rx_ring->q_vector, skb);
+
+	/* Update the last_rx_timestamp timer in order to enable watchdog check
+	 * for error case of latched timestamp on a dropped packet.
+	 */
+	rx_ring->last_rx_timestamp = jiffies;
 }
 
 extern int igb_ptp_hwtstamp_ioctl(struct net_device *netdev,
@@ -829,5 +870,7 @@ int igb_procfs_topdir_init(void);
 void igb_procfs_topdir_exit(void);
 #endif /* IGB_PROCFS */
 #endif /* IGB_HWMON */
+
+
 
 #endif /* _IGB_H_ */

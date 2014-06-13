@@ -42,6 +42,10 @@
 #define E1000_BARCTRL			0x5BBC /* BAR ctrl reg */
 #define E1000_BARCTRL_FLSIZE		0x0700 /* BAR ctrl Flsize */
 #define E1000_BARCTRL_CSRSIZE		0x2000 /* BAR ctrl CSR size */
+#define E1000_MPHY_ADDR_CTRL	0x0024 /* GbE MPHY Address Control */
+#define E1000_MPHY_DATA		0x0E10 /* GBE MPHY Data */
+#define E1000_MPHY_STAT		0x0E0C /* GBE MPHY Statistics */
+#define E1000_PPHY_CTRL		0x5b48 /* PCIe PHY Control */
 #define E1000_I350_BARCTRL		0x5BFC /* BAR ctrl reg */
 #define E1000_I350_DTXMXPKTSZ		0x355C /* Maximum sent packet size reg*/
 #define E1000_SCTL	0x00024  /* SerDes Control - RW */
@@ -75,6 +79,7 @@
 #define E1000_TIPG	0x00410  /* Tx Inter-packet gap -RW */
 #define E1000_AIT	0x00458  /* Adaptive Interframe Spacing Throttle - RW */
 #define E1000_LEDCTL	0x00E00  /* LED Control - RW */
+#define E1000_LEDMUX	0x08130  /* LED MUX Control */
 #define E1000_EXTCNF_CTRL	0x00F00  /* Extended Configuration Control */
 #define E1000_EXTCNF_SIZE	0x00F08  /* Extended Configuration Size */
 #define E1000_PHY_CTRL	0x00F10  /* PHY Control Register in CSR */
@@ -452,8 +457,6 @@
 #define E1000_PBACL	0x05B68  /* MSIx PBA Clear - Read/Write 1's to clear */
 #define E1000_FFLT	0x05F00  /* Flexible Filter Length Table - RW Array */
 #define E1000_HOST_IF	0x08800  /* Host Interface */
-#define E1000_FFMT	0x09000  /* Flexible Filter Mask Table - RW Array */
-#define E1000_FFVT	0x09800  /* Flexible Filter Value Table - RW Array */
 #define E1000_HIBBA	0x8F40   /* Host Interface Buffer Base Address */
 /* Flexible Host Filter Table */
 #define E1000_FHFT(_n)	(0x09000 + ((_n) * 0x100))

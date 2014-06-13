@@ -756,8 +756,12 @@ int _kc_pci_save_state(struct pci_dev *pdev)
 
 void _kc_pci_restore_state(struct pci_dev *pdev)
 {
+#if defined(DRIVER_IXGBE) || defined(DRIVER_I40E) || defined(DRIVER_IXGBEVF)
+	struct adapter_struct *adapter = pci_get_drvdata(pdev);
+#else
 	struct net_device *netdev = pci_get_drvdata(pdev);
 	struct adapter_struct *adapter = netdev_priv(netdev);
+#endif
 	int size = PCI_CONFIG_SPACE_LEN, i;
 	u16 pcie_cap_offset;
 	u16 pcie_link_status;
@@ -812,6 +816,14 @@ void *_kc_kmemdup(const void *src, size_t len, unsigned gfp)
 	return p;
 }
 #endif /* <= 2.6.19 */
+
+/*****************************************************************************/
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21) )
+struct pci_dev *_kc_netdev_to_pdev(struct net_device *netdev)
+{
+	return ((struct adapter_struct *)netdev_priv(netdev))->pdev;
+}
+#endif /* < 2.6.21 */
 
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) )
@@ -977,20 +989,29 @@ out_err:
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24) )
 #ifdef NAPI
-struct net_device *napi_to_poll_dev(struct napi_struct *napi)
+#if defined(DRIVER_IXGBE) || defined(DRIVER_IGB) || defined(DRIVER_I40E) || \
+	defined(DRIVER_IXGBEVF)
+struct net_device *napi_to_poll_dev(const struct napi_struct *napi)
 {
 	struct adapter_q_vector *q_vector = container_of(napi,
 	                                                struct adapter_q_vector,
 	                                                napi);
 	return &q_vector->poll_dev;
 }
+#endif
 
 int __kc_adapter_clean(struct net_device *netdev, int *budget)
 {
 	int work_done;
 	int work_to_do = min(*budget, netdev->quota);
+#if defined(DRIVER_IXGBE) || defined(DRIVER_IGB) || defined(DRIVER_I40E) || \
+	defined(E1000E_MQ) || defined(DRIVER_IXGBEVF)
 	/* kcompat.h netif_napi_add puts napi struct in "fake netdev->priv" */
 	struct napi_struct *napi = netdev->priv;
+#else
+	struct adapter_struct *adapter = netdev_priv(netdev);
+	struct napi_struct *napi = &adapter->rx_ring[0].napi;
+#endif
 	work_done = napi->poll(napi, work_to_do);
 	*budget -= work_done;
 	netdev->quota -= work_done;
@@ -1158,6 +1179,8 @@ int _kc_pci_num_vf(struct pci_dev *dev)
 #endif /* < 2.6.34 */
 
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35) )
+#if defined(DRIVER_IXGBE) || defined(DRIVER_IGB) || defined(DRIVER_I40E) || \
+	defined(DRIVER_IXGBEVF)
 #ifdef HAVE_TX_MQ
 #if (!(RHEL_RELEASE_CODE && RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(6,0)))
 #ifndef CONFIG_NETDEVICES_MULTIQUEUE
@@ -1207,6 +1230,7 @@ ssize_t _kc_simple_write_to_buffer(void *to, size_t available, loff_t *ppos,
         return count;
 }
 
+#endif /* defined(DRIVER_IXGBE) || defined(DRIVER_IGB) || defined(DRIVER_I40E) */
 #endif /* < 2.6.35 */
 
 /*****************************************************************************/
@@ -1250,11 +1274,18 @@ void _kc_skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page,
 	skb->truesize += truesize;
 }
 
+int _kc_simple_open(struct inode *inode, struct file *file)
+{
+        if (inode->i_private)
+                file->private_data = inode->i_private;
+
+        return 0;
+}
+
 #endif /* < 3.4.0 */
 
 /******************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(3,7,0) )
-#if !(SLE_VERSION_CODE && SLE_VERSION_CODE >= SLE_VERSION(11,3,0))
 static inline int __kc_pcie_cap_version(struct pci_dev *dev)
 {
 	int pos;
@@ -1409,7 +1440,12 @@ int __kc_pcie_capability_clear_and_set_word(struct pci_dev *dev, int pos,
 
 	return ret;
 }
-#endif /* !(SLE_VERSION_CODE && SLE_VERSION_CODE >= SLE_VERSION(11,3,0)) */
+
+int __kc_pcie_capability_clear_word(struct pci_dev *dev, int pos,
+					     u16 clear)
+{
+	return __kc_pcie_capability_clear_and_set_word(dev, pos, clear, 0);
+}
 #endif /* < 3.7.0 */
 
 /******************************************************************************/
@@ -1419,7 +1455,7 @@ int __kc_pcie_capability_clear_and_set_word(struct pci_dev *dev, int pos,
 /*****************************************************************************/
 #if ( LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0) )
 #ifdef CONFIG_PCI_IOV
-int pci_vfs_assigned(struct pci_dev *dev)
+int __kc_pci_vfs_assigned(struct pci_dev *dev)
 {
 	unsigned int vfs_assigned = 0;
 #ifdef HAVE_PCI_DEV_FLAGS_ASSIGNED
@@ -1429,12 +1465,12 @@ int pci_vfs_assigned(struct pci_dev *dev)
 
 	/* only search if we are a PF */
 	if (!dev->is_physfn)
-		return -ENODEV;
+		return 0;
 
 	/* find SR-IOV capability */
 	pos = pci_find_ext_capability(dev, PCI_EXT_CAP_ID_SRIOV);
 	if (!pos)
-		return -ENODEV;
+		return 0;
 
 	/*
 	 * determine the device ID for the VFs, the vendor ID will be the
