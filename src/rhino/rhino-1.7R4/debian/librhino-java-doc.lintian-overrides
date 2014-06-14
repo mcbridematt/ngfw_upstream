@@ -1,0 +1,2 @@
+# Lintian match "GNU General Public License" in MPL-2.0 licence content
+librhino-java-doc binary: copyright-should-refer-to-common-license-file-for-gpl

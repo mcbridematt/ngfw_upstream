@@ -1,0 +1,190 @@
+Index: rhino-1.7R4/src/org/mozilla/javascript/Parser.java
+===================================================================
+--- rhino-1.7R4.orig/src/org/mozilla/javascript/Parser.java	2014-06-02 18:09:25.377325443 +0200
++++ rhino-1.7R4/src/org/mozilla/javascript/Parser.java	2014-06-02 18:09:25.377325443 +0200
+@@ -2784,6 +2784,12 @@
+               if (this.inUseStrictDirective && ts.isNumberOctal()) {
+                   reportError("msg.no.octal.strict");
+               }
++              if (ts.isNumberOctal()) {
++                  s = "0"+s;
++              }
++              if (ts.isNumberHex()) {
++                  s = "0x"+s;
++              }
+               return new NumberLiteral(ts.tokenBeg,
+                                        s,
+                                        ts.getNumber());
+@@ -3322,8 +3328,10 @@
+         ObjectProperty pn = new ObjectProperty(pos);
+         if (isGetter) {
+             pn.setIsGetter();
++            fn.setFunctionIsGetter();
+         } else {
+             pn.setIsSetter();
++            fn.setFunctionIsSetter();
+         }
+         int end = getNodeEnd(fn);
+         pn.setLeft(propName);
+Index: rhino-1.7R4/src/org/mozilla/javascript/TokenStream.java
+===================================================================
+--- rhino-1.7R4.orig/src/org/mozilla/javascript/TokenStream.java	2014-06-02 18:09:25.377325443 +0200
++++ rhino-1.7R4/src/org/mozilla/javascript/TokenStream.java	2014-06-02 18:09:25.377325443 +0200
+@@ -267,6 +267,7 @@
+ 
+     final double getNumber() { return number; }
+     final boolean isNumberOctal() { return isOctal; }
++    final boolean isNumberHex() { return isHex; }
+ 
+     final boolean eof() { return hitEOF; }
+ 
+@@ -412,11 +413,13 @@
+                 isOctal = false;
+                 stringBufferTop = 0;
+                 int base = 10;
++                isHex = isOctal = false;
+ 
+                 if (c == '0') {
+                     c = getChar();
+                     if (c == 'x' || c == 'X') {
+                         base = 16;
++                        isHex = true;
+                         c = getChar();
+                     } else if (isDigit(c)) {
+                         base = 8;
+@@ -1558,6 +1561,7 @@
+     private String string = "";
+     private double number;
+     private boolean isOctal;
++    private boolean isHex;
+ 
+     // delimiter for last string literal scanned
+     private int quoteChar;
+Index: rhino-1.7R4/src/org/mozilla/javascript/ast/FunctionNode.java
+===================================================================
+--- rhino-1.7R4.orig/src/org/mozilla/javascript/ast/FunctionNode.java	2014-06-02 18:09:25.377325443 +0200
++++ rhino-1.7R4/src/org/mozilla/javascript/ast/FunctionNode.java	2014-06-02 18:09:25.377325443 +0200
+@@ -368,8 +368,10 @@
+     @Override
+     public String toSource(int depth) {
+         StringBuilder sb = new StringBuilder();
+-        sb.append(makeIndent(depth));
+-        sb.append("function");
++        if (!isGetterOrSetter()) {
++            sb.append(makeIndent(depth));
++            sb.append("function");
++        }
+         if (functionName != null) {
+             sb.append(" ");
+             sb.append(functionName.toSource(0));
+@@ -398,7 +400,7 @@
+         } else {
+             sb.append(getBody().toSource(depth).trim());
+         }
+-        if (functionType == FUNCTION_STATEMENT) {
++        if (functionType == FUNCTION_STATEMENT || isGetterOrSetter()) {
+             sb.append("\n");
+         }
+         return sb.toString();
+Index: rhino-1.7R4/src/org/mozilla/javascript/ast/ObjectProperty.java
+===================================================================
+--- rhino-1.7R4.orig/src/org/mozilla/javascript/ast/ObjectProperty.java	2014-06-02 18:09:25.377325443 +0200
++++ rhino-1.7R4/src/org/mozilla/javascript/ast/ObjectProperty.java	2014-06-02 18:09:25.377325443 +0200
+@@ -92,17 +92,18 @@
+     @Override
+     public String toSource(int depth) {
+         StringBuilder sb = new StringBuilder();
+-        sb.append(makeIndent(depth));
++        sb.append("\n");
++        sb.append(makeIndent(depth+1));
+         if (isGetter()) {
+             sb.append("get ");
+         } else if (isSetter()) {
+             sb.append("set ");
+         }
+-        sb.append(left.toSource(0));
++        sb.append(left.toSource(getType()==Token.COLON ? 0 : depth));
+         if (type == Token.COLON) {
+             sb.append(": ");
+         }
+-        sb.append(right.toSource(0));
++        sb.append(right.toSource(getType()==Token.COLON ? 0 : depth+1));
+         return sb.toString();
+     }
+ }
+Index: rhino-1.7R4/testsrc/org/mozilla/javascript/tests/Bug491621Test.java
+===================================================================
+--- rhino-1.7R4.orig/testsrc/org/mozilla/javascript/tests/Bug491621Test.java	2014-06-02 18:09:25.377325443 +0200
++++ rhino-1.7R4/testsrc/org/mozilla/javascript/tests/Bug491621Test.java	2014-06-02 18:09:25.377325443 +0200
+@@ -96,4 +96,22 @@
+         assertSource("if(c)const a=0;else a=1",
+                 "if (c) \nconst a = 0; else a = 1;\n");
+     }
++
++    @Test//Bug 800616
++    public void testOctLiteralToSource()
++    {
++        assertSource("010;", "010;\n");
++    }
++
++    @Test//Bug 800616
++    public void testHexLiteralToSource()
++    {
++        assertSource("0xff;", "0xff;\n");
++    }
++
++    @Test//Bug 800616
++    public void testHexOctDecLiteralToSource()
++    {
++        assertSource("0xff;\n9;\n07;\n1;", "0xff;\n9;\n07;\n1;\n");
++    }
+ }
+Index: rhino-1.7R4/testsrc/org/mozilla/javascript/tests/BugGetterSetterTest.java
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ rhino-1.7R4/testsrc/org/mozilla/javascript/tests/BugGetterSetterTest.java	2014-06-02 18:09:25.377325443 +0200
+@@ -0,0 +1,44 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++package org.mozilla.javascript.tests;
++
++import org.junit.Before;
++import org.junit.Test;
++import org.mozilla.javascript.CompilerEnvirons;
++import org.mozilla.javascript.Parser;
++import org.mozilla.javascript.ast.AstRoot;
++
++import java.io.IOException;
++import java.io.StringReader;
++
++import static junit.framework.Assert.assertEquals;
++
++public class BugGetterSetterTest {
++    private CompilerEnvirons environment = new CompilerEnvirons();
++
++    @Before
++    public void setUp() throws Exception {
++        environment.setLanguageVersion(180);
++        environment.setStrictMode(false);
++    }
++
++    @Test
++    public void testNodeReplacementInWhileLoopWithBrackets() throws IOException {
++        String script = "var o = {\n" +
++                "  _x: 123, \n" +
++                "  get x() {\n" +
++                "    return this._x;\n" +
++                "  }\n" +
++                ", \n" +
++                "  set x(value) {\n" +
++                "    this._x = value;\n" +
++                "  }\n" +
++                "};\n";
++
++        Parser parser = new Parser(environment);
++        AstRoot astRoot = parser.parse(new StringReader(script), null, 1);
++        assertEquals(script, astRoot.toSource());
++    }
++}

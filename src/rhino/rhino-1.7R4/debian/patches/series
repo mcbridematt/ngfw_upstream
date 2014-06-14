@@ -1,0 +1,4 @@
+01_rhino-nowarn.patch
+02_exclude-jdk15.patch
+03_public_getSourcePositionFromStack.patch
+04_bug_798642_800616.diff
