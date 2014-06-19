@@ -1,3 +1,9 @@
+igb-source (1:5.1.2+untangle1-1) unstable; urgency=low
+
+  * New version
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 19 Jun 2014 05:41:02 -0700
+
 igb-source (1:4.3.0+untangle2-1) unstable; urgency=low
 
   * Get it to build with 2.6.32

@@ -1,3 +1,9 @@
+e1000e-source (3.0.4.1+untangle1-1) unstable; urgency=low
+
+  * New version
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 19 Jun 2014 05:40:25 -0700
+
 e1000e-source (2.4.14+untangle1-1) unstable; urgency=low
 
   * New version, and try to get it to build on 2.6.32
