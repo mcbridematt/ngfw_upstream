@@ -1,3 +1,9 @@
+igb-source (1:5.2.5+untangle1-1) unstable; urgency=medium
+
+  * New version
+
+ -- Sebastien Delafond <seb@untangle.com>  Sat, 21 Jun 2014 12:35:00 +0200
+
 igb-source (1:5.1.2+untangle1-1) unstable; urgency=low
 
   * New version
