@@ -1,7 +1,7 @@
-#niagara		wheezy
-e1000e          wheezy
+#niagara         wheezy
+e1000e           wheezy
 #e1000           wheezy
-igb             wheezy
+igb              wheezy
 #bnx2            squeeze
 #tg3             squeeze
-
+openswan-modules wheezy
