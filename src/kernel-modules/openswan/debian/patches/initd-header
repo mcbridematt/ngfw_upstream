@@ -1,0 +1,16 @@
+Description: Populate Default-Start line
+Author: Harald Jenny <harald@a-little-linux-box.at>
+Forwarded: no
+Last-Update: 2012-01-01
+
+--- openswan-debian.orig/programs/setup/setup.in
++++ openswan-debian/programs/setup/setup.in
+@@ -5,7 +5,7 @@
+ # Provides:          ipsec
+ # Required-Start:    $network $remote_fs $syslog $named
+ # Required-Stop:     $syslog $remote_fs
+-# Default-Start:
++# Default-Start:     2 3 4 5
+ # Default-Stop:      0 1 6
+ # Short-Description: Start Openswan IPsec at boot time
+ # Description:       Enable automatic key management for IPsec (KLIPS and NETKEY)
