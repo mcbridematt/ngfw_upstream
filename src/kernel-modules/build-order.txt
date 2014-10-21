@@ -1,4 +1,3 @@
-#niagara         wheezy
 e1000e           wheezy
 #e1000           wheezy
 igb              wheezy
