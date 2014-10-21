@@ -1,4 +1,3 @@
 e1000e           wheezy
-#e1000           wheezy
 igb              wheezy
 #tg3             squeeze
