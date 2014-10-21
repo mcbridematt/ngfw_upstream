@@ -4,4 +4,3 @@ e1000e           wheezy
 igb              wheezy
 #bnx2            squeeze
 #tg3             squeeze
-#openswan-modules wheezy
