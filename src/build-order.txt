@@ -1,3 +1,6 @@
+libmnl/libmnl-1.0.3                                     wheezy
+libnetfilter-conntrack/libnetfilter-conntrack-1.0.4     wheezy
+libnfnetlink/libnfnetlink-1.0.1                         wheezy
 xl2tpd/xl2tpd-1.3.6+dfsg                                wheezy
 libgettext-ruby/libgettext-ruby-1.91.0                  wheezy
 iptables/iptables-1.4.14                                wheezy
@@ -6,4 +9,3 @@ rhino/rhino-1.7R4                                       wheezy
 
 kernel-modules/e1000e                                   wheezy
 kernel-modules/igb                                      wheezy
-
