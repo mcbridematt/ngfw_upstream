@@ -1,3 +1,9 @@
+libnfnetlink (1.0.1-4) unstable; urgency=low
+
+  * Relax dependency on dpkg
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 23 Oct 2014 05:02:49 -0700
+
 libnfnetlink (1.0.1-3) unstable; urgency=medium
 
   * [54caaa4] Handle symlink to directory conversion in a policy conform way.

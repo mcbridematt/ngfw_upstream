@@ -1,3 +1,9 @@
+libnetfilter-queue (1.0.2+20141023+git329468-2) unstable; urgency=low
+
+  * PRC on older untangle-* packages
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 23 Oct 2014 05:02:49 -0700
+
 libnetfilter-queue (1.0.2+20141023+git329468-1) unstable; urgency=low
 
   * New upstream version
