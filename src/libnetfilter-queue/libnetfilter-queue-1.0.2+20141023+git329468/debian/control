@@ -18,7 +18,6 @@ Package: libnetfilter-queue1-dbg
 Section: debug
 Architecture: any
 Depends: ${shlibs:Depends}, libnetfilter-queue1 (= ${binary:Version}), ${misc:Depends}
-Pre-Depends: dpkg (>= 1.17.5)
 Description: Debugging symbols for libnetfilter-queue1
  libnetfilter_queue is a userspace library providing an API to packets
  that have been queued by the kernel packet filter. It is part of a
@@ -29,7 +28,6 @@ Description: Debugging symbols for libnetfilter-queue1
 Package: libnetfilter-queue-dev
 Section: libdevel
 Architecture: any
-Pre-Depends: dpkg (>= 1.17.5)
 Depends: ${shlibs:Depends}, pkg-config,
  libnetfilter-queue1 (= ${binary:Version}),
  libnfnetlink-dev (>= 0.0.25),
