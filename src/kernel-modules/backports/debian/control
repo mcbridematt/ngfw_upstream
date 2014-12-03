@@ -1,22 +1,22 @@
-Source: backports-3.17.1
+Source: backports
 Section: unknown
 Priority: extra
 Maintainer: David Han <dhan@untangle.com>
 Build-Depends: debhelper (>= 8.0.0), bzip2
 Standards-Version: 3.9.3
 Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://git.debian.org/collab-maint/backports-3.17.1.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/backports-3.17.1.git;a=summary
+#Vcs-Git: git://git.debian.org/collab-maint/backports.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/backports.git;a=summary
 
-Package: backports-3.17.1-utils
+Package: backports-utils
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description> <insert long description, indented with spaces>
 
-Package: backports-3.17.1-source
+Package: backports-source
 Architecture: all
 Depends: module-assistant, debhelper (>= 7), make, bzip2
-Description: source for the backports-3.17.1 driver.
- This package provides the source code for the backports-3.17.1 kernel modules.
- The backports-3.17.1 package is also required in order to make use of these
+Description: source for the backports driver.
+ This package provides the source code for the backports kernel modules.
+ The backports package is also required in order to make use of these
  modules. Kernel source or headers are required to compile these modules.

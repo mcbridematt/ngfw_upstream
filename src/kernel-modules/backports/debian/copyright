@@ -1,5 +1,5 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: backports-3.17.1
+Upstream-Name: backports
 Source: <url://example.com>
 
 Files: *

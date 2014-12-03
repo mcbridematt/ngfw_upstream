@@ -21,17 +21,17 @@
 # some default definitions, important!
 #
 # Name of the source package
-psource:=backports-3.17.1-source
+psource:=backports-source
 
 # The short upstream name, used for the module source directory
-sname:=backports-3.17.1
+sname:=backports
 
 ### KERNEL SETUP
 ### Setup the stuff needed for making kernel module packages
 ### taken from /usr/share/kernel-package/sample.module.rules
 
 # prefix of the target package name
-PACKAGE=backports-3.17.1-modules
+PACKAGE=backports-modules
 # modifieable for experiments or debugging m-a
 MA_DIR ?= /usr/share/modass
 # load generic variable handling
@@ -115,7 +115,7 @@ build-indep-stamp:
 	# Add here command to compile/build the arch indep package.
 	# It's ok not to do anything here, if you don't need to build
 	#  anything for this package.
-	#docbook-to-man debian/backports-3.17.1.sgml > backports-3.17.1.1
+	#docbook-to-man debian/backports.sgml > backports.1
 
 	touch $@
 
@@ -150,8 +150,8 @@ install: build
 		debian/compat debian/$(psource)/usr/src/modules/$(sname)/debian/
 	cd debian/$(psource)/usr/src && tar c modules | bzip2 -9 > $(sname).tar.bz2 && rm -rf modules
 
-	# Add here commands to install the package into debian/backports-3.17.1.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/backports-3.17.1 install
+	# Add here commands to install the package into debian/backports.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/backports install
 
 	dh_install
 
