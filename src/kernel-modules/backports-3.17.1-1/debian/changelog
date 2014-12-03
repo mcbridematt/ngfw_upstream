@@ -1,5 +1,5 @@
-backports-3.17.1 (1-1) unstable; urgency=low
+backports-source (3.17.1-1) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release
 
- -- David Han <dhan@untangle.com>  Fri, 14 Nov 2014 19:36:47 -0700
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 03 Dec 2014 13:40:54 -0800
