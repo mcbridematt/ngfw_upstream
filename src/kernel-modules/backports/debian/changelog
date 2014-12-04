@@ -1,3 +1,9 @@
+backports (3.17.1+untangle3-1) unstable; urgency=low
+
+  * KLIB
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 04 Dec 2014 04:13:08 -0800
+
 backports (3.17.1+untangle2-1) unstable; urgency=low
 
   * No README
