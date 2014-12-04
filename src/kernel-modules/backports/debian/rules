@@ -15,9 +15,9 @@ configure-stamp:
 build: build-stamp
 
 modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
-	mkdir -p /tmp/modules/$(NAME)
-	cp -R * /tmp/modules/$(NAME)
-	rm -fr /tmp/modules/$(NAME)/debian
+	mkdir -p /tmp/modules/$(NAME)/src
+	cp -R * .local-symbols .blacklist.map /tmp/modules/$(NAME)/src
+	rm -fr /tmp/modules/$(NAME)/src/debian
 	mv /tmp/modules ./
 	mkdir -p modules/$(NAME)/debian
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
