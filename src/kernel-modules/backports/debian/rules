@@ -5,7 +5,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-NAME=e1000e
+NAME=backports
 
 configure: configure-stamp
 configure-stamp:
