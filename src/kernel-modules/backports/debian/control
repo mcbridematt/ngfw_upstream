@@ -1,10 +1,10 @@
 Source: backports
-Section: unknown
+Section: main/kernel
 Priority: extra
-Maintainer: David Han <dhan@untangle.com>
+Maintainer: Sebastien Delafond <seb@untangle.com>
 Build-Depends: debhelper (>= 8.0.0), bzip2
 Standards-Version: 3.9.3
-Homepage: <insert the upstream URL, if relevant>
+#Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://git.debian.org/collab-maint/backports.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/backports.git;a=summary
 
@@ -15,3 +15,4 @@ Description: source for the backports driver.
  This package provides the source code for the backports kernel modules.
  The backports package is also required in order to make use of these
  modules. Kernel source or headers are required to compile these modules.
+
