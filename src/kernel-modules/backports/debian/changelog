@@ -1,10 +1,10 @@
-backports (3.17.1-1+untangle2) unstable; urgency=low
+backports (3.17.1+untangle2-1) unstable; urgency=low
 
   * No README
 
  -- Sebastien Delafond <seb@untangle.com>  Thu, 04 Dec 2014 03:11:10 -0800
 
-backports (3.17.1-1+untangle1) unstable; urgency=low
+backports (3.17.1+untangle1-1) unstable; urgency=low
 
   * Initial release
 
