@@ -15,13 +15,13 @@ configure-stamp:
 build: build-stamp
 
 modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
-	mkdir -p modules/$(NAME)
-	cp -R * modules/$(NAME)
-	rm -fr modules/$(NAME)/debian
+	mkdir -p /tmp/modules/$(NAME)
+	cp -R * /tmp/modules/$(NAME)
+	rm -fr /tmp/modules/$(NAME)/debian
+	mv /tmp/modules ./
 	mkdir -p modules/$(NAME)/debian
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
 	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
-	cp README* modules/$(NAME)
 	chmod -R ug=rwX,o=rX modules
 
 $(NAME).tar.gz: modules/$(NAME)
