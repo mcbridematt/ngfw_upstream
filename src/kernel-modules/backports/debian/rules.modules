@@ -3,7 +3,7 @@
 NAME=backports
 
 # prefix of the target package name
-PACKAGE=$(NAME)-module
+PACKAGE=$(NAME)-modules
 # modifieable for experiments or debugging m-a
 MA_DIR ?= /usr/share/modass
 # load generic variable handling
