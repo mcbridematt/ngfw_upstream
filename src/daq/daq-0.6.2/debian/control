@@ -1,0 +1,33 @@
+Source: daq
+Priority: extra
+Maintainer: Javier Fernandez-Sanguino Pen~a <jfs@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, libpcap0.8-dev, flex, bison
+Standards-Version: 3.8.4
+Section: libs
+Homepage: http://www.snort.org/snort-downloads
+
+Package: libdaq-dev
+Section: libdevel
+Architecture: any
+Depends: libdaq0 (= ${binary:Version})
+Description: Data Acquisition library for packet I/O - development files
+ DAQ is a library that introduces an abstraction layer to PCAP functions
+ facilitation operation in a variety of hardware and software interfaces. 
+ .
+ It was written for Snort but it may be useful to other packet processing
+ applicatons.
+ .
+ This package contains the static library and the C header files.
+
+Package: libdaq0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Data Acquisition library for packet I/O - shared library
+ DAQ is a library that introduces an abstraction layer to PCAP functions
+ facilitation operation in a variety of hardware and software interfaces. 
+ .
+ It was written for Snort but it may be useful to other packet processing
+ applicatons.
+ .
+ This package contains the shared library.
