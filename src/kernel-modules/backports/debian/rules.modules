@@ -25,7 +25,7 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	$(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) defconfig-iwlwifi defconfig-ath10k
+	$(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) defconfig-iwlwifi defconfig-ath9k defconfig-ath10k
 	$(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS)
 
 	dh_installdirs lib/modules/$(KVERS)/extra

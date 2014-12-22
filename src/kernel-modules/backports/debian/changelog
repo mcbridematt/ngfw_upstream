@@ -1,3 +1,9 @@
+backports (3.17.1+untangle5-1) unstable; urgency=low
+
+  * Add ath9k
+
+ -- Sebastien Delafond <seb@untangle.com>  Mon, 22 Dec 2014 01:53:54 -0800
+
 backports (3.17.1+untangle4-1) unstable; urgency=low
 
   * Add ath10k
