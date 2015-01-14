@@ -33,7 +33,7 @@ binary-modules: kdist_config
 	  $(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) ; \
 	  find . -name *.ko | while read mod ; do \
 	     basename $$mod >> list ; \
-	     install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/extra ; \
+	     install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/extra || true ; \
 	  done ; \
 	done
 

@@ -1,3 +1,9 @@
+backports (3.17.1+untangle7-1) unstable; urgency=low
+
+  * Do not error out if a .ko file already exist in target directory
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 14 Jan 2015 04:41:21 -0800
+
 backports (3.17.1+untangle6-1) unstable; urgency=low
 
   * Build each module separately
