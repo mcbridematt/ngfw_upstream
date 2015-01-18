@@ -1,5 +1,5 @@
---- drivers/net/wireless/ath/regd.c	2014-12-03 14:39:32.000000000 -0800
-+++ drivers/net/wireless/ath/regd.c.bak	2015-01-18 05:04:07.000000000 -0800
+--- a/drivers/net/wireless/ath/regd.c	2014-12-03 14:39:32.000000000 -0800
++++ a/drivers/net/wireless/ath/regd.c.bak	2015-01-18 05:04:07.000000000 -0800
 @@ -44,11 +44,11 @@
  
  /* We allow IBSS on these on a case by case basis by regulatory domain */
