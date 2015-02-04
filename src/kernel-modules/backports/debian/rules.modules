@@ -25,7 +25,7 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	dh_installdirs lib/modules/$(KVERS)/extra
+	dh_installdirs lib/modules/$(KVERS)/updates
 	touch list
 
 	for conf in iwlwifi ath9k ath10k ; do \
@@ -33,7 +33,7 @@ binary-modules: kdist_config
 	  $(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) ; \
 	  find . -name *.ko | while read mod ; do \
 	     basename $$mod >> list ; \
-	     install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/extra || true ; \
+	     install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/updates || true ; \
 	  done ; \
 	done
 
