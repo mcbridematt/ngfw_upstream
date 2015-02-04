@@ -1,3 +1,9 @@
+igb-source (1:5.2.9.4+untangle4-1) unstable; urgency=low
+
+  * Run postinst with -x
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 07:06:44 -0800
+
 igb-source (1:5.2.9.4+untangle3-1) unstable; urgency=low
 
   * Proper postinst

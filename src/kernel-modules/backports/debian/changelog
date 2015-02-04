@@ -1,3 +1,9 @@
+backports (3.17.1+untangle10-1) unstable; urgency=low
+
+  * Run postinst with -x
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 07:06:44 -0800
+
 backports (3.17.1+untangle9-1) unstable; urgency=low
 
   * Fix #12183
