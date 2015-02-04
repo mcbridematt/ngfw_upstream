@@ -1,3 +1,9 @@
+e1000e-source (3.1.0.2+untangle3-1) unstable; urgency=low
+
+  * Proper postinst
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 05:17:18 -0800
+
 e1000e-source (3.1.0.2+untangle2-1) unstable; urgency=low
 
   * Fix #12183
