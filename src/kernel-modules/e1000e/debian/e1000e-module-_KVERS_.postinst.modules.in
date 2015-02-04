@@ -1,6 +1,5 @@
 #! /bin/sh
 
-set -x
 set -e
 
 exec >> /var/log/uvm/kernel-modules.log 2>&1
@@ -8,10 +7,7 @@ exec >> /var/log/uvm/kernel-modules.log 2>&1
 KVERS=$(echo $DPKG_MAINTSCRIPT_PACKAGE | perl -pe 's/.+-3.2/3.2/')
 
 date -Iseconds
-
-while read mod ; do
-  find /lib/modules/$KVERS -name $mod -a ! -path "*extra*" -exec rm -f "{}" \;
-done < /usr/share/doc/$DPKG_MAINTSCRIPT_PACKAGE/list
+echo $KVERS
 
 depmod -a
 #DEBHELPER#
