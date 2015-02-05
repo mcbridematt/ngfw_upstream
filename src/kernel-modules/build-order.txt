@@ -1,4 +1,4 @@
-kernel-modules   wheezy
+open-vm            wheezy
 # e1000e           wheezy
 # igb              wheezy
 # backports        wheezy
