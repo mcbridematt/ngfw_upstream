@@ -1,3 +1,4 @@
-e1000e           wheezy
-igb              wheezy
-backports        wheezy
+kernel-modules   wheezy
+# e1000e           wheezy
+# igb              wheezy
+# backports        wheezy
