@@ -1,3 +1,9 @@
+e1000e-source (3.1.0.2+untangle6-1) unstable; urgency=low
+
+  * Make sure we do not error out during initial install
+
+ -- Sebastien Delafond <seb@untangle.com>  Sat, 07 Feb 2015 02:20:20 -0800
+
 e1000e-source (3.1.0.2+untangle5-2) unstable; urgency=low
 
   * Depmod now runs fine, taking out -x
