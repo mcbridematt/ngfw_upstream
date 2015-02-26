@@ -149,9 +149,9 @@ clean:
 	-( cd docs && rm -rf grub multiboot )
 
 	# remove files that will be change due our automake and autoconf rebuilding
-	-rm -f $(shell find . -name 'Makefile.in' -o \
-                    -name 'aclocal.m4' -o \
-                    -name 'configure')
+	# -rm -f $(shell find . -name 'Makefile.in' -o \
+        #             -name 'aclocal.m4' -o \
+        #             -name 'configure')
 
 	# reverse patches we applied. this has to happen after make distclean
 	-$(MAKE) -s -f debian/rules unpatch
