@@ -11,7 +11,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Provides: untangle-libnetfilter-queue0
 Replaces: untangle-libnetfilter-queue0
-Conflicts: untangle-libnetfilter-queue0, untangle-libnetfilter-queue-dev
+Conflicts: untangle-libnetfilter-queue0
 Description: Netfilter netlink-queue library
  libnetfilter_queue is a userspace library providing an API to packets
  that have been queued by the kernel packet filter. It is part of a
