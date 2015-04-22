@@ -7,7 +7,7 @@ Build-Depends: debhelper (>> 3.0.0)
 Standards-Version: 3.8.0
 
 Package: jshint
-Depends: spidermonkey-bin, python
+Depends: spidermonkey-bin | rhino, python
 Architecture: all
 Description: jshint
  The jshint library, plus a wrapper script.
