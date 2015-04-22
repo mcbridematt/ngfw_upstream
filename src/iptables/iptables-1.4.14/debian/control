@@ -2,7 +2,7 @@ Source: iptables
 Section: net
 Priority: important
 Maintainer: Laurence J. Lane <ljlane@debian.org>
-Build-Depends: debhelper (>> 8.9.4), autoconf, automake, libtool (>=2.2.6), libnfnetlink-dev
+Build-Depends: debhelper (>> 8.9.4), autoconf, automake, libtool (>=2.2.6), libnfnetlink-dev, linux-libc-dev
 Standards-Version: 3.9.2
 Homepage: http://www.netfilter.org/
 
