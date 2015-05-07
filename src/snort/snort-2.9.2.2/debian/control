@@ -21,7 +21,9 @@ Build-Depends:
     bison
 Build-Depends-Indep: 
     texlive, 
-    texlive-latex-base, 
+    texlive-latex-base,
+    texlive-font-utils,
+    testlive-binaries,
     ghostscript
 Standards-Version:  3.9.2
 Homepage: http://www.snort.org/
