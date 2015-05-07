@@ -12,7 +12,7 @@ Build-Depends:
     libpq-dev, 
     po-debconf (>= 0.5.0), 
     libprelude-dev, 
-    libgnutls-dev, 
+    libgnutls-dev | libgnutls28-dev,
     libdumbnet-dev, 
     libdaq-dev, 
     flex, 
