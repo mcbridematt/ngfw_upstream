@@ -14,7 +14,9 @@ Build-Depends:
     libprelude-dev, 
     libgnutls-dev | libgnutls28-dev,
     libdumbnet-dev, 
-    libdaq-dev, 
+    libdaq-dev,
+    libnfnetlink-dev,
+    libnetfilter-queue-dev,
     flex, 
     bison
 Build-Depends-Indep: 
