@@ -23,7 +23,7 @@ Build-Depends-Indep:
     texlive, 
     texlive-latex-base,
     texlive-font-utils,
-    testlive-binaries,
+    texlive-binaries,
     ghostscript
 Standards-Version:  3.9.2
 Homepage: http://www.snort.org/
