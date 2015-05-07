@@ -1,3 +1,4 @@
+snort/snort-2.9.2.2                                             jessie
 grub/grub-0.97                                                  wheezy
 wpa/wpa-2.3                                                     wheezy
 ifupdown/ifupdown-0.7.49                                        wheezy
@@ -18,3 +19,4 @@ daq/daq-0.6.2                                                   wheezy,jessie
 kernel-modules/backports                                        wheezy,jessie
 kernel-modules/e1000e                                           wheezy,jessie
 kernel-modules/igb                                              wheezy,jessie
+
