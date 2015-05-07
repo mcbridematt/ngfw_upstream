@@ -129,15 +129,15 @@ build-indep-stamp: configure-stamp
 	# Build the documentation
 # Only do this if we have the required binaries and files
 # Note: I hate hardcoding paths here, but the buildds are stupid
-	@if [ -x /usr/bin/ps2pdf -a -x /usr/bin/pslatex -a \
-	     -x /usr/bin/dvips -a \
-	     -e /usr/share/texlive/texmf-dist/tex/latex/pslatex/pslatex.sty -a \
-	     -e /usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty ] ; \
-	then \
-	    $(MAKE) -C doc snort_manual.pdf faq.pdf ; \
-	else \
-	    echo >&2 'WARNING: Not building documentation, environment not available!'; \
-	fi
+	# @if [ -x /usr/bin/ps2pdf -a -x /usr/bin/pslatex -a \
+	#      -x /usr/bin/dvips -a \
+	#      -e /usr/share/texlive/texmf-dist/tex/latex/pslatex/pslatex.sty -a \
+	#      -e /usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty ] ; \
+	# then \
+	$(MAKE) -C doc snort_manual.pdf faq.pdf
+	# else \
+	#     echo >&2 'WARNING: Not building documentation, environment not available!'; \
+	# fi
 	touch $@
 
 build: build-arch build-indep
