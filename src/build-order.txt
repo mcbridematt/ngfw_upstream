@@ -14,7 +14,7 @@ iptables/iptables-1.4.21                                        jessie
 rhino/rhino-1.7R4                                               wheezy
 $sleep 40                                                       jessie
 daq/daq-0.6.2                                                   wheezy,jessie
-$sleep 40                                                       jessie
+$sleep 125                                                       jessie
 snort/snort-2.9.2.2                                             jessie
 
 kernel-modules/backports                                        wheezy,jessie
