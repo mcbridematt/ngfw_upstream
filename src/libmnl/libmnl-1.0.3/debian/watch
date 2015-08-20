@@ -1,2 +1,0 @@
-version=3
-opts=pgpsigurlmangle=s/$/.sig/ http://www.netfilter.org/projects/libmnl/files/libmnl-(.*).tar.bz2
