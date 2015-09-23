@@ -19,7 +19,6 @@ modules/$(NAME): $(wildcard src/*) $(wildcard debian/*)
 	cp -dR src modules/$(NAME)
 	cp debian/*.in debian/copyright debian/changelog debian/compat modules/$(NAME)/debian
 	install -m755 debian/rules.modules modules/$(NAME)/debian/rules
-	cp README* modules/$(NAME)
 	chmod -R ug=rwX,o=rX modules
 
 $(NAME).tar.gz: modules/$(NAME)
