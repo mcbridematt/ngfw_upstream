@@ -35,7 +35,6 @@ binary-modules: kdist_config
 	   install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/updates ; \
 	done
 
-	dh_installdocs list README*
 	dh_installmodules
 	dh_installchangelogs
 	dh_compress
