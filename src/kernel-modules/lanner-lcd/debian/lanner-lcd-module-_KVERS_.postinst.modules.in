@@ -1,0 +1,15 @@
+#! /bin/sh
+
+set -e
+
+exec >> /var/log/uvm/kernel-modules.log 2>&1
+
+KVERS=$(echo $DPKG_MAINTSCRIPT_PACKAGE | perl -pe 's/.+-3.2/3.2/')
+
+date -Iseconds
+echo $KVERS
+
+depmod -a || true # this fails during initial install
+#DEBHELPER#
+
+exit 0
