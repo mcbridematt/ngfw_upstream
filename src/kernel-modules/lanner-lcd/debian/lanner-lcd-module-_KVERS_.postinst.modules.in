@@ -4,10 +4,30 @@ set -e
 
 exec >> /var/log/uvm/kernel-modules.log 2>&1
 
+ourInit() {
+if [ -x /usr/sbin/invoke-rc.d ] && [ ! "`readlink /usr/sbin/invoke-rc.d`" = /bin/true ] ; then
+  invoke-rc.d $1 $2
+else
+  /etc/init.d/$1 $2
+fi
+}
+
 KVERS=$(echo $DPKG_MAINTSCRIPT_PACKAGE | perl -pe 's/.+-3.2/3.2/')
 
 date -Iseconds
 echo $KVERS
+
+DEV="plcm_drv"
+if ! [ -c /dev/$DEV ] ; then
+  UDEV_DEV=/lib/udev/devices
+  mkdir -p ${UDEV_DEV}/$DEV
+  mknod ${UDEV_DEV}/$DEV c 248 0
+  ourInit udev restart
+fi
+
+if ! grep -q $DEV /etc/modules ; then
+  echo $DEV >> /etc/modules
+fi
 
 depmod -a || true # this fails during initial install
 #DEBHELPER#
