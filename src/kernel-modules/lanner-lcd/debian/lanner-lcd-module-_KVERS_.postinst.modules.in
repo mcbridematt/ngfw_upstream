@@ -25,7 +25,7 @@ fi
 
 # also make sure it will get created upon reboot
 if ! grep -q $DEV /etc/rc.local ; then
-  perl -i -pe "s|exit 0|mknod /dev/$DEV c 248 0\nexit 0|" /etc/rc.local
+  perl -i -pe "s|^exit 0|mknod /dev/$DEV c 248 0\nexit 0|" /etc/rc.local
 fi
 
 # load the module at boot
