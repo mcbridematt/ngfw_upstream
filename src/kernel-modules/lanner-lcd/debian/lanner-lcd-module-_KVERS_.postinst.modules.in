@@ -18,18 +18,24 @@ date -Iseconds
 echo $KVERS
 
 DEV="plcm_drv"
+# take care of creating the device node right away
 if ! [ -c /dev/$DEV ] ; then
-  UDEV_DEV=/lib/udev/devices
-  mkdir -p ${UDEV_DEV}/$DEV
-  mknod ${UDEV_DEV}/$DEV c 248 0
-  ourInit udev restart
+  mknod /dev/$DEV c 248 0
 fi
 
+# also make sure it will get created upon reboot
+if ! grep -q $DEV /etc/rc.local ; then
+  perl -i -pe "s|exit 0|mknod /dev/$DEV c 248 0\nexit 0|" /etc/rc.local
+fi
+
+# load the module at boot
 if ! grep -q $DEV /etc/modules ; then
   echo $DEV >> /etc/modules
 fi
 
-depmod -a || true # this fails during initial install
+# the next 2 will fail during initial install
+depmod -a || true
+modprobe $DEV || true
 #DEBHELPER#
 
 exit 0
