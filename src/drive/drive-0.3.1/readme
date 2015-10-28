@@ -1,0 +1,36 @@
+sudo add-apt-repository ppa:twodopeshaggy/drive
+https://github.com/odeke-em/drive/archive/v0.0.7.tar.gz
+
+
+NOTES for build process:
+
+run go get in toplevel dir for 
+export GOPATH=/home/linuxlite/drivedebpackage/
+ 	go get github.com/odeke-em/drive/cmd/drive
+ 	go get github.com/odeke-em/drive/config
+ 	go get github.com/odeke-em/command
+
+copy pkg and src over
+
+
+
+
+in main dir run:
+dch -i
+
+
+(to test if builds)
+dpkg-buildpackage -us -uc
+
+(source pkg for ubuntu)
+debuild  -S  -sa -k7EC3233B
+
+(repleace 7EC3233B with your own gpg key to sign properly)
+
+
+upload to ppa!
+
+dput drive <source.changes>
+
+(example)
+dput drive drive_0.0.4.b-0_source.changes 

@@ -1,0 +1,13 @@
+Source: drive
+Section: net
+Priority: extra
+Maintainer: Sebastien Delafond <sdelafond@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), golang-go, git
+Standards-Version: 3.9.1
+Homepage: https://github.com/odeke-em/drive
+
+Package: drive
+Architecture: amd64 i386 armel armhf arm64
+Depends: ${misc:Depends}
+Description: Google Drive tool written in Go language
+ Command line tool for managing data on Google drive.

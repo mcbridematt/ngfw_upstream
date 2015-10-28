@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+# This file is in the public domain.
+# You may freely use, modify, distribute, a
+
+export GOPATH=$(CURDIR)
+
+PKGDIR=debian/drive
+
+%:
+	dh $@ 
+
+clean:
+	dh_clean
+	rm -rf $(GOPATH)/bin/* $(GOPATH)/pkg/*
+	#cd $(GOPATH)/src && find * -name '*.go' -exec dirname {} \; | xargs -n1 go clean
+	rm -f $(GOPATH)/goinstall.log
+
+binary-arch: clean
+	dh_prep
+	dh_installdirs
+	cd $(GOPATH)/src/github.com/odeke-em/drive/cmd/drive/ && find * -name '*.go' -exec dirname {} \; | xargs -n1 go install
+	cd $(GOPATH)/src/github.com/odeke-em/drive/drive-server/ && find * -name '*.go' -exec dirname {} \; | xargs -n1 go install
+	mkdir -p $(PKGDIR)/usr/bin
+	cp $(GOPATH)/bin/* $(PKGDIR)/usr/bin/
+	mkdir -p $(PKGDIR)/usr/share/icons
+	dh_install /src/github.com/odeke-em/drive/icons/*png /usr/share/icons/hicolor/128x128/mimetypes/
+	dh_install /src/github.com/odeke-em/drive/icons/*svg /usr/share/icons/hicolor/scalable/mimetypes/
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-arch
