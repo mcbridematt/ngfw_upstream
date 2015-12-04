@@ -24,8 +24,10 @@ func (g *Commands) Init() error {
 	g.context.ClientId = os.Getenv(GoogleApiClientIdEnvKey)
 	g.context.ClientSecret = os.Getenv(GoogleApiClientSecretEnvKey)
 	if g.context.ClientId == "" || g.context.ClientSecret == "" {
-		g.context.ClientId = "354790962074-7rrlnuanmamgg1i4feed12dpuq871bvd.apps.googleusercontent.com"
-		g.context.ClientSecret = "RHjKdah8RrHFwu6fcc0uEVCw"
+		g.context.ClientId = "661509598543-1p2n8foedn1n0t7t767q9sgd0accml07.apps.googleusercontent.com"
+		g.context.ClientSecret = "eJDmfgIrqJvFvk5ZoH05CJz-"
+		//g.context.ClientId = "354790962074-7rrlnuanmamgg1i4feed12dpuq871bvd.apps.googleusercontent.com"
+		//g.context.ClientSecret = "RHjKdah8RrHFwu6fcc0uEVCw"
 	}
 
 	ctx := context.Background()

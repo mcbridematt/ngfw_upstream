@@ -38,7 +38,8 @@ import (
 
 const (
 	// OAuth 2.0 OOB redirect URL for authorization.
-	RedirectURL = "urn:ietf:wg:oauth:2.0:oob"
+	RedirectURL = "http://wiki.untangle.com/oauth2.php"
+	//RedirectURL = "urn:ietf:wg:oauth:2.0:oob"
 
 	// OAuth 2.0 full Drive scope used for authorization.
 	DriveScope = "https://www.googleapis.com/auth/drive"
