@@ -1,0 +1,55 @@
+dh_testdir
+# Basic package (no BBDD support):
+/usr/bin/make 
+make[1]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2'
+/usr/bin/make  all-recursive
+make[2]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2'
+Making all in src
+make[3]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src'
+Making all in sfutil
+make[4]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/sfutil'
+make[4]: Nothing to be done for 'all'.
+make[4]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/sfutil'
+Making all in win32
+make[4]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/win32'
+make[4]: Nothing to be done for 'all'.
+make[4]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/win32'
+Making all in output-plugins
+make[4]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/output-plugins'
+make[4]: Nothing to be done for 'all'.
+make[4]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/output-plugins'
+Making all in detection-plugins
+make[4]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/detection-plugins'
+/usr/bin/make  all-am
+make[5]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/detection-plugins'
+make[5]: Nothing to be done for 'all-am'.
+make[5]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/detection-plugins'
+make[4]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/detection-plugins'
+Making all in dynamic-plugins
+make[4]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins'
+Making all in sf_engine
+make[5]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+/usr/bin/make  all-recursive
+make[6]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+Making all in examples
+make[7]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine/examples'
+make[7]: Nothing to be done for 'all'.
+make[7]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine/examples'
+make[7]: Entering directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+/bin/bash ../../../libtool  --tag=CC   --mode=link gcc  -g -O2 -D_GNU_SOURCE -DSF_VISIBILITY -fvisibility=hidden -fno-strict-aliasing -Wall -export-dynamic -module  -L/root/development/ngfw/upstream/pkgs/src/daq/daq-2.0.6/debian/libdaq-dev/usr/lib -lpcre -L/usr/lib -ldumbnet -o libsf_engine.la -rpath /usr/lib/snort_dynamicengine bmh.lo sf_snort_detection_engine.lo sf_snort_plugin_api.lo sf_snort_plugin_byte.lo sf_snort_plugin_content.lo sf_snort_plugin_hdropts.lo sf_snort_plugin_loop.lo sf_snort_plugin_pcre.lo sf_snort_plugin_rc4.lo sf_decompression.lo sfhashfcn.lo sfghash.lo sfprimetable.lo sf_ip.lo sf_sechash.lo    -lz -ldumbnet -lpcre -lpcap -lnsl -lm -lm  -lcrypto -ldl -ldaq -lz -lpthread -lpthread -lpthread
+libtool: link: gcc -shared  -fPIC -DPIC  .libs/bmh.o .libs/sf_snort_detection_engine.o .libs/sf_snort_plugin_api.o .libs/sf_snort_plugin_byte.o .libs/sf_snort_plugin_content.o .libs/sf_snort_plugin_hdropts.o .libs/sf_snort_plugin_loop.o .libs/sf_snort_plugin_pcre.o .libs/sf_snort_plugin_rc4.o .libs/sf_decompression.o .libs/sfhashfcn.o .libs/sfghash.o .libs/sfprimetable.o .libs/sf_ip.o .libs/sf_sechash.o   -L/root/development/ngfw/upstream/pkgs/src/daq/daq-2.0.6/debian/libdaq-dev/usr/lib -L/usr/lib /usr/lib/libdumbnet.so -lpcre -lpcap -lnsl -lm -lcrypto /usr/lib/libdaq.so -ldl -lz -lpthread  -O2   -Wl,-soname -Wl,libsf_engine.so.0 -o .libs/libsf_engine.so.0.0.0
+Makefile:593: recipe for target 'libsf_engine.la' failed
+make[7]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+Makefile:623: recipe for target 'all-recursive' failed
+make[6]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+Makefile:522: recipe for target 'all' failed
+make[5]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins/sf_engine'
+Makefile:434: recipe for target 'all-recursive' failed
+make[4]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src/dynamic-plugins'
+Makefile:540: recipe for target 'all-recursive' failed
+make[3]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2/src'
+Makefile:505: recipe for target 'all-recursive' failed
+make[2]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2'
+Makefile:370: recipe for target 'all' failed
+make[1]: Leaving directory '/root/development/ngfw/upstream/pkgs/src/snort/snort-2.9.8.2'
+debian/rules:81: recipe for target 'build-basic-stamp' failed
