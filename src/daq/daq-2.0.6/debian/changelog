@@ -1,0 +1,46 @@
+daq (2.0.6-1) unstable; urgency=low
+  * Update to latest version of daq.
+
+daq (0.6.2-2) unstable; urgency=low
+
+  * Upload to unstable (Closes: #656289)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@debian.org>  Wed, 18 Jan 2012 19:34:45 +0100
+
+daq (0.6.2-1) experimental; urgency=low
+
+  * New upstream release
+
+ -- Andrew Pollock <apollock@google.com>  Thu, 22 Dec 2011 10:21:09 -0800
+
+daq (0.3-2) experimental; urgency=low
+
+  * Fix FTBFS: update Build-Depends with flex, bison (Closes: #609054)
+  * This version now supports inline mode since the dumbnet library is now properly 
+    detected (Closes: #609865)
+  * To fix the above change the debian/patches/10_dnet-to-dumbnet.diff patch
+    New changes in the patch:
+      - Make m4/sf.m4 work with latest autoconf since the AX_CFLAGS_GCC_OPTION
+        call would not work when using multiple GCC_OPTIONS, only one option (pedantic)
+        is now check to set 
+     - os-daq-modules/Makefile.am, os-daq-modules/daq_ipq.c, os-daq-modules/daq_nfq.c:
+        Modified to use 'dumbnet' instead of 'dnet'
+     - README: it's 'aclocal -I m4', there is no 'config' directory
+     - More changes due to the automatic regeneration of all autoconf files after doing the
+       above changes and running:
+       'libbtoolize --copy --force ; aclocal -I m4; autoheader; autoconf; automake --foreign '
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@debian.org>  Thu, 13 Jan 2011 01:11:14 +0100
+
+daq (0.3-1) experimental; urgency=low
+
+  * Initial release. 
+  * This library is required for Snort 2.9.0 (produced by the Snort team).
+    Since I will be targetting experimental with Snort 2.9.0 I'm uploading this
+    library there too.
+  * debian/patches/10_dnet-to-dumbnet.diff: Patch to use dumbnet instead of
+    dnet. It is not applied as it currently breaks the build due to an autoconf
+    issue (to be investigated). This only prevents the IPQ and NFQ DAQs from
+    being available (but the PCAP module should work)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@debian.org>  Thu, 11 Nov 2010 00:52:20 +0100
