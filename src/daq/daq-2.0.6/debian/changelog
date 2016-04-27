@@ -1,6 +1,9 @@
 daq (2.0.6-1) unstable; urgency=low
+
   * Update to latest version of daq.
 
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 27 Apr 2016 10:22:33 -0400
+  
 daq (0.6.2-2) unstable; urgency=low
 
   * Upload to unstable (Closes: #656289)

@@ -1,9 +1,15 @@
 snort (2.9.8.2-1) unstable; urgency=medium
+
   * Upgrade to latest stable snort
 
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 27 Apr 2016 10:22:33 -0400
+  
 snort (2.9.8.0-1) unstable; urgency=medium
+
   * Upgrade to latest stable snort
 
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 27 Apr 2016 10:22:33 -0400
+  
 snort (2.9.2.2-3) unstable; urgency=medium
 
   [ Upload target towards Wheezy fixing some important bugs
