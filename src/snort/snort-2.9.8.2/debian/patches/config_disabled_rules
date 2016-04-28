@@ -6,7 +6,7 @@ Last-Update: 2012-05-05
 
 --- a/etc/snort.conf
 +++ b/etc/snort.conf
-@@ -572,15 +572,15 @@
+@@ -554,8 +554,8 @@
  include $RULE_PATH/attack-responses.rules
  include $RULE_PATH/backdoor.rules
  include $RULE_PATH/bad-traffic.rules
@@ -14,37 +14,42 @@ Last-Update: 2012-05-05
 -include $RULE_PATH/botnet-cnc.rules
 +# include $RULE_PATH/blacklist.rules
 +# include $RULE_PATH/botnet-cnc.rules
- include $RULE_PATH/chat.rules
--include $RULE_PATH/content-replace.rules
-+# include $RULE_PATH/content-replace.rules
- include $RULE_PATH/ddos.rules
- include $RULE_PATH/dns.rules
- include $RULE_PATH/dos.rules
+ include $RULE_PATH/browser-chrome.rules
+ include $RULE_PATH/browser-firefox.rules
+ include $RULE_PATH/browser-ie.rules
+@@ -572,7 +572,7 @@
  include $RULE_PATH/exploit.rules
+ include $RULE_PATH/file-executable.rules
+ include $RULE_PATH/file-flash.rules
 -include $RULE_PATH/file-identify.rules
 +# include $RULE_PATH/file-identify.rules
- include $RULE_PATH/finger.rules
- include $RULE_PATH/ftp.rules
- include $RULE_PATH/icmp.rules
-@@ -595,25 +595,28 @@
- include $RULE_PATH/oracle.rules
+ include $RULE_PATH/file-image.rules
+ include $RULE_PATH/file-multimedia.rules
+ include $RULE_PATH/file-office.rules
+@@ -603,7 +603,7 @@
+ include $RULE_PATH/os-windows.rules
  include $RULE_PATH/other-ids.rules
  include $RULE_PATH/p2p.rules
 -include $RULE_PATH/phishing-spam.rules
 +# include $RULE_PATH/phishing-spam.rules
+ include $RULE_PATH/policy-multimedia.rules
+ include $RULE_PATH/policy-other.rules
  include $RULE_PATH/policy.rules
- include $RULE_PATH/pop2.rules
- include $RULE_PATH/pop3.rules
+@@ -624,7 +624,7 @@
+ include $RULE_PATH/pua-toolbars.rules
  include $RULE_PATH/rpc.rules
  include $RULE_PATH/rservices.rules
 -include $RULE_PATH/scada.rules
 +# include $RULE_PATH/scada.rules
  include $RULE_PATH/scan.rules
+ include $RULE_PATH/server-apache.rules
+ include $RULE_PATH/server-iis.rules
+@@ -634,17 +634,17 @@
+ include $RULE_PATH/server-oracle.rules
+ include $RULE_PATH/server-other.rules
+ include $RULE_PATH/server-webapp.rules
 -include $RULE_PATH/shellcode.rules
-+# Note: These rules are disable by default as they are
-+# too coarse grained. Enabling them causes a large
-+# performance impact
-+#include $RULE_PATH/shellcode.rules
++# include $RULE_PATH/shellcode.rules
  include $RULE_PATH/smtp.rules
  include $RULE_PATH/snmp.rules
 -include $RULE_PATH/specific-threats.rules
