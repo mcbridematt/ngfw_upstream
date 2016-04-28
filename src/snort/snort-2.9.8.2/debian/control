@@ -18,7 +18,8 @@ Build-Depends:
     libnfnetlink-dev,
     libnetfilter-queue-dev,
     flex, 
-    bison
+    bison,
+    autoconf
 Build-Depends-Indep: 
     texlive, 
     texlive-latex-base,
