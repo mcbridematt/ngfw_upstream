@@ -40,18 +40,16 @@ Last-Update: 2012-08-07
  
  ###################################################
  # Step #2: Configure the decoder.  For more information, see README.decode
-@@ -528,7 +529,9 @@
+@@ -528,7 +529,7 @@
  # output alert_syslog: LOG_AUTH LOG_ALERT
  
  # pcap
 -# output log_tcpdump: tcpdump.log
 +output log_tcpdump: tcpdump.log
-+
-+include database.conf
  
  # metadata reference data.  do not modify these lines
  include classification.config
-@@ -542,6 +545,10 @@
+@@ -542,6 +543,10 @@
  # NOTE: All categories are enabled in this conf file
  ###################################################
  
@@ -62,7 +60,7 @@ Last-Update: 2012-08-07
  # site specific rules
  include $RULE_PATH/local.rules
  
-@@ -648,6 +655,20 @@
+@@ -648,6 +653,20 @@
  include $RULE_PATH/web-iis.rules
  include $RULE_PATH/web-misc.rules
  include $RULE_PATH/web-php.rules
