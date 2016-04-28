@@ -1064,7 +1064,7 @@ snort (2.3.3-3) unstable; urgency=low
 
   * Properly remove the snort user on purge.
 
- -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Thu, 20 Oct 2005 01:13:47 +0200
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Thu, 20 Oct 2005 01.14.17 +0200
 
 snort (2.3.3-2.1) unstable; urgency=low
 
