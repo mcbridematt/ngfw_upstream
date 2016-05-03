@@ -252,7 +252,6 @@ binary-indep: build-indep install-indep
 	dh_fixperms -i
 	dh_makeshlibs -i
 	dh_installdeb -i
-	rm -rf $(TMP)/snort-common/DEBIAN/conffiles
 	dh_perl -i
 	dh_shlibdeps -i
 	dh_gencontrol -i
