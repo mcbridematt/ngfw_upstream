@@ -169,11 +169,9 @@ case "$1" in
 		got_instance=1
 		log_progress_msg "($interface"
 
-                # Check if the interface is available:
-                # - only if iproute is available
-                # - the interface exists 
-                # - the interface is up
-                if ! [ -x /sbin/ip ] || ( ip link show dev "$interface" >/dev/null 2>&1 && [ -n "`ip link show up "$interface" 2>/dev/null`" ] ) ; then
+                # Remove comparisons to see if all interfaces are up.
+                # Since we manage interfaces, they're correctly up or down.
+                if [ 1 ] ; then
 
 		PIDFILE=/var/run/snort_$interface.pid
                 CONFIGFILE=/etc/snort/snort.$interface.conf
@@ -194,6 +192,13 @@ case "$1" in
                     else
                         log_progress_msg "using /etc/snort/snort.$interface.conf"
                     fi
+                    
+                    use_nfq_daq=$(echo "$DEBIAN_SNORT_OPTIONS" | grep -c "\-\-daq nfq" )
+                    if [ "$use_nfq_daq" = "1" ] ; then
+                        INTERFACE_OPTIONS="--daq-var device=$interface"
+                    else
+                        INTERFACE_OPTIONS="-i $interface"
+                    fi
 
                     set +e
                     /sbin/start-stop-daemon --start --quiet  \
@@ -201,7 +206,7 @@ case "$1" in
                         --exec $DAEMON -- $COMMON $DEBIAN_SNORT_OPTIONS \
                         -c $CONFIGFILE \
                         -S "HOME_NET=[$DEBIAN_SNORT_HOME_NET]" \
-                        -i $interface >/dev/null
+                        $INTERFACE_OPTIONS >/dev/null
                     ret=$?
                     case "$ret" in
 			0)
