@@ -213,6 +213,7 @@ install-indep:
 	install -m 755 -o root -g root `pwd`/debian/snort.cron.daily $(TMP)/snort-common/etc/cron.daily/5snort
 	install -m 755 -o root -g root `pwd`/debian/my/snort-stat $(TMP)/snort-common/usr/sbin/
 	install -m 644 -o root -g root `pwd`/etc/snort.conf $(TMP)/snort-common/etc/snort/
+	install -m 644 -o root -g root `pwd`/debian/snort.debian.conf $(TMP)/snort-common/etc/snort/
 	install -m 644 -o root -g root `pwd`/etc/unicode.map $(TMP)/snort-common/etc/snort/
 	install -m 644 -o root -g root `pwd`/etc/threshold.conf $(TMP)/snort-common/etc/snort/
 #  Install files of the arch-independent packages
@@ -222,8 +223,8 @@ install-indep:
 #	install -m 644 etc/sid-msg.map $(TMP)/snort-rules-default/etc/snort/
 	install -m 644 etc/gen-msg.map $(TMP)/snort-rules-default/etc/snort/
 #	install -m 644 etc/community-sid-msg.map $(TMP)/snort-rules-default/etc/snort/
-#	install -m 644 etc/classification.config $(TMP)/snort-rules-default/etc/snort/
-#	install -m 644 etc/reference.config $(TMP)/snort-rules-default/etc/snort/
+	install -m 644 -o root -g root `pwd`/etc/classification.config $(TMP)/snort-rules-default/etc/snort/
+	install -m 644 -o root -g root `pwd`/etc/reference.config $(TMP)/snort-rules-default/etc/snort/
 # Remove useless directories
 	rm -rf $(TMP)/snort-common/etc/ppp
 	rm -rf $(TMP)/snort-doc/usr/share/doc
