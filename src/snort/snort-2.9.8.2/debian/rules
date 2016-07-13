@@ -30,8 +30,8 @@ CONFFLAGS= --prefix=/usr \
 	--with-daq-includes=$(DAQ_DEV_PATH)/usr/include
 
 aclocal.m4:
-	aclocal-1.9 -I m4/
-	automake-1.9 -i
+	aclocal-1.14 -I m4/
+	automake-1.14 -i
 	autoconf
 
 clean-sources:
@@ -58,6 +58,7 @@ clean: clean-sources
 	    doc/snort_manual.log doc/snort_manual.toc
 	rm -f doc/faq.idx doc/faq.out doc/faq.log doc/faq.toc doc/faq.aux \
 	    doc/faq.pdf doc/faq.ps
+	dh_autoreconf clean
 	dh_clean
 
 configure: configure-stamp
