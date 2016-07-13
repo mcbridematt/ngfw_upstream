@@ -32,7 +32,7 @@ Vcs-Git: git://git.debian.org/git/pkg-snort/pkg-snort.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-snort/pkg-snort.git
 
 Package: snort
-Architecture: any
+Architecture: i386 amd64
 Pre-Depends: adduser (>= 3.11)
 Depends: 
     snort-common-libraries (>=${binary:Version}),
@@ -105,7 +105,7 @@ Description: Documentation for the Snort IDS [documentation]
 
 Package: snort-mysql
 Provides: snort
-Architecture: any
+Architecture: i386 amd64
 Priority: extra
 Pre-Depends: adduser (>= 3.11)
 Depends: 
@@ -189,7 +189,7 @@ Description: flexible Network Intrusion Detection System ruleset
  or using the oinkmaster package.
 
 Package: snort-common-libraries
-Architecture: any
+Architecture: i386 amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: snort (>= 2.7.0) | snort-pgsql (>= 2.7.0) | snort-mysql (>= 2.7.0)
 Conflicts: snort-common (<< 2.7.0-6)
