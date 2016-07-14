@@ -19,8 +19,6 @@ endif
 
 export CFLAGS
 
-DAQ_DEV_PATH=$(abspath ../../daq/daq-2.0.6/debian/tmp)
-
 CONFFLAGS= --prefix=/usr \
 	--bindir=\$$\{exec_prefix\}/sbin \
 	--mandir=\$$\{exec_prefix\}/share/man \
