@@ -23,8 +23,7 @@ Build-Depends:
     dh-autoreconf,
     dpkg-dev,
     pkg-config,
-    zlib1g-dev,
-    liblzma-dev    
+    zlib1g-dev
 Build-Depends-Indep: 
     texlive, 
     texlive-latex-base,
