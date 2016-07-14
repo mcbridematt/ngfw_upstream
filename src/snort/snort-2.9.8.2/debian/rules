@@ -58,7 +58,7 @@ clean: clean-sources
 	    doc/snort_manual.log doc/snort_manual.toc
 	rm -f doc/faq.idx doc/faq.out doc/faq.log doc/faq.toc doc/faq.aux \
 	    doc/faq.pdf doc/faq.ps
-	dh_autoreconf clean
+	dh_autoreconf_clean
 	dh_clean
 
 configure: configure-stamp
