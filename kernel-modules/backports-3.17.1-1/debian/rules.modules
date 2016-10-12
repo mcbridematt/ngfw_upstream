@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-NAME=backports
+NAME=backports-3.17.1-1
 
 # prefix of the target package name
 PACKAGE=$(NAME)-modules
