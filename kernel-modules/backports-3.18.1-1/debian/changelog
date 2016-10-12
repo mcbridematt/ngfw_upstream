@@ -1,0 +1,71 @@
+backports (3.18.1+untangle12-1) unstable; urgency=low
+
+  * Make sure we do not error out during initial install
+
+ -- Sebastien Delafond <seb@untangle.com>  Sat, 07 Feb 2015 02:20:20 -0800
+
+backports (3.18.1+untangle11-1) unstable; urgency=low
+
+  * Depmod now runs fine, taking out -x
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 09:05:56 -0800
+
+backports (3.18.1+untangle10-1) unstable; urgency=low
+
+  * Run postinst with -x
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 07:06:44 -0800
+
+backports (3.18.1+untangle9-1) unstable; urgency=low
+
+  * Fix #12183
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 04 Feb 2015 03:39:54 -0800
+
+backports (3.18.1+untangle8-1) unstable; urgency=low
+
+  * Patch ath9k for 5GHz
+
+ -- Sebastien Delafond <seb@untangle.com>  Sun, 18 Jan 2015 05:09:27 -0800
+
+backports (3.18.1+untangle7-1) unstable; urgency=low
+
+  * Do not error out if a .ko file already exist in target directory
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 14 Jan 2015 04:41:21 -0800
+
+backports (3.18.1+untangle6-1) unstable; urgency=low
+
+  * Build each module separately
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 14 Jan 2015 03:43:05 -0800
+
+backports (3.18.1+untangle5-1) unstable; urgency=low
+
+  * Add ath9k
+
+ -- Sebastien Delafond <seb@untangle.com>  Mon, 22 Dec 2014 01:53:54 -0800
+
+backports (3.18.1+untangle4-1) unstable; urgency=low
+
+  * Add ath10k
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 17 Dec 2014 04:40:06 -0800
+
+backports (3.18.1+untangle3-1) unstable; urgency=low
+
+  * KLIB
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 04 Dec 2014 04:13:08 -0800
+
+backports (3.18.1+untangle2-1) unstable; urgency=low
+
+  * No README
+
+ -- Sebastien Delafond <seb@untangle.com>  Thu, 04 Dec 2014 03:11:10 -0800
+
+backports (3.18.1+untangle1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Sebastien Delafond <seb@untangle.com>  Wed, 03 Dec 2014 13:40:54 -0800

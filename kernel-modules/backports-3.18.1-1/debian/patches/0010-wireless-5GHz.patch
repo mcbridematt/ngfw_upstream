@@ -1,0 +1,30 @@
+--- a/drivers/net/wireless/ath/regd.c	2014-12-03 14:39:32.000000000 -0800
++++ a/drivers/net/wireless/ath/regd.c.bak	2015-01-18 05:04:07.000000000 -0800
+@@ -44,11 +44,11 @@
+ 
+ /* We allow IBSS on these on a case by case basis by regulatory domain */
+ #define ATH9K_5GHZ_5150_5350	REG_RULE(5150-10, 5350+10, 80, 0, 30,\
+-					 NL80211_RRF_NO_IR)
++					 0)
+ #define ATH9K_5GHZ_5470_5850	REG_RULE(5470-10, 5850+10, 80, 0, 30,\
+-					 NL80211_RRF_NO_IR)
++					 0)
+ #define ATH9K_5GHZ_5725_5850	REG_RULE(5725-10, 5850+10, 80, 0, 30,\
+-					 NL80211_RRF_NO_IR)
++					 0)
+ 
+ #define ATH9K_2GHZ_ALL		ATH9K_2GHZ_CH01_11, \
+ 				ATH9K_2GHZ_CH12_13, \
+@@ -760,9 +760,11 @@
+ 	if (r)
+ 		return r;
+ 
+-	if (ath_is_world_regd(reg))
++	if (ath_is_world_regd(reg)) {
++                printk(KERN_DEBUG "ath_is_world_regd = true\n");
+ 		memcpy(&common->reg_world_copy, reg,
+ 		       sizeof(struct ath_regulatory));
++        }
+ 
+ 	ath_regd_init_wiphy(reg, wiphy, reg_notifier);
+ 

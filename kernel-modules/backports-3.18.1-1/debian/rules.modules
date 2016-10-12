@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+
+NAME=backports-3.18.1-1
+
+# prefix of the target package name
+PACKAGE=$(NAME)-modules
+# modifieable for experiments or debugging m-a
+MA_DIR ?= /usr/share/modass
+# load generic variable handling
+-include $(MA_DIR)/include/generic.make
+# load default rules
+-include $(MA_DIR)/include/common-rules.make
+
+MAJORKVERS=$(shell echo $(KVERS) | cut -f 1 -d .)
+MINORKVERS=$(shell echo $(KVERS) | cut -f 2 -d .)
+
+kdist_clean:
+	-rm -f build-stamp configure-stamp
+	test -f src/Makefile && $(ROOT_CMD) $(MAKE) -C src clean || true
+	-dh_clean
+	-rm -f debian/control
+	-rm -f list
+
+kdist_config: prep-deb-files
+
+binary-modules: kdist_config
+	dh_clean -k
+	dh_installdirs lib/modules/$(KVERS)/updates
+	touch list
+
+	for conf in iwlwifi ath9k ath10k ; do \
+	  $(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) defconfig-$$conf ; \
+	  $(ROOT_CMD) $(MAKE) -C src KLIB=/lib/modules/$(KVERS) ; \
+	  find . -name *.ko | while read mod ; do \
+	     basename $$mod >> list ; \
+	     install -m 0644 "$$mod" debian/$(PKGNAME)/lib/modules/$(KVERS)/updates || true ; \
+	  done ; \
+	done
+
+	dh_installdocs list
+	dh_installmodules
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -v$(VERSION)
+	dh_md5sums
+	find debian/$(PKGNAME)
+	dh_builddeb --destdir=$(DEB_DESTDIR)

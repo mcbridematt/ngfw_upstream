@@ -1,0 +1,20 @@
+Source: backports-3.18.1-1
+Section: unknown
+Priority: optional
+Maintainer: David Han <dhan@untangle.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.9.3
+
+Package: backports-3.18.1-1-modules-_KVERS_
+Architecture: any
+Provides: backports-3.18.1-1-modules
+Description: backports modules for Linux (kernel _KVERS_).
+ This package contains the set of loadable kernel modules for the
+ <description>.
+ .
+ This package contains the compiled kernel modules for _KVERS_
+ .
+ If you have compiled your own kernel, you will most likely need to build
+ your own backports-modules. The backports-source package has been
+ provided for use with the Debian's module-assistant or kernel-package
+ utilities to produce a version of backports-modules for your kernel.
