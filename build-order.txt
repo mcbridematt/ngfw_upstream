@@ -7,7 +7,8 @@ daq/daq-2.0.6							jessie
 $sleep 40                                                       jessie
 snort/snort-2.9.8.2						jessie
 
+kernel-modules/backports-3.18.1-1                               jessie
 kernel-modules/lanner-lcd                                       jessie
-kernel-modules/backports                                        jessie
+kernel-modules/backports-3.17.1-1                               jessie
 kernel-modules/e1000e                                           jessie
 kernel-modules/igb                                              jessie
