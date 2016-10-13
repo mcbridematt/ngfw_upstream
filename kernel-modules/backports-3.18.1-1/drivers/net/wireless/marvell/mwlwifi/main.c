@@ -32,6 +32,13 @@
 #include "debugfs.h"
 #endif
 
+static inline void _ieee80211_hw_set(struct ieee80211_hw *hw,
+                                      enum ieee80211_hw_flags flg)
+{
+        return __set_bit(flg, hw->flags);
+}
+#define ieee80211_hw_set(hw, flg)       _ieee80211_hw_set(hw, IEEE80211_HW_##flg)
+
 #define MWL_DESC         "Marvell 802.11ac Wireless Network Driver"
 #define MWL_DEV_NAME     "Marvell 802.11ac Adapter"
 
@@ -430,7 +437,7 @@ static void mwl_set_ht_caps(struct mwl_priv *priv,
 	band->ht_cap.cap |= IEEE80211_HT_CAP_SGI_40;
 
 	ieee80211_hw_set(hw, AMPDU_AGGREGATION);
-	ieee80211_hw_set(hw, SUPPORTS_AMSDU_IN_AMPDU);
+//	ieee80211_hw_set(hw, SUPPORTS_AMSDU_IN_AMPDU);
 	band->ht_cap.ampdu_factor = IEEE80211_HT_MAX_AMPDU_64K;
 	band->ht_cap.ampdu_density = IEEE80211_HT_MPDU_DENSITY_4;
 

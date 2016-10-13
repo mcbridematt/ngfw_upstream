@@ -261,10 +261,10 @@ static ssize_t mwl_debugfs_sta_read(struct file *file, char __user *ubuf,
 		len += scnprintf(p + len, size - len, "rx_bw: %d, rx_nss: %d\n",
 				 sta->bandwidth, sta->rx_nss);
 		len += scnprintf(p + len, size - len,
-				 "tdls: %d, tdls_init: %d\n",
-				 sta->tdls, sta->tdls_initiator);
-		len += scnprintf(p + len, size - len, "wme: %d, mfp: %d\n",
-				 sta->wme, sta->mfp);
+				 "tdls: %d\n",
+				 sta->tdls);
+		len += scnprintf(p + len, size - len, "wme: %d\n",
+				 sta->wme);
 		len += scnprintf(p + len, size - len, "IV: %08x%04x\n",
 				 sta_info->iv32, sta_info->iv16);
 		len += scnprintf(p + len, size - len, "\n");

@@ -26,6 +26,16 @@
 
 #define MAX_AMPDU_ATTEMPTS  5
 
+struct ieee80211_ampdu_params {
+        enum ieee80211_ampdu_mlme_action action;
+        struct ieee80211_sta *sta;
+        u16 tid;
+        u16 ssn;
+        u8 buf_size;
+        bool amsdu;
+        u16 timeout;
+};
+
 static const struct ieee80211_rate mwl_rates_24[] = {
 	{ .bitrate = 10, .hw_value = 2, },
 	{ .bitrate = 20, .hw_value = 4, },
