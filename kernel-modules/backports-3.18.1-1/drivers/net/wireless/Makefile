@@ -55,6 +55,8 @@ obj-$(CPTCFG_WL_TI)	+= ti/
 
 obj-$(CPTCFG_MWIFIEX)	+= mwifiex/
 
+obj-$(CPTCFG_MWLWIFI)	+= marvell/mwlwifi/
+
 obj-$(CPTCFG_BRCMFMAC)	+= brcm80211/
 obj-$(CPTCFG_BRCMSMAC)	+= brcm80211/
 
