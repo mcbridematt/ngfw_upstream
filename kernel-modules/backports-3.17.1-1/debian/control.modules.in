@@ -8,6 +8,7 @@ Standards-Version: 3.9.3
 Package: backports-3.17.1-1-modules-_KVERS_
 Architecture: any
 Provides: backports-3.17.1-1-modules
+Conflicts: backports-modules
 Description: backports modules for Linux (kernel _KVERS_).
  This package contains the set of loadable kernel modules for the
  <description>.
