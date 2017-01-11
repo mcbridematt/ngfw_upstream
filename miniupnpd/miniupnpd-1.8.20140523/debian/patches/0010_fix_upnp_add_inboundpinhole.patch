@@ -1,0 +1,43 @@
+Description: miniupnpd/upnppinhole.c: fix upnp_add_inboundpinhole()
+ check inet_pton() return
+Author: Thomas Bernard <miniupnp@free.fr>
+Origin: upstream, https://github.com/miniupnp/miniupnp/commit/d00b75782e7d73e78d0b935cee6f4873bc48c9e8.patch
+Date: Tue, 9 Dec 2014 10:52:26 +0100
+Bug-Debian: https://bugs.debian.org/772644
+Last-Update: 2014-12-09
+
+diff --git a/upnppinhole.c b/miniupnpd/upnppinhole.c
+index 08f1cf6..932bc11 100644
+--- a/upnppinhole.c
++++ b/upnppinhole.c
+@@ -88,10 +88,10 @@ upnp_check_outbound_pinhole(int proto, int * timeout)
+ #endif
+ 
+ /* upnp_add_inboundpinhole()
+- * returns: 0 on success
+- *          -1 failed to add pinhole
+- *          -2 already created
+- *          -3 inbound pinhole disabled
++ * returns:  1 on success
++ *          -1 Pinhole space exhausted
++ *          -4 invalid arguments
++ *         -42 not implemented
+  * TODO : return uid on success (positive) or error value (negative)
+  */
+ int
+@@ -109,10 +109,11 @@ upnp_add_inboundpinhole(const char * raddr,
+ 	unsigned int timestamp;
+ 	struct in6_addr address;
+ 
+-	if(inet_pton(AF_INET6, iaddr, &address) < 0)
+-	{
+-		syslog(LOG_ERR, "inet_pton(%s) : %m", iaddr);
+-		return 0;
++	r = inet_pton(AF_INET6, iaddr, &address);
++	if(r <= 0) {
++		syslog(LOG_ERR, "inet_pton(%d, %s, %p) FAILED",
++		       AF_INET6, iaddr, &address);
++		return -4;
+ 	}
+ 	current = time(NULL);
+ 	timestamp = current + leasetime;

@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+
+#export DEB_BUILD_MAINT_OPTIONS = hardening=-all
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	CONFIG_OPTIONS="--ipv6 --igd2" $(MAKE) -f Makefile.linux
+
+override_dh_auto_install:
+	make -j1 -f Makefile.linux install DESTDIR=$(CURDIR)/debian/miniupnpd AM_UPDATE_INFO_DIR=no
+
+	# Move the miniupnpd.conf in /usr/share so it's not marked as CONFFILE
+	mkdir -p $(CURDIR)/debian/miniupnpd/usr/share/miniupnpd
+	mv $(CURDIR)/debian/miniupnpd/etc/miniupnpd/miniupnpd.conf $(CURDIR)/debian/miniupnpd/usr/share/miniupnpd/miniupnpd.conf
+
+	# Copy the /etc/default/miniupnpd to /usr/share
+	cp $(CURDIR)/debian/examples/miniupnpd.default $(CURDIR)/debian/miniupnpd/usr/share/miniupnpd
+
+override_dh_auto_clean:
+	#dh_auto_clean
+
+	$(MAKE) -f Makefile.linux clean
+
+override_dh_builddeb:
+	dh_builddeb -- -Zxz -z9
+
+display-po-stats:
+	cd $(CURDIR)/debian/po ; for i in *.po ; do \
+		echo -n $$i": " ; \
+		msgfmt -o /dev/null --statistic $$i ; \
+	done
+
+call-for-po-trans:
+	podebconf-report-po --call --withtranslators --languageteam
+
+override_dh_auto_test:
+	echo "Unit tests disabled"
+	#$(MAKE) -f Makefile.linux test

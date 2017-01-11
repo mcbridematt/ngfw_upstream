@@ -1,0 +1,86 @@
+# French po-debconf translation for miniupnpd
+# Copyright (C) 2013
+# This file is distributed under the same license as the miniupnpd package.
+# Baptiste Jammet <baptiste@mailoo.org>, 2013
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miniupnpd\n"
+"Report-Msgid-Bugs-To: miniupnpd@packages.debian.org\n"
+"POT-Creation-Date: 2014-05-28 06:37+0000\n"
+"PO-Revision-Date: 2013-09-11 13:35+0100\n"
+"Last-Translator: Baptiste Jammet <baptiste@mailoo.org>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
+"Language: french\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:2001
+msgid "Start the MiniUPnP daemon automatically?"
+msgstr "Faut-il démarrer le démon MiniUPnP automatiquement ?"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:2001
+msgid ""
+"Choose this option if the MiniUPnP daemon should start automatically, now "
+"and at boot time."
+msgstr ""
+"Choisissez cette option si vous voulez que le démon MiniUPnP démarre "
+"automatiquement, maintenant et à chaque démarrage du système."
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:3001
+msgid "LAN IP address to listen on for UPnP queries:"
+msgstr "Adresse IP à écouter pour les requêtes UPnP :"
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:3001
+msgid ""
+"The MiniUPnP daemon will listen for requests on the local network. Please "
+"enter the IP address it should listen on."
+msgstr ""
+"Le démon MiniUPnp sera à l'écoute de requêtes sur le réseau local. Veuillez "
+"indiquer l'adresse IP sur laquelle il écoutera."
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:4001
+msgid "External WAN network interface to open ports on:"
+msgstr "Interface réseau WAN sur laquelle il faut ouvrir des ports :"
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:4001
+msgid ""
+"The MiniUPnP daemon will listen on a specific IP address on the local "
+"network, then open ports on the WAN interface. Please enter the name of the "
+"WAN network interface on which the MiniUPnP daemon should perform port "
+"forwarding."
+msgstr ""
+"Le démon MiniUPnP écoutera sur une adresse IP spécifique du réseau local, "
+"puis ouvrira certains ports sur l'interface WAN. Veuillez indiquer le nom de "
+"l'interface de réseau WAN sur laquelle le démon MiniUPnP mettra en place des "
+"redirections de ports."
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:5001
+msgid "Enable IPv6 firewall chain?"
+msgstr "Faut-il activer la chaîne de pare-feu IPv6 ?"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:5001
+msgid ""
+"Please specify whether the MiniUPnP daemon should run its ip6tables script "
+"on startup to initialize the IPv6 firewall chain."
+msgstr ""
+"Veuillez indiquer si le démon MiniUPnP doit exécuter ses scripts ip6tables "
+"au démarrage pour initialiser la chaîne de pare-feu IPv6."

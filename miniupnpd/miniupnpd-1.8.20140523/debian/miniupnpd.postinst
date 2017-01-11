@@ -1,0 +1,94 @@
+#!/bin/sh
+
+set -e
+
+CONFFILE="/etc/miniupnpd/miniupnpd.conf"
+DEFAULT_FILE="/etc/default/miniupnpd"
+
+. /usr/share/debconf/confmodule
+
+replace_config_value () {
+	grep -Eq "^[ \t]*#${1}=" ${DEFAULT_FILE} || \
+	grep -Eq "^#[ \t]${1}=" ${DEFAULT_FILE} && \
+		sed -i "s|^[ \t#]${1}=|${1}=|" ${DEFAULT_FILE}
+
+	grep -Eq "^[ \t]*${1}=" ${DEFAULT_FILE} || \
+		echo "${1}=" >>${DEFAULT_FILE}
+
+	sed -i "s|^[ \t]*${1}=.*|${1}=${2}|" ${DEFAULT_FILE}
+}
+
+case "${1}" in
+configure)
+	#########################################################################
+	### Maintain the uuid value in the /etc/miniupnpd/miniupnpd.conf file ###
+	#########################################################################
+	# Make sure /etc/miniupnpd is there. It's in debian/dirs
+	# already, but we want to make sure an admin didn't delete it.
+	if ! [ -e /etc/miniupnpd ] ; then
+		mkdir /etc/miniupnpd	
+	fi
+	if ! [ -d /etc/miniupnpd ] ; then
+		echo "Something is wrong: /etc/miniupnpd exists, but is not a directory!"
+		exit 1
+	fi
+	# Make sure we have a /etc/miniupnpd/miniupnpd.conf
+	if ! [ -e ${CONFFILE} ] ; then
+		mkdir -p /etc/miniupnpd
+		cp -f /usr/share/miniupnpd/miniupnpd.conf /etc/miniupnpd
+	fi
+
+	# This postinst will generate a random uuid for miniupnpd
+	# only if the uuid= directive is either not there, or empty.
+	# in all other cases, the script will keep the existing
+	# uuid and not modify it.
+
+	# Create an empty uuid directive if it's not there
+	grep -Eq '^[ \t]*uuid=' "${CONFFILE}" || \
+	echo "uuid=" >>${CONFFILE}
+
+	# If it was empty (default on first setup), then use a new uuid
+	uuid=`grep -E '^[ \t]*uuid=' ${CONFFILE} | cut -d'=' -f2`
+	if [ -z "${uuid}" ] ; then
+		uuid=`uuidgen`
+		sed -i "s|^[ \t]*uuid=.*|uuid=${uuid}|" ${CONFFILE}
+	fi
+	#########################################################
+	### Maintain the /etc/default/miniupnpd configuration ###
+	#########################################################
+	db_get miniupnpd/start_daemon
+	if [ "${RET}" = "true" ] ; then
+		START_DAEMON=1
+	else
+		START_DAEMON=0
+	fi
+	replace_config_value START_DAEMON ${START_DAEMON}
+
+	db_get miniupnpd/listen
+	LISTEN_IP=${RET}
+	replace_config_value MiniUPnPd_LISTENING_IP ${LISTEN_IP}
+
+	db_get miniupnpd/iface
+	IFACE=${RET}
+	replace_config_value MiniUPnPd_EXTERNAL_INTERFACE ${IFACE}
+
+	db_get miniupnpd/ip6script
+	if [ "${RET}" = "true" ] ; then
+		replace_config_value MiniUPnPd_ip6tables_enable "yes"
+	else
+		replace_config_value MiniUPnPd_ip6tables_enable "no"
+	fi
+
+	db_stop
+;;
+abort-upgrade|abort-remove|abort-deconfigure)
+;;
+*)
+	echo "postinst called with unknown argument \`${1}'" >&2
+	exit 1
+;;
+esac
+
+#DEBHELPER#
+
+exit 0

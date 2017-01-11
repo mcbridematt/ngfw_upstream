@@ -1,0 +1,41 @@
+Subject: miniupnpd/upnpsoap.c: fix potential memory corruption in upnpsoap.c/GetListOfPortMappings()
+ Credits goes to Stephen Röttger of the Google Security Team for identifying
+ the vulnerabilities
+Author: Thomas Bernard <miniupnp@free.fr>
+Origin: upstream, https://github.com/miniupnp/miniupnp/commit/e6bc04aa06341fa4df3ccae87a167e9adf816911.patch
+Bug-Debian: https://bugs.debian.org/772644
+Date: Tue, 9 Dec 2014 11:01:37 +0100
+
+Index: miniupnpd/upnpsoap.c
+===================================================================
+--- miniupnpd.orig/upnpsoap.c	2014-07-14 15:08:01.000000000 +0800
++++ miniupnpd/upnpsoap.c	2014-12-09 22:11:34.000000000 +0800
+@@ -1006,6 +1006,7 @@
+ 			body = realloc(body, bodyalloc);
+ 			if(!body)
+ 			{
++				syslog(LOG_CRIT, "realloc(%p, %u) FAILED", body_sav, (unsigned)bodyalloc);
+ 				ClearNameValueList(&data);
+ 				SoapError(h, 501, "ActionFailed");
+ 				free(body_sav);
+@@ -1030,6 +1031,20 @@
+ 	free(port_list);
+ 	port_list = NULL;
+ 
++	if((bodylen + sizeof(list_end) + 1024) > bodyalloc)
++	{
++		char * body_sav = body;
++		bodyalloc += (sizeof(list_end) + 1024);
++		body = realloc(body, bodyalloc);
++		if(!body)
++		{
++			syslog(LOG_CRIT, "realloc(%p, %u) FAILED", body_sav, (unsigned)bodyalloc);
++			ClearNameValueList(&data);
++			SoapError(h, 501, "ActionFailed");
++			free(body_sav);
++			return;
++		}
++	}
+ 	memcpy(body+bodylen, list_end, sizeof(list_end));
+ 	bodylen += (sizeof(list_end) - 1);
+ 	bodylen += snprintf(body+bodylen, bodyalloc-bodylen, resp_end,

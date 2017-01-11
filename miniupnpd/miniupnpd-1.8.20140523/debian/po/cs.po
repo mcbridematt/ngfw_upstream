@@ -1,0 +1,85 @@
+# Czech PO debconf template translation of miniupnpd.
+# Copyright (C) 2013 Michal Simunek <michal.simunek@gmail.com>
+# This file is distributed under the same license as the miniupnpd package.
+# Michal Simunek <michal.simunek@gmail.com>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miniupnpd 1.8.20130730-2\n"
+"Report-Msgid-Bugs-To: miniupnpd@packages.debian.org\n"
+"POT-Creation-Date: 2013-09-09 07:23+0200\n"
+"PO-Revision-Date: 2013-09-15 12:01+0200\n"
+"Last-Translator: Michal Simunek <michal.simunek@gmail.com>\n"
+"Language-Team: Czech <debian-l10n-czech@lists.debian.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:2001
+msgid "Start the MiniUPnP daemon automatically?"
+msgstr "Spouštět daemona MiniUPnP automaticky?"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:2001
+msgid ""
+"Choose this option if the MiniUPnP daemon should start automatically, now "
+"and at boot time."
+msgstr ""
+"Tuto možnost vyberte, pokud se má daemon MiniUPnP nyní automaticky spustit "
+"a spouštět při zavádění systému."
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:3001
+msgid "LAN IP address to listen on for UPnP queries:"
+msgstr "IP adresa v síti LAN, na které se má naslouchat UPnP dotazům:"
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:3001
+msgid ""
+"The MiniUPnP daemon will listen for requests on the local network. Please "
+"enter the IP address it should listen on."
+msgstr ""
+"Daemon MiniUPnP bude naslouchat dotazům na místní síti. Zadejte prosím IP "
+"adresu, na které má naslouchat."
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:4001
+msgid "External WAN network interface to open ports on:"
+msgstr "Vnější WAN rozhraní, na kterém se mají otevřít porty:"
+
+#. Type: string
+#. Description
+#: ../miniupnpd.templates:4001
+msgid ""
+"The MiniUPnP daemon will listen on a specific IP address on the local "
+"network, then open ports on the WAN interface. Please enter the name of the "
+"WAN network interface on which the MiniUPnP daemon should perform port "
+"forwarding."
+msgstr ""
+"Daemon MiniUPnP bude naslouchat na určité IP adrese v místní síti, potom "
+"otevře porty na WAN rozhraní. Zadejte prosím název síťového rozhraní WAN, "
+"na kterém má daemon MiniUPnP provést přesměrování portů."
+""
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:5001
+msgid "Enable IPv6 firewall chain?"
+msgstr "Povolit IPv6 řetězec ve firewallu?"
+
+#. Type: boolean
+#. Description
+#: ../miniupnpd.templates:5001
+msgid ""
+"Please specify whether the MiniUPnP daemon should run its ip6tables script "
+"on startup to initialize the IPv6 firewall chain."
+msgstr ""
+"Zvolte si prosím, zda má daemon MiniUPnP při spouštění k zavedení IPv6 "
+"řetězce ve firewallu spustit vlastní skript ip6tables."

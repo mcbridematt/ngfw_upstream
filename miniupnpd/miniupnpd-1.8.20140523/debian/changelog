@@ -1,0 +1,117 @@
+miniupnpd (1.8.20140523-4) unstable; urgency=high
+
+  * Fixes multiple vulnerabilities (Closes: #772644).
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 09 Dec 2014 22:29:04 +0800
+
+miniupnpd (1.8.20140523-3) unstable; urgency=medium
+
+  * Do not install the configuration file in /etc/miniupnpd, use /usr/share
+    instead, so that miniupnpd.conf isn't CONFFILE (Closes: #767646).
+  * Do not use /usr/share/doc/miniupnpd/examples to get our default config
+    file, which isn't policy compliant, but use /usr/share/miniupnpd.
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 04 Nov 2014 16:35:36 +0800
+
+miniupnpd (1.8.20140523-2) unstable; urgency=medium
+
+  * Removed $all from init script.
+
+ -- Thomas Goirand <zigo@debian.org>  Mon, 14 Jul 2014 07:08:43 +0000
+
+miniupnpd (1.8.20140523-1) unstable; urgency=medium
+
+  * New upstream release (Closes: #749392).
+  * Standards-Version: bumped to 3.9.5.
+
+ -- Thomas Goirand <zigo@debian.org>  Sun, 08 Jun 2014 09:35:49 +0000
+
+miniupnpd (1.8.20130730-3) unstable; urgency=medium
+
+  * Now depending on iproute2 instead of iproute.
+  * Added Italian debconf translaiton (Closes: #724684).
+  * Added Spanish debconf translation, thanks to "Matias A. Bellone"
+    <matiasbellone+debian@gmail.com> (Closes: #733065).
+  * Added Swedish debconf translation, thanks to Martin Bagge
+    <brother@bsnet.se> (Closes: #727185).
+  * Fixed postinst that is destroying the default file (Closes: #726915).
+  * Fixed wrong directive for enabling ipv6.
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 28 May 2014 16:10:53 +0800
+
+miniupnpd (1.8.20130730-2) unstable; urgency=low
+
+  * Added the review from the intl team (Closes: #719950).
+  * Added Debconf translations, with thanks to:
+    - Japanese, victory (Closes: #724310).
+    - Portuguese, Traduz (Closes: #724029).
+    - French, Baptiste Jammet (Closes: #723768).
+    - German, Chris Leick (Closes: #723147).
+    - Czech, Michal Šimůnek (Closes: #723025).
+    - Russian, Yuri Kozlov (Closes: #722602).
+    - Danish, Joe Dalton (Closes: #722278).
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 25 Sep 2013 23:30:11 +0800
+
+miniupnpd (1.8.20130730-1) unstable; urgency=low
+
+  * Uploading to unstable.
+  * New upstream release fixing CVE-2013-2600: MiniUPnPd versions 1.8 and
+    earlier are prone to an information disclosure vulnerability due to
+    improper use of snprintf() while preparing SSDP responses. An attacker can
+    exploit this vulnerability by sending a crafted request with a long ST
+    header. If the header is long enough, the SSDP response buffer will be
+    truncated by snprintf() and the subsequent sendto() call will read off the
+    end of the buffer thereby disclosing the contents of adjacent memory. This
+    response can reveal details of internal network topology as well as other
+    activity on the target network. Fix at:
+    .
+    https://github.com/miniupnp/miniupnp/commit/18887cb1e49295e69c308d8bb1f2526798a77429
+    .
+    Correctly handle truncated snprintf() in SSDP code (Closes: #716936,
+    #686537).
+  * Now packaging using pristine-tar git-import-orig.
+  * Added new IPv6 rules in the init script, and its configuration through
+    debconf (Closes: #686287).
+  * Fixed the clean process.
+  * Removes now obsolete patches.
+  * Build-Depends on libnfnetlink-dev.
+  * Standards-Version: 3.9.4.
+  * Canonical URLs for VCS feilds.
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 23 Jul 2013 11:16:15 +0800
+
+miniupnpd (1.7-4) experimental; urgency=low
+
+  * Rewrite the debconf text for the external interface, which was completely
+  wrong: it was asking for the LAN interface, when in fact, what was required
+  was the name of the WAN interface. Also makes other Debconf questions more
+  clear, writing WAN and LAN when needed (Closes: #685652).
+  * Now guessed the name of the WAN interface using route (and depends on
+  net-tools as a consequence).
+  * Enables IPv6 and IGDv2 support build options (Closes: #685651, #685650).
+  * Added display-po-stats and display-po-stats rules target.
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 23 Aug 2012 11:45:03 +0000
+
+miniupnpd (1.7-3) experimental; urgency=low
+
+  * Added debconf support for maintaining /etc/default/miniupnpd.
+
+ -- Thomas Goirand <zigo@debian.org>  Sun, 19 Aug 2012 09:17:20 +0000
+
+miniupnpd (1.7-2) experimental; urgency=low
+
+  * Only calls sed for putting a uuid if there's no value for the uuid
+  in the configuration file.
+  * Removes hardening option from debian/rules.
+  * Fixed postinst so that it copies miniupnpd.conf from the correct location.
+  Thanks to Andreas Beckmann for reporting (Closes: #685191).
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 07 Aug 2012 07:12:45 +0000
+
+miniupnpd (1.7-1) experimental; urgency=low
+
+  * Initial release (Closes: #658434).
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 10 Jul 2012 20:16:37 +0000
