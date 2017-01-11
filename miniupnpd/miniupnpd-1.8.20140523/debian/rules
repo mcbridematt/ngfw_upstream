@@ -6,7 +6,7 @@
 	dh $@
 
 override_dh_auto_build:
-	CONFIG_OPTIONS="--ipv6 --igd2" $(MAKE) -f Makefile.linux
+	CONFIG_OPTIONS="--ipv6" $(MAKE) -f Makefile.linux
 
 override_dh_auto_install:
 	make -j1 -f Makefile.linux install DESTDIR=$(CURDIR)/debian/miniupnpd AM_UPDATE_INFO_DIR=no
