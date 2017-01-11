@@ -23,9 +23,6 @@ override_dh_auto_clean:
 
 	$(MAKE) -f Makefile.linux clean
 
-override_dh_builddeb:
-	dh_builddeb -- -Zxz -z9
-
 display-po-stats:
 	cd $(CURDIR)/debian/po ; for i in *.po ; do \
 		echo -n $$i": " ; \
