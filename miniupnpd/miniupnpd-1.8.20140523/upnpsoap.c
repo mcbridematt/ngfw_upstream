@@ -45,21 +45,17 @@ BuildSendAndCloseSoapResp(struct upnphttp * h,
 		"</s:Body>"
 		"</s:Envelope>\r\n";
 
-	int r = BuildHeader_upnphttp(h, 200, "OK",  sizeof(beforebody) - 1
-	                             + sizeof(afterbody) - 1 + bodylen );
+	BuildHeader_upnphttp(h, 200, "OK",  sizeof(beforebody) - 1
+		+ sizeof(afterbody) - 1 + bodylen );
 
-	if(r >= 0) {
-		memcpy(h->res_buf + h->res_buflen, beforebody, sizeof(beforebody) - 1);
-		h->res_buflen += sizeof(beforebody) - 1;
+	memcpy(h->res_buf + h->res_buflen, beforebody, sizeof(beforebody) - 1);
+	h->res_buflen += sizeof(beforebody) - 1;
 
-		memcpy(h->res_buf + h->res_buflen, body, bodylen);
-		h->res_buflen += bodylen;
+	memcpy(h->res_buf + h->res_buflen, body, bodylen);
+	h->res_buflen += bodylen;
 
-		memcpy(h->res_buf + h->res_buflen, afterbody, sizeof(afterbody) - 1);
-		h->res_buflen += sizeof(afterbody) - 1;
-	} else {
-		BuildResp2_upnphttp(h, 500, "Internal Server Error", NULL, 0);
-	}
+	memcpy(h->res_buf + h->res_buflen, afterbody, sizeof(afterbody) - 1);
+	h->res_buflen += sizeof(afterbody) - 1;
 
 	SendRespAndClose_upnphttp(h);
 }
@@ -1010,7 +1006,6 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
 			body = realloc(body, bodyalloc);
 			if(!body)
 			{
-				syslog(LOG_CRIT, "realloc(%p, %u) FAILED", body_sav, (unsigned)bodyalloc);
 				ClearNameValueList(&data);
 				SoapError(h, 501, "ActionFailed");
 				free(body_sav);
@@ -1035,20 +1030,6 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
 	free(port_list);
 	port_list = NULL;
 
-	if((bodylen + sizeof(list_end) + 1024) > bodyalloc)
-	{
-		char * body_sav = body;
-		bodyalloc += (sizeof(list_end) + 1024);
-		body = realloc(body, bodyalloc);
-		if(!body)
-		{
-			syslog(LOG_CRIT, "realloc(%p, %u) FAILED", body_sav, (unsigned)bodyalloc);
-			ClearNameValueList(&data);
-			SoapError(h, 501, "ActionFailed");
-			free(body_sav);
-			return;
-		}
-	}
 	memcpy(body+bodylen, list_end, sizeof(list_end));
 	bodylen += (sizeof(list_end) - 1);
 	bodylen += snprintf(body+bodylen, bodyalloc-bodylen, resp_end,

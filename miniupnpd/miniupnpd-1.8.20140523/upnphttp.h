@@ -136,9 +136,8 @@ Process_upnphttp(struct upnphttp *);
 
 /* BuildHeader_upnphttp()
  * build the header for the HTTP Response
- * also allocate the buffer for body data
- * return -1 on error */
-int
+ * also allocate the buffer for body data */
+void
 BuildHeader_upnphttp(struct upnphttp * h, int respcode,
                      const char * respmsg,
                      int bodylen);

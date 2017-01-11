@@ -88,10 +88,10 @@ upnp_check_outbound_pinhole(int proto, int * timeout)
 #endif
 
 /* upnp_add_inboundpinhole()
- * returns:  1 on success
- *          -1 Pinhole space exhausted
- *          -4 invalid arguments
- *         -42 not implemented
+ * returns: 0 on success
+ *          -1 failed to add pinhole
+ *          -2 already created
+ *          -3 inbound pinhole disabled
  * TODO : return uid on success (positive) or error value (negative)
  */
 int
@@ -109,11 +109,10 @@ upnp_add_inboundpinhole(const char * raddr,
 	unsigned int timestamp;
 	struct in6_addr address;
 
-	r = inet_pton(AF_INET6, iaddr, &address);
-	if(r <= 0) {
-		syslog(LOG_ERR, "inet_pton(%d, %s, %p) FAILED",
-		       AF_INET6, iaddr, &address);
-		return -4;
+	if(inet_pton(AF_INET6, iaddr, &address) < 0)
+	{
+		syslog(LOG_ERR, "inet_pton(%s) : %m", iaddr);
+		return 0;
 	}
 	current = time(NULL);
 	timestamp = current + leasetime;

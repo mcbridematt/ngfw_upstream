@@ -268,8 +268,8 @@ upnp_redirect(const char * rhost, unsigned short eport,
 	unsigned int timestamp;
 
 	proto = proto_atoi(protocol);
-	if(inet_aton(iaddr, &address) <= 0) {
-		syslog(LOG_ERR, "inet_aton(%s) FAILED", iaddr);
+	if(inet_aton(iaddr, &address) < 0) {
+		syslog(LOG_ERR, "inet_aton(%s) : %m", iaddr);
 		return -1;
 	}
 
