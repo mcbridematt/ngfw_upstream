@@ -1,3 +1,9 @@
+jshint (2.9.4-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Sebastien Delafond <sdelafond@gmail.com>  Thu, 16 Mar 2017 18:59:24 +0100
+
 jshint (2.1.4-1) unstable; urgency=low
 
   * Alternate depend on rhino
