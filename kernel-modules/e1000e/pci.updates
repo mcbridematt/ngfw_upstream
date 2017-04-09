@@ -89,8 +89,17 @@
 	153b  Ethernet Connection I217-V
 	1559  Ethernet Connection I218-V
 	155a  Ethernet Connection I218-LM
+	156f  Ethernet Connection I219-LM
+	1570  Ethernet Connection I219-V
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
 	15a3  Ethernet Connection (3) I218-V
+	15b7  Ethernet Connection (2) I219-LM
+	15b8  Ethernet Connection (2) I219-V
+	15b9  Ethernet Connection (3) I219-LM
+	15d6  Ethernet Connection (5) I219-V
+	15d7  Ethernet Connection (4) I219-LM
+	15d8  Ethernet Connection (4) I219-V
+	15e3  Ethernet Connection (5) I219-LM
 	294c  82566DC-2 Gigabit Network Connection

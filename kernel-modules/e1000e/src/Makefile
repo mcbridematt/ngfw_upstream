@@ -1,7 +1,7 @@
 ################################################################################
 #
 # Intel PRO/1000 Linux driver
-# Copyright(c) 1999 - 2014 Intel Corporation.
+# Copyright(c) 1999 - 2016 Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms and conditions of the GNU General Public License,
@@ -83,8 +83,8 @@ VSP :=  $(KOBJ)/include/generated/utsrelease.h \
         /boot/vmlinuz.version.h
 
 # Config file Search Path
-CSP :=  $(KSRC)/include/generated/autoconf.h \
-        $(KSRC)/include/linux/autoconf.h \
+CSP :=  $(KOBJ)/include/generated/autoconf.h \
+        $(KOBJ)/include/linux/autoconf.h \
         /boot/vmlinuz.autoconf.h
 
 # prune the lists down to only files that exist
@@ -186,7 +186,7 @@ endif
 ifneq ($(filter %NO_PTP_SUPPORT,$(CFLAGS_EXTRA)),-DNO_PTP_SUPPORT)
 # Do not attempt to enable PTP on kernels that do not support it
 ifeq (1,$(shell ([ $(KVER_CODE) -ge 196608 ] || [ $(RHEL_CODE) -ge 1540 ]) && echo 1 || echo 0))
-include $(KSRC)/include/config/auto.conf
+include $(KOBJ)/include/config/auto.conf
 ifdef CONFIG_PTP_1588_CLOCK
 CFILES += ptp.c
 endif # CONFIG_PTP_1588_CLOCK
@@ -195,9 +195,9 @@ endif # NO_PTP_SUPPORT
 
 # set the install path
 ifeq (1,$(shell [ $(KVER_CODE) -lt 197120 ] && echo 1 || echo 0))
-INSTDIR := /lib/modules/$(KVER)/kernel/drivers/net/$(DRIVER_NAME)
+INSTDIR := /lib/modules/$(KVER)/updates/drivers/net/$(DRIVER_NAME)
 else
-INSTDIR := /lib/modules/$(KVER)/kernel/drivers/net/ethernet/intel/$(DRIVER_NAME)
+INSTDIR := /lib/modules/$(KVER)/updates/drivers/net/ethernet/intel/$(DRIVER_NAME)
 endif
 
 # look for SMP in config.h
@@ -225,6 +225,14 @@ ifeq ($(SMP),1)
   EXTRA_CFLAGS += -D__SMP__
 endif
 
+# Don't set gcc-i-sys.sh until after our $(shell) invocations of ${CC}
+ifneq ($(wildcard ./gcc-i-sys.sh),)
+GCC_I_SYS := $(shell readlink -f ./gcc-i-sys.sh)
+$(shell chmod +x ${GCC_I_SYS})
+export REAL_CC := ${CC}
+export CC := ${GCC_I_SYS}
+endif
+
 ###########################################################################
 # Kernel Version Specific rules
 
@@ -244,9 +252,9 @@ $(DRIVER_NAME)-objs := $(CFILES:.c=.o)
 else
 default:
 ifeq ($(KOBJ),$(KSRC))
-	$(MAKE) -C $(KSRC) SUBDIRS=$(shell pwd) modules
+	$(MAKE) -C $(KSRC) CC=${CC} SUBDIRS=$(shell pwd) modules
 else
-	$(MAKE) -C $(KSRC) O=$(KOBJ) SUBDIRS=$(shell pwd) modules
+	$(MAKE) -C $(KSRC) CC=${CC} O=$(KOBJ) SUBDIRS=$(shell pwd) modules
 endif
 endif
 
@@ -284,7 +292,7 @@ $(TARGET): $(filter-out $(TARGET), $(CFILES:.c=.o))
 
 $(CFILES:.c=.o): $(HFILES) Makefile
 default:
-	$(MAKE)
+	$(MAKE) CC=${CC}
 
 endif # ifeq (1,$(shell [ $(KVER_CODE) -ge 132352 ] && echo 1 || echo 0))
 
@@ -357,3 +365,5 @@ else
 	$(MAKE) -C $(KSRC) O=$(KOBJ) SUBDIRS=$(shell pwd) clean
 endif
 	rm -rf $(TARGET) $(TARGET:.ko=.o) $(TARGET:.ko=.mod.c) $(TARGET:.ko=.mod.o) $(CFILES:.c=.o) $(MANFILE).gz .*cmd .tmp_versions Module.markers Module.symvers modules.order
+
+.NOTPARALLEL:

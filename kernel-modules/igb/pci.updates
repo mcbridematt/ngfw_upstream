@@ -47,12 +47,13 @@
 		1028 1f62  Gigabit 4P X540/I350 rNDC
 		1028 1f73  Gigabit 4P X520/I350 rNDC
 		1028 1f9a  Gigabit 4P X710/I350 rNDC
-		103c 17D1  Ethernet 1Gb 4-port 366FLR Adapter
+		103c 17d1  Ethernet 1Gb 4-port 366FLR Adapter
 		103c 337f  Ethernet 1Gb 2-port 361i Adapter
 		103c 3380  Ethernet 1Gb 4-port 366i Adapter
 		103c 339e  Ethernet 1Gb 2-port 361T Adapter
 		103c 2003  Ethernet 1Gb 2-port 367i Adapter
 		103c 2226  Ethernet 1Gb 1-port 364i Adapter
+		103c 8157  Ethernet 1Gb 4-port 366T Adapter
 		108e 7b16  Quad Port GbE PCIe 2.0 ExpressModule, UTP
 		108e 7b18  Quad Port GbE PCIe 2.0 Low Profile Adapter, UTP
 		17aa 1074  Lenovo ThinkServer I350-T4 AnyFabric
