@@ -1,0 +1,16 @@
+Source: javalang
+Maintainer: Sebastien Delafond <sdelafond@gmail.com>
+Section: python
+Priority: optional
+Build-Depends: dh-python, python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9)
+Standards-Version: 3.9.6
+Homepage: http://github.com/c2nes/javalang
+
+Package: python-javalang
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Pure Python Java parser and tools
+ javalang is a pure Python library for working with Java source
+ code. javalang provies a lexer and parser targeting Java 7. The
+ implementation is based on the Java language spec available at
+ http://docs.oracle.com/javase/specs/jls/se7/html/.
