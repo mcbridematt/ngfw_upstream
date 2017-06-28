@@ -2,7 +2,7 @@ Source: javalang
 Maintainer: Sebastien Delafond <sdelafond@gmail.com>
 Section: python
 Priority: optional
-Build-Depends: dh-python, python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9)
+Build-Depends: dh-python, python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 9), python-six
 Standards-Version: 3.9.6
 Homepage: http://github.com/c2nes/javalang
 
