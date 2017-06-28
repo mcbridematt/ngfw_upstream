@@ -1,5 +1,6 @@
 MANIFEST.in
 README.rst
+setup.cfg
 setup.py
 javalang/__init__.py
 javalang/ast.py
