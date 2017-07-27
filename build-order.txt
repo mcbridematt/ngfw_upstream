@@ -7,7 +7,7 @@ iptables/iptables-1.4.21                                        jessie,stretch
 $sleep 40                                                       jessie,stretch
 daq/daq-2.0.6							jessie,stretch
 $sleep 40                                                       jessie,stretch
-snort/snort-2.9.8.2						jessie,stretch
+snort/snort-2.9.8.2						jessie
 
 kernel-modules/backports-3.18.1-1                               jessie
 kernel-modules/lanner-lcd                                       jessie,stretch
