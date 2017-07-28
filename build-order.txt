@@ -1,5 +1,5 @@
 python-javalang/javalang-0.11.0					jessie,stretch
-miniupnpd/miniupnpd-1.8.20140523				jessie,stretch
+miniupnpd/miniupnpd-1.8.20140523				jessie
 drive/drive-0.3.1						jessie,stretch
 libnetfilter-queue/libnetfilter-queue-1.0.2+20141023+git329468  jessie,stretch
 jshint/jshint-2.1.3					        jessie,stretch
