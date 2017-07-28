@@ -1,0 +1,23 @@
+diff -u -r debian/rules /home/seb/work/untangle/vcs/ngfw_upstream/miniupnpd/miniupnpd-1.8.20140523/debian/rules
+--- debian/rules	2014-12-09 15:37:29.000000000 +0100
++++ /home/seb/work/untangle/vcs/ngfw_upstream/miniupnpd/miniupnpd-1.8.20140523/debian/rules	2017-01-11 10:38:39.983178455 +0100
+@@ -6,7 +6,7 @@
+ 	dh $@
+ 
+ override_dh_auto_build:
+-	CONFIG_OPTIONS="--ipv6 --igd2" $(MAKE) -f Makefile.linux
++	CONFIG_OPTIONS="--ipv6" $(MAKE) -f Makefile.linux
+ 
+ override_dh_auto_install:
+ 	make -j1 -f Makefile.linux install DESTDIR=$(CURDIR)/debian/miniupnpd AM_UPDATE_INFO_DIR=no
+@@ -23,9 +23,6 @@
+ 
+ 	$(MAKE) -f Makefile.linux clean
+ 
+-override_dh_builddeb:
+-	dh_builddeb -- -Zxz -z9
+-
+ display-po-stats:
+ 	cd $(CURDIR)/debian/po ; for i in *.po ; do \
+ 		echo -n $$i": " ; \
+Only in debian/source: options
