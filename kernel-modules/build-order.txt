@@ -1,4 +1,4 @@
-lanner-lcd		jessie
+lanner-lcd		jessie,stretch
 e1000e			jessie
 igb			jessie
 backports-3.17.1-1	jessie
