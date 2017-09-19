@@ -1,3 +1,9 @@
+igb-source (1:5.3.5.4.0-1) unstable; urgency=medium
+
+  * Switch to UNTANGLE-KEEP-UPSTREAM-VERSION
+
+ -- Sebastien Delafond <sdelafond@gmail.com>  Tue, 19 Sep 2017 15:59:12 +0200
+
 igb-source (1:5.3.5.4+untangle1-1) unstable; urgency=medium
 
   * New upstream version

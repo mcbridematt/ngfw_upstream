@@ -1,3 +1,9 @@
+e1000e-source (3.3.5.3.0-1) unstable; urgency=medium
+
+  * Switch to UNTANGLE-KEEP-UPSTREAM-VERSION
+
+ -- Sebastien Delafond <sdelafond@gmail.com>  Tue, 19 Sep 2017 15:59:12 +0200
+
 e1000e-source (3.3.5.3+untangle1-1) unstable; urgency=medium
 
   * New upstream version
