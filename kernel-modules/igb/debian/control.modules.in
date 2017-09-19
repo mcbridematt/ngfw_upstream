@@ -7,7 +7,6 @@ Standards-Version: 3.7.2
 
 Package: igb-module-_KVERS_
 Architecture: any
-Depends: modutils | module-init-tools
 Provides: igb-kernel
 Recommends: linux-image-_KVERS_
 Description: igb ethernet driver for kernel _KVERS_ (binary module)

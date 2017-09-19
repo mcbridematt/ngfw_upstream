@@ -7,7 +7,6 @@ Standards-Version: 3.7.2
 
 Package: e1000e-module-_KVERS_
 Architecture: any
-Depends: modutils | module-init-tools
 Provides: e1000e-kernel
 Recommends: linux-image-_KVERS_
 Description: e1000e ethernet driver for kernel _KVERS_ (binary module)

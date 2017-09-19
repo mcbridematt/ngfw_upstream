@@ -7,7 +7,6 @@ Standards-Version: 3.7.2
 
 Package: lanner-lcd-module-_KVERS_
 Architecture: any
-Depends: modutils | module-init-tools
 Provides: lanner-lcd-kernel
 Recommends: linux-image-_KVERS_
 Description: lanner-lcd ethernet driver for kernel _KVERS_ (binary module)
