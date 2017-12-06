@@ -1,4 +1,4 @@
-backports-3.17.1-1 (3.17.1+untangle16-1) unstable; urgency=medium
+backports-3.17.1-1 (3.17.1+untangle17-1) unstable; urgency=medium
 
   * Enable all wifi modules (NGFW-11283)
 
