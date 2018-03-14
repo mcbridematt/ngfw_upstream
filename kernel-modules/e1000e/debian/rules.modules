@@ -11,8 +11,6 @@ MA_DIR ?= /usr/share/modass
 # load default rules
 -include $(MA_DIR)/include/common-rules.make
 
-EXTRA_CFLAGS += $(CFLAGS_EXTRA) -fno-pie
-
 MAJORKVERS=$(shell echo $(KVERS) | cut -f 1 -d .)
 MINORKVERS=$(shell echo $(KVERS) | cut -f 2 -d .)
 
@@ -27,7 +25,7 @@ kdist_config: prep-deb-files
 
 binary-modules: kdist_config
 	dh_clean -k
-	$(ROOT_CMD) $(MAKE) -C src
+	$(ROOT_CMD) $(MAKE) CFLAGS_EXTRA=-fno-pie -C src
 
 	dh_installdirs lib/modules/$(KVERS)/updates
 
