@@ -11,6 +11,8 @@ MA_DIR ?= /usr/share/modass
 # load default rules
 -include $(MA_DIR)/include/common-rules.make
 
+EXTRA_CFLAGS += $(CFLAGS_EXTRA) -fno-pie
+
 MAJORKVERS=$(shell echo $(KVERS) | cut -f 1 -d .)
 MINORKVERS=$(shell echo $(KVERS) | cut -f 2 -d .)
 
