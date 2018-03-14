@@ -109,7 +109,7 @@ build-inline-stamp:
 	touch $@
 
 build-arch: build-arch-stamp 
-build-arch-stamp: build-basic-stamp build-mysql-stamp
+build-arch-stamp: build-basic-stamp #build-mysql-stamp
 	dh_testdir
 	touch $@
 
