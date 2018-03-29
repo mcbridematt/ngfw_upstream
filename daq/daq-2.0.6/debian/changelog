@@ -47,3 +47,4 @@ daq (0.3-1) experimental; urgency=low
     being available (but the PCAP module should work)
 
  -- Javier Fernandez-Sanguino Pen~a <jfs@debian.org>  Thu, 11 Nov 2010 00:52:20 +0100
+

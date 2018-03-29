@@ -115,3 +115,4 @@ miniupnpd (1.7-1) experimental; urgency=low
   * Initial release (Closes: #658434).
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 10 Jul 2012 20:16:37 +0000
+
