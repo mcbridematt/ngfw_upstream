@@ -1,0 +1,11 @@
+[Unit]
+Description=MiniUPnp Daemon
+
+[Service]
+Type=Simple
+EnvironmentFile=-/etc/default/miniupnpd
+ExecStart=/usr/sbin/miniupnpd" -- ${MiniUPnPd_OTHER_OPTIONS}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
