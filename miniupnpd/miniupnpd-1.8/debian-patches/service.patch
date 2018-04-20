@@ -255,7 +255,7 @@ diff -ruN debian.orig/miniupnpd.service debian/miniupnpd.service
 +[Service]
 +Type=Simple
 +EnvironmentFile=-/etc/default/miniupnpd
-+ExecStart=/usr/sbin/miniupnpd -- ${MiniUPnPd_OTHER_OPTIONS}
++ExecStart=/usr/sbin/miniupnpd ${MiniUPnPd_OTHER_OPTIONS}
 +Restart=always
 +
 +[Install]
