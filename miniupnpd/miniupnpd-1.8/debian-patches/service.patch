@@ -253,9 +253,9 @@ diff -ruN debian.orig/miniupnpd.service debian/miniupnpd.service
 +Description=MiniUPnp Daemon
 +
 +[Service]
-+Type=Simple
++Type=forking
 +EnvironmentFile=-/etc/default/miniupnpd
-+ExecStart=/usr/sbin/miniupnpd ${MiniUPnPd_OTHER_OPTIONS}
++ExecStart=/usr/sbin/miniupnpd -N -f /etc/miniupnpd/miniupnpd.conf
 +Restart=always
 +
 +[Install]
