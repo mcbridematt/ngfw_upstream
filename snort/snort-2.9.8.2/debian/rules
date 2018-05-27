@@ -28,8 +28,8 @@ CONFFLAGS= --prefix=/usr \
 	--with-daq-includes=$(DAQ_DEV_PATH)/usr/include
 
 aclocal.m4:
-	aclocal-1.14 -I m4/
-	automake-1.14 -i
+	aclocal -I m4/
+	automake -i
 	autoconf
 
 clean-sources:
@@ -59,8 +59,11 @@ clean: clean-sources
 	dh_autoreconf_clean
 	dh_clean
 
-configure: configure-stamp
+configure:
+	configure-stamp
+
 configure-stamp:
+	dh_autoreconf
 	dh_testdir
 # Standard package support
 	./configure $(CONFFLAGS) \
@@ -97,6 +100,7 @@ build-inline: build-inline-stamp
 build-inline-stamp:
 	dh_testdir
 	sh debian/clean_sources.sh
+	dh_autoreconf
 	# Inline support
 	./configure $(CONFFLAGS) \
 		--without-mysql \
@@ -146,7 +150,7 @@ install-arch:
 	find $(TMP)/snort-common/usr/lib  -name "*.la" -exec \
 		sed -i -e "s,^dependency_libs=.*,dependency_libs=''," {} +
 # Snort binaries
-	install -m 755 -o root -g root src/snort-basic $(TMP)/snort/usr/sbin/snort
+	install -D -m 755 -o root -g root src/snort-basic $(TMP)/snort/usr/sbin/snort
 #	install -m 755 -o root -g root src/snort-mysql $(TMP)/snort-mysql/usr/sbin/snort
 #	install -m 755 -o root -g root src/snort-pgsql $(TMP)/snort-pgsql/usr/sbin/snort
 #	install -m 755 -o root -g root src/snort-inline   $(TMP)/snort/usr/sbin/snort
@@ -154,18 +158,18 @@ install-arch:
 #	install -m 644 -o root -g root `pwd`/debian/snort.common.parameters $(TMP)/snort-mysql/etc/snort/snort.common.parameters
 #	install -m 644 -o root -g root `pwd`/debian/snort.common.parameters $(TMP)/snort-pgsql/etc/snort/snort.common.parameters
 #	install -m 644 -o root -g root `pwd`/debian/snort.common.parameters $(TMP)/snort/etc/snort/snort.common.parameters
-	install -m 644 -o root -g root `pwd`/debian/snort.default $(TMP)/snort/etc/default/snort
+	install -D -m 644 -o root -g root `pwd`/debian/snort.default $(TMP)/snort/etc/default/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.default $(TMP)/snort-mysql/etc/default/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.default $(TMP)/snort-pgsql/etc/default/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.default $(TMP)/snort-inline/etc/default/snort
 #  Install init.d initscripts
-	install -m 755 -o root -g root `pwd`/debian/snort.init.d $(TMP)/snort/etc/init.d/snort
+	install -D -m 755 -o root -g root `pwd`/debian/snort.init.d $(TMP)/snort/etc/init.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/snort.init.d $(TMP)/snort-mysql/etc/init.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/snort.init.d $(TMP)/snort-pgsql/etc/init.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/snort.init.d $(TMP)/snort-inline/etc/init.d/snort
 #  Install PPP initscripts
-	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-up.d $(TMP)/snort/etc/ppp/ip-up.d/snort
-	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-down.d $(TMP)/snort/etc/ppp/ip-down.d/snort
+	install -D -m 755 -o root -g root `pwd`/debian/my/snort.ip-up.d $(TMP)/snort/etc/ppp/ip-up.d/snort
+	install -D -m 755 -o root -g root `pwd`/debian/my/snort.ip-down.d $(TMP)/snort/etc/ppp/ip-down.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-up.d $(TMP)/snort-mysql/etc/ppp/ip-up.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-down.d $(TMP)/snort-mysql/etc/ppp/ip-down.d/snort
 	# install -m 755 -o root -g root `pwd`/debian/my/snort.ip-up.d $(TMP)/snort-pgsql/etc/ppp/ip-up.d/snort
@@ -173,11 +177,12 @@ install-arch:
 #	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-up.d $(TMP)/snort-inline/etc/ppp/ip-up.d/snort
 #	install -m 755 -o root -g root `pwd`/debian/my/snort.ip-down.d $(TMP)/snort-inline/etc/ppp/ip-down.d/snort
 # Logrotate files
-	install -m 644 -o root -g root `pwd`/debian/snort.logrotate $(TMP)/snort/etc/logrotate.d/snort
+	install -D -m 644 -o root -g root `pwd`/debian/snort.logrotate $(TMP)/snort/etc/logrotate.d/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.logrotate $(TMP)/snort-mysql/etc/logrotate.d/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.logrotate $(TMP)/snort-pgsql/etc/logrotate.d/snort
 #	install -m 644 -o root -g root `pwd`/debian/snort.logrotate $(TMP)/snort-inline/etc/logrotate.d/snort
 # Move libraries to the snort-common-libraries package
+	install -o root -g root -d $(TMP)/snort-common-libraries/usr/
 	mv $(TMP)/snort-common/usr/lib/ $(TMP)/snort-common-libraries/usr/
 # Remove headers, as this is not a -dev package
 #	mv $(TMP)/snort-common/usr/src/ $(TMP)/snort-common-libraries/usr/
