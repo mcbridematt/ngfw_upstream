@@ -7,7 +7,7 @@ Build-Depends:
     libnet1-dev, 
     libpcap0.8-dev, 
     libpcre3-dev, 
-    debhelper (>= 5.0.0), 
+    debhelper (>= 9.20160402),
     libpq-dev, 
     po-debconf (>= 0.5.0), 
     libprelude-dev, 
