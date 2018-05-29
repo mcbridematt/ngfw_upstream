@@ -59,9 +59,7 @@ clean: clean-sources
 	dh_autoreconf_clean
 	dh_clean
 
-configure:
-	configure-stamp
-
+configure: configure-stamp
 configure-stamp:
 	dh_autoreconf
 	dh_testdir

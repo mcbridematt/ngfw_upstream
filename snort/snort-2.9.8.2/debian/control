@@ -35,7 +35,7 @@ Vcs-Git: git://git.debian.org/git/pkg-snort/pkg-snort.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-snort/pkg-snort.git
 
 Package: snort
-Architecture: i386 amd64
+Architecture: i386 amd64 arm64
 Pre-Depends: adduser (>= 3.11)
 Depends: 
     snort-common-libraries (>=${binary:Version}),
@@ -127,7 +127,7 @@ Description: flexible Network Intrusion Detection System ruleset
  or using the oinkmaster package.
 
 Package: snort-common-libraries
-Architecture: i386 amd64
+Architecture: i386 amd64 arm64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: snort (>= 2.7.0) | snort-pgsql (>= 2.7.0) | snort-mysql (>= 2.7.0)
 Conflicts: snort-common (<< 2.7.0-6)
